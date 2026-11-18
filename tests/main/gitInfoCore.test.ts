@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { healLink } from "../../shared/projects/record";
-import { parseCommitTime, parseHeadFile, parseOriginUrl, parseStatus, remoteToHttps, riskyConfigKeys } from "../../electron/features/gitInfoCore";
+import {
+  configEntries, configKeys, disallowedKeys, isPlainConfigText, isPlainRepoConfig, parseCommitTime, parseHeadFile,
+  parseOriginUrl, parseStatus, plainConfigValues, remoteToHttps,
+} from "../../electron/features/gitInfoCore";
 
 describe("parseStatus", () => {
   it("reads a clean branch", () => {
@@ -66,24 +69,85 @@ describe("remoteToHttps", () => {
   });
 });
 
-describe("riskyConfigKeys", () => {
-  it("a clean config has none", () => {
-    const names = [
-      "core.repositoryformatversion", "core.filemode", "core.bare", "core.logallrefupdates",
-      "remote.origin.url", "remote.origin.fetch", "branch.main.remote", "branch.main.merge", "user.name", "diff.renames",
-    ];
-    expect(riskyConfigKeys(names)).toEqual([]);
+const FRESH_CLONE = `[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	url = git@github.com:u/repo.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "main"]
+	remote = origin
+	merge = refs/heads/main
+`;
+
+describe("configEntries and configKeys", () => {
+  it("reads sections, quoted subsections (case kept) and keys (lower-cased)", () => {
+    expect(configKeys("[Core]\n\tFileMode = true\n[remote \"Origin\"]\n  URL = x\n[branch \"we\\\"ird\"]\nremote = o\n"))
+      .toEqual(["core.filemode", "remote.Origin.url", "branch.we\"ird.remote"]);
+  });
+  it("reads the deprecated dotted header, a key on the header line and a bare key", () => {
+    expect(configKeys("[remote.ORIGIN]\nurl = x\n[core] bare\n")).toEqual(["remote.origin.url", "core.bare"]);
+  });
+  it("skips comments and strips trailing comments outside quotes", () => {
+    expect(configEntries("# top\n; also\n[core]\n  eol = lf # note\n  autocrlf = \"in#put\" ; x\n")).toEqual([
+      { key: "core.eol", value: "lf" }, { key: "core.autocrlf", value: "in#put" },
+    ]);
+  });
+  it("refuses a continuation line, an unterminated quote, junk and keys before a section", () => {
+    expect(configEntries("[core]\n  eol = l\\\nfsmonitor = x\n")).toBeNull();
+    expect(configEntries("[core]\n  eol = \"lf\n")).toBeNull();
+    expect(configEntries("[core]\n  = x\n")).toBeNull();
+    expect(configEntries("[core\nbare = true\n")).toBeNull();
+    expect(configEntries("bare = true\n")).toBeNull();
+    expect(configKeys("[core]\n%%%\n")).toBeNull();
+  });
+});
+
+describe("isPlainConfigText and isPlainRepoConfig", () => {
+  it("accepts a fresh clone", () => {
+    expect(isPlainConfigText(FRESH_CLONE)).toBe(true);
+    expect(isPlainConfigText("")).toBe(true);
+  });
+  it("accepts branches, submodule urls and plain user settings", () => {
+    const text = `${FRESH_CLONE}[branch "feature/x"]\n\trebase = true\n\tvscode-merge-base = origin/main\n`
+      + "[submodule \"lib\"]\n\turl = https://github.com/u/lib.git\n\tactive = true\n\tupdate = rebase\n"
+      + "[user]\n\tname = A\n\temail = a@b\n[pull]\n\tff = only\n[init]\n\tdefaultBranch = main\n"
+      + "[lfs]\n\trepositoryformatversion = 0\n[lfs \"https://h.example/r.git/info/lfs\"]\n\taccess = basic\n";
+    expect(isPlainConfigText(text)).toBe(true);
   });
   it.each([
-    "filter.lfs.clean", "filter.x.smudge", "filter.x.process", "core.fsmonitor", "core.hooksPath", "diff.pdf.textconv",
-    "diff.x.command", "diff.external", "core.sshCommand", "core.editor", "core.pager", "core.attributesFile",
-    "gpg.program", "gpg.ssh.program", "log.showSignature", "alias.st", "include.path", "includeIf.gitdir:~/w/.path",
-    "pager.log", "merge.ours.driver", "credential.helper", "sequence.editor", "uploadpack.packObjectsHook",
-  ])("flags %s", (key) => {
-    expect(riskyConfigKeys([key])).toEqual([key.toLowerCase()]);
+    ["filter", "[filter \"lfs\"]\n\tclean = git-lfs clean -- %f\n"],
+    ["fsmonitor", "[core]\n\tfsmonitor = ./x.sh\n"],
+    ["fsmonitor on the header line", "[core] fsmonitor = ./x.sh\n"],
+    ["alias", "[alias]\n\tst = !sh -c x\n"],
+    ["worktree config", "[extensions]\n\tworktreeConfig = true\n"],
+    ["format version 1", "[core]\n\trepositoryformatversion = 1\n"],
+    ["include", "[include]\n\tpath = ../evil\n"],
+    ["includeIf", "[includeIf \"gitdir:/\"]\n\tpath = ../evil\n"],
+    ["unknown key", "[core]\n\tsomethingnew = 1\n"],
+    ["unknown section", "[future]\n\tx = 1\n"],
+    ["signing key", "[user]\n\tsigningkey = abc\n"],
+    ["submodule update command", "[submodule \"s\"]\n\tupdate = !rm -rf ~\n"],
+    ["ext:: url", "[remote \"origin\"]\n\turl = ext::sh -c touch% /tmp/x\n"],
+    ["helper:: submodule url", "[submodule \"s\"]\n\turl = fd::3\n"],
+    ["allowlisted key without its subsection", "[remote]\n\turl = x\n"],
+  ])("rejects %s", (_name, extra) => {
+    expect(isPlainConfigText(FRESH_CLONE + extra)).toBe(false);
   });
-  it("is case-insensitive and ignores blank lines", () => {
-    expect(riskyConfigKeys(["", "CORE.FSMONITOR", "Core.Bare", " Alias.co "])).toEqual(["core.fsmonitor", "alias.co"]);
+  it("lists only the keys off the allowlist", () => {
+    const keys = ["core.bare", "core.fsmonitor", "remote.o.url", "alias.co", "extensions.worktreeconfig"];
+    expect(disallowedKeys(keys)).toEqual(["core.fsmonitor", "alias.co", "extensions.worktreeconfig"]);
+    expect(isPlainRepoConfig(keys)).toBe(false);
+    expect(isPlainRepoConfig(["core.bare", "branch.main.merge"])).toBe(true);
+  });
+  it("checks values only where they matter", () => {
+    expect(plainConfigValues([{ key: "core.repositoryformatversion", value: "0" }])).toBe(true);
+    expect(plainConfigValues([{ key: "core.repositoryformatversion", value: null }])).toBe(false);
+    expect(plainConfigValues([{ key: "submodule.s.update", value: " !x" }])).toBe(false);
+    expect(plainConfigValues([{ key: "remote.o.pushurl", value: "ext::x" }])).toBe(false);
+    expect(plainConfigValues([{ key: "branch.main.description", value: "a::b" }])).toBe(true);
   });
 });
 

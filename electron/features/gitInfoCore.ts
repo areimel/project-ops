@@ -61,32 +61,123 @@ export function remoteToHttps(remote: string): string | null {
   return healLink(`https://${host}/${path}`);
 }
 
-// Local config keys that make git run a program (or pull in more config that could). A scanned folder may hold a
-// repository the owner did not create, so when any of these is set no git command runs in it (gitInfo.ts reads
-// HEAD and config from disk instead). Matched case-insensitively on the names `git config --list --name-only` prints.
-const RISKY_KEYS: readonly RegExp[] = [
-  /^filter\./,                                   // clean, smudge, process
-  /^diff\.external$/, /^diff\..+\.(textconv|command)$/,
-  /^merge\..+\.driver$/,
-  /^core\.(fsmonitor|hookspath|sshcommand|editor|pager|askpass|gitproxy|attributesfile)$/,
-  /^sequence\.editor$/,
-  /^credential\./,
-  /^gpg\./,                                      // gpg.program, gpg.<format>.program
-  /^log\.showsignature$/,
-  /^alias\./,
-  /^pager\./,
-  /^include\.path$/, /^includeif\./,             // pull in further config
-  /(command|textconv|program|helper|editor|pager|askpass|driver|hook|hookspath|fsmonitor)$/,   // any other *command key
-];
+// Whether git may run in a folder at all. A scanned folder may hold a repository the owner did not create, and its
+// config can name programs git runs (filters, fsmonitor, hooks, textconv, aliases, includes, worktree config ...).
+// Rather than refuse known-bad keys, git runs only when EVERY key in .git/config is on a short list of plain data
+// keys; anything unknown, including keys added by future git versions, means "not plain" and no git process.
 
-/** The names in `names` (one per line of `config --local --list --name-only`) that are risky, lower-cased, in order. */
-export function riskyConfigKeys(names: readonly string[]): string[] {
-  const out: string[] = [];
-  for (const raw of names) {
-    const name = raw.trim().toLowerCase();
-    if (name !== "" && RISKY_KEYS.some((re) => re.test(name))) out.push(name);
+export interface ConfigEntry {
+  key: string;            // `section.key` or `section.subsection.key`; section and key lower-cased, subsection kept
+  value: string | null;   // null for a bare key (boolean true)
+}
+
+/** A value after `=`: quotes, escapes and an unquoted `#`/`;` comment. Null when unterminated or continued. */
+function parseValue(raw: string): string | null {
+  let out = "";
+  let quoted = false;
+  for (let i = 0; i < raw.length; i++) {
+    const c = raw[i]!;
+    if (c === "\\") {
+      const next = raw[i + 1];
+      if (next === undefined) return null;               // line continuation: refused rather than interpreted
+      const map: Record<string, string> = { "\\": "\\", "\"": "\"", n: "\n", t: "\t", b: "\b" };
+      if (!(next in map)) return null;
+      out += map[next];
+      i++;
+    } else if (c === "\"") quoted = !quoted;
+    else if (!quoted && (c === "#" || c === ";")) break;
+    else out += c;
+  }
+  return quoted ? null : out.trim();
+}
+
+/**
+ * The entries of a git config file, in order, or null when any line is not plainly understood (unknown syntax,
+ * a continuation line, an unterminated quote, a key before any section). Strict on purpose: when in doubt, the
+ * caller treats the repository as not plain.
+ */
+export function configEntries(text: string): ConfigEntry[] | null {
+  const out: ConfigEntry[] = [];
+  let section: string | null = null;
+  for (const rawLine of text.split(/\r?\n/)) {
+    let line = rawLine.trim();
+    if (line.startsWith("[")) {
+      const m = /^\[\s*([A-Za-z0-9.-]+)\s*(?:"((?:[^"\\]|\\.)*)")?\s*\]/.exec(line);
+      if (!m) return null;
+      const name = m[1]!.toLowerCase();
+      if (m[2] !== undefined) section = `${name}.${m[2].replace(/\\(.)/g, "$1")}`;
+      else {
+        const dot = name.indexOf(".");            // deprecated [section.sub]: the subsection is case-insensitive
+        section = dot < 0 ? name : `${name.slice(0, dot)}.${name.slice(dot + 1)}`;
+      }
+      line = line.slice(m[0].length).trim();      // git allows `[core] key = value` on the header line
+    }
+    if (line === "" || line.startsWith("#") || line.startsWith(";")) continue;
+    if (section === null) return null;
+    const kv = /^([A-Za-z][A-Za-z0-9-]*)\s*(?:=(.*))?$/.exec(line);
+    if (!kv) return null;
+    const value = kv[2] === undefined ? null : parseValue(kv[2]);
+    if (kv[2] !== undefined && value === null) return null;
+    out.push({ key: `${section}.${kv[1]!.toLowerCase()}`, value });
   }
   return out;
+}
+
+/** The key names of a config file (see configEntries), or null when it cannot be parsed. */
+export function configKeys(text: string): string[] | null {
+  return configEntries(text)?.map((e) => e.key) ?? null;
+}
+
+// Plain data keys: [section, keys without a subsection, keys with a subsection].
+const ALLOWED: Record<string, { plain?: readonly string[]; sub?: readonly string[] }> = {
+  core: { plain: ["repositoryformatversion", "filemode", "bare", "logallrefupdates", "ignorecase", "precomposeunicode", "symlinks", "autocrlf", "eol", "safecrlf"] },
+  remote: { sub: ["url", "fetch", "pushurl", "tagopt", "prune", "gh-resolved"] },
+  branch: { sub: ["remote", "merge", "rebase", "description", "pushremote", "vscode-merge-base", "github-pr-owner-number"] },
+  user: { plain: ["name", "email"] },
+  pull: { plain: ["rebase", "ff"] },
+  push: { plain: ["default", "autosetupremote"] },
+  init: { plain: ["defaultbranch"] },
+  submodule: { sub: ["url", "active", "update"] },
+  lfs: { plain: ["repositoryformatversion", "url"], sub: ["access"] },
+};
+
+function isAllowedKey(key: string): boolean {
+  const first = key.indexOf(".");
+  const last = key.lastIndexOf(".");
+  if (first < 0) return false;
+  const rule = ALLOWED[key.slice(0, first)];
+  const name = key.slice(last + 1);
+  if (!rule) return false;
+  return first === last ? (rule.plain ?? []).includes(name) : (rule.sub ?? []).includes(name);
+}
+
+/** The keys that are not on the plain-data allowlist, in order (for the log line). */
+export function disallowedKeys(keys: readonly string[]): string[] {
+  return keys.filter((k) => !isAllowedKey(k));
+}
+
+/** True only when every key is on the plain-data allowlist (so `extensions.*`, `include.*`, `filter.*` ... are not). */
+export function isPlainRepoConfig(keys: readonly string[]): boolean {
+  return disallowedKeys(keys).length === 0;
+}
+
+const isUrlKey = (key: string): boolean =>
+  /^remote\..+\.(url|pushurl)$/.test(key) || /^submodule\..+\.url$/.test(key) || key === "lfs.url";
+
+/** Values of allowlisted keys that still matter: format version 0 only, no `!cmd` submodule update, no transport helpers. */
+export function plainConfigValues(entries: readonly ConfigEntry[]): boolean {
+  return entries.every(({ key, value }) => {
+    if (key === "core.repositoryformatversion") return value !== null && value.trim() === "0";
+    if (/^submodule\..+\.update$/.test(key)) return value === null || !value.trim().startsWith("!");
+    if (isUrlKey(key)) return value === null || !value.includes("::");   // ext::, fd:: and other <helper>::<address>
+    return true;
+  });
+}
+
+/** A whole .git/config text: parseable, every key allowlisted, every checked value plain. */
+export function isPlainConfigText(text: string): boolean {
+  const entries = configEntries(text);
+  return entries !== null && isPlainRepoConfig(entries.map((e) => e.key)) && plainConfigValues(entries);
 }
 
 /** The branch from a `.git/HEAD` file: `ref: refs/heads/<name>` gives the name; a bare hash or anything else, null. */

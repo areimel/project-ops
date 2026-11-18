@@ -103,3 +103,17 @@ export function resolveLauncher(kind: LauncherKind, preferred: unknown, installe
   if (typeof preferred === "string" && ids.includes(preferred)) return preferred;
   return ids.find((id) => installed.includes(id)) ?? null;
 }
+
+const BUNDLE_EXTENSIONS = [
+  ".app", ".bundle", ".framework", ".plugin", ".kext", ".prefpane", ".saver", ".workflow", ".appex", ".xpc",
+  ".qlgenerator", ".mdimporter", ".component", ".service", ".action", ".wdgt", ".pkg", ".mpkg",
+];
+
+/**
+ * Is a folder name a macOS bundle (package)? Finder and `shell.openPath` launch or install a bundle instead of
+ * showing it, so the caller reveals it in its parent folder instead. Case-insensitive; the bare extension is not a bundle.
+ */
+export function isBundleName(name: string): boolean {
+  const n = name.replace(/[\\/]+$/, "").toLowerCase();
+  return BUNDLE_EXTENSIONS.some((ext) => n.endsWith(ext) && n.length > ext.length);
+}

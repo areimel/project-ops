@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import { realpath, stat } from "node:fs/promises";
+import { basename } from "node:path";
 import { app, shell } from "electron";
 import { brand } from "../../shared/brand";
 import {
@@ -7,7 +8,7 @@ import {
   type EditorId, type LaunchPlatform, type LauncherKind, type TerminalId,
 } from "../../shared/launchers";
 import { log } from "./logger";
-import { childEnv, isInside, launchError } from "./launchCore";
+import { childEnv, isBundleName, isInside, launchError } from "./launchCore";
 import { which } from "./which";
 
 // Opens a folder in an editor or terminal from the fixed table in shared/launchers.ts. The page never supplies
@@ -64,6 +65,11 @@ export async function openFolder(dir: string): Promise<void> {
   await assertDir(dir);
   if (dryRun()) {
     log.info("launch", `[open-folder] ${dir}`);
+    return;
+  }
+  // On macOS opening a bundle folder (Foo.app, X.framework ...) launches it; show it in its parent instead.
+  if (process.platform === "darwin" && isBundleName(basename(dir))) {
+    shell.showItemInFolder(dir);
     return;
   }
   const error = await shell.openPath(dir);

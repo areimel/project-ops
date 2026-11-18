@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { childEnv, isInside, launchError, onPath, resolveLauncher, resolveOnPath } from "../../electron/features/launchCore";
+import { childEnv, isBundleName, isInside, launchError, onPath, resolveLauncher, resolveOnPath } from "../../electron/features/launchCore";
 
 describe("childEnv", () => {
   it("restores the desktop variable and drops the ORIGINAL_ key", () => {
@@ -112,4 +112,11 @@ describe("resolveLauncher", () => {
   it("returns null when nothing is installed", () => {
     expect(resolveLauncher("terminal", undefined, [])).toBeNull();
   });
+});
+
+describe("isBundleName", () => {
+  it.each(["Foo.app", "X.FRAMEWORK", "a.bundle", "p.plugin", "d.kext", "Pane.prefPane", "s.saver", "w.workflow", "Foo.app/"])(
+    "%s is a bundle", (name) => expect(isBundleName(name)).toBe(true));
+  it.each(["project-ops", "my.app.src", "apps", ".app", "notes.txt", "framework"])(
+    "%s is not", (name) => expect(isBundleName(name)).toBe(false));
 });
