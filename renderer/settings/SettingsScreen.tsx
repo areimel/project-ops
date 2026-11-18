@@ -4,6 +4,7 @@ import { useSetting } from "../hooks/useSettings";
 import { AboutSection } from "./AboutSection";
 import { AppearanceSection } from "./AppearanceSection";
 import { DataSection } from "./DataSection";
+import { ProjectsSection } from "./ProjectsSection";
 import "./settings.css";
 
 function BehaviourSection() {
@@ -24,6 +25,7 @@ export function SettingsScreen() {
     <div className="app-root settings">
       <div className="settings-sheet">
         <h1>Settings</h1>
+        <ProjectsSection />
         <AppearanceSection />
         <BehaviourSection />
         <DataSection />
