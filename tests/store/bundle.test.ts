@@ -2,9 +2,10 @@ import { describe, expect, it } from "vitest";
 import { buildBundle, healBundle } from "../../electron/store/bundle";
 import { createCollection } from "../../electron/store/collectionCore";
 import { brand } from "../../shared/brand";
-import { tasks } from "../../shared/collections/tasks";
-import { notes } from "../../shared/collections/notes";
+import { notes, tasks } from "./fixtures";
 import { defaultSettings } from "../../shared/settings";
+
+const NAMES = ["notes", "tasks"];
 
 describe("bundle", () => {
   it("round-trips through JSON into fresh collections", () => {
@@ -15,8 +16,8 @@ describe("bundle", () => {
     t.create({ title: "Two", done: true });
     const settings = { ...defaultSettings(), theme: "kraft" as const, accent: "#112233" };
 
-    const json = JSON.stringify(buildBundle(settings, { notes: n.list(), tasks: t.list(), snippets: [] }, new Date("2026-11-17T10:00:00Z")));
-    const bundle = healBundle(JSON.parse(json));
+    const json = JSON.stringify(buildBundle(settings, { notes: n.list(), tasks: t.list() }, new Date("2026-11-17T10:00:00Z")));
+    const bundle = healBundle(JSON.parse(json), NAMES);
     expect(bundle).not.toBeNull();
     expect(bundle?.format).toBe(brand.packageName);
     expect(bundle?.exportedAt).toBe("2026-11-17T10:00:00.000Z");
@@ -30,8 +31,15 @@ describe("bundle", () => {
     expect(t2.list()).toEqual(t.list());
   });
 
+  it("with no collection names registered, collections are empty and settings still import", () => {
+    const b = healBundle({ format: brand.packageName, version: 1, collections: { notes: [1] }, settings: { mode: "dark" } });
+    expect(b?.collections).toEqual({});
+    expect(b?.settings).toEqual({ mode: "dark" });
+    expect(healBundle({ format: brand.packageName, version: 1 })?.collections).toEqual({});
+  });
+
   it("rejects what is not a bundle of this app", () => {
-    const ok = buildBundle(defaultSettings(), { notes: [], tasks: [], snippets: [] });
+    const ok = buildBundle(defaultSettings(), { notes: [], tasks: [] });
     expect(healBundle(ok)).not.toBeNull();
     for (const raw of [undefined, null, 5, "x", [], {}, { ...ok, format: "other-app" }, { ...ok, version: 2 }, { ...ok, version: "1" }, { ...ok, version: 0 }]) {
       expect(healBundle(raw), JSON.stringify(raw)).toBeNull();
@@ -39,23 +47,23 @@ describe("bundle", () => {
   });
 
   it("ignores unknown collections; a malformed body gives no collections and no settings", () => {
-    const b = healBundle({ format: brand.packageName, version: 1, collections: { notes: "no", evil: [1], constructor: [1] }, settings: 7 });
+    const b = healBundle({ format: brand.packageName, version: 1, collections: { notes: "no", evil: [1], constructor: [1] }, settings: 7 }, NAMES);
     expect(b?.collections).toEqual({});
     expect(b?.settings).toEqual({});
     expect(b?.exportedAt).toBe("");
   });
 
   it("returns only the collections and settings the file contains, so a partial import leaves the rest alone", () => {
-    const b = healBundle({ format: brand.packageName, version: 1, collections: { tasks: [{ title: "x" }] }, settings: { mode: "dark", theme: "nope" } });
+    const b = healBundle({ format: brand.packageName, version: 1, collections: { tasks: [{ title: "x" }] }, settings: { mode: "dark", theme: "nope" } }, NAMES);
     expect(Object.keys(b?.collections ?? {})).toEqual(["tasks"]);
     expect(b?.settings).toEqual({ mode: "dark" });
-    const empty = healBundle({ format: brand.packageName, version: 1, collections: { notes: [] } });
+    const empty = healBundle({ format: brand.packageName, version: 1, collections: { notes: [] } }, NAMES);
     expect(empty?.collections).toEqual({ notes: [] });     // an empty list is present: it replaces
     expect(empty?.settings).toEqual({});
   });
 
   it("items inside a bundle are healed on import, not trusted", () => {
-    const b = healBundle({ format: brand.packageName, version: 1, collections: { tasks: [{ title: "ok" }, { title: "" }, "x", { title: "y", done: "no" }] } });
+    const b = healBundle({ format: brand.packageName, version: 1, collections: { tasks: [{ title: "ok" }, { title: "" }, "x", { title: "y", done: "no" }] } }, NAMES);
     const t = createCollection(tasks);
     t.replaceAll(b?.collections.tasks);
     expect(t.list().map((r) => r.title)).toEqual(["ok", "y"]);

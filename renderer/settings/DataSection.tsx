@@ -24,7 +24,7 @@ export function DataSection() {
   const importData = () => run(async () => {
     const ok = await confirm({
       title: "Import data", confirmLabel: "Choose file",
-      body: "Importing replaces the notes, tasks and snippets that are in the file you choose, and applies the settings in it. Anything the file does not contain stays as it is. Export first if you want a copy of what you have now.",
+      body: "Importing applies the settings in the file you choose. Anything the file does not contain stays as it is. Export first if you want a copy of what you have now.",
     });
     if (!ok) return;
     const r = await window.app.invoke("data:import");
@@ -36,7 +36,7 @@ export function DataSection() {
   const reset = () => run(async () => {
     const ok = await confirm({
       title: "Reset all data", confirmLabel: "Reset all data", danger: true,
-      body: "This permanently deletes every note, task and snippet, your settings, the list of recent files and the saved news. The window size and position and the log files are kept. It cannot be undone. Export your data first if you may want it back.",
+      body: "This permanently deletes your settings. The window size and position and the log files are kept. It cannot be undone. Export your data first if you may want it back.",
     });
     if (!ok) return;
     await window.app.invoke("data:reset");

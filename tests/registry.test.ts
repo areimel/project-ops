@@ -4,8 +4,8 @@ import { APPS } from "../renderer/apps/registry";
 import { activeCommands } from "../renderer/shell/commandTable";
 
 describe("app registry", () => {
-  it("has the eight demos in sheet order", () => {
-    expect(APPS.map((a) => a.id)).toEqual(["notes", "tasks", "editor", "clipboard", "timer", "system", "news", "player"]);
+  it("has no apps yet", () => {
+    expect(APPS.map((a) => a.id)).toEqual([]);
   });
   it("has unique ids, a valid shape, a name and a summary", () => {
     expect(new Set(APPS.map((a) => a.id)).size).toBe(APPS.length);

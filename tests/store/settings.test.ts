@@ -3,7 +3,7 @@ import { SETTINGS_VERSION, classifySettingsFile, defaultSettings, healSettings, 
 
 describe("defaultSettings", () => {
   it("matches the contract defaults", () => {
-    expect(defaultSettings()).toEqual({ theme: "blueprint", mode: "system", accent: null, closeToTray: false, notifications: true });
+    expect(defaultSettings()).toEqual({ theme: "blueprint", mode: "system", accent: null, closeToTray: false });
   });
 });
 
@@ -12,11 +12,11 @@ describe("healSettings", () => {
     for (const raw of [undefined, null, 4, "x", [], {}]) expect(healSettings(raw)).toEqual(defaultSettings());
   });
   it("reads the stored envelope", () => {
-    const raw = { version: SETTINGS_VERSION, values: { theme: "kraft", mode: "dark", accent: "#AABBCC", closeToTray: true, notifications: false } };
-    expect(healSettings(raw)).toEqual({ theme: "kraft", mode: "dark", accent: "#aabbcc", closeToTray: true, notifications: false });
+    const raw = { version: SETTINGS_VERSION, values: { theme: "kraft", mode: "dark", accent: "#AABBCC", closeToTray: true } };
+    expect(healSettings(raw)).toEqual({ theme: "kraft", mode: "dark", accent: "#aabbcc", closeToTray: true });
   });
   it("heals each key on its own and fills the rest", () => {
-    expect(healSettings({ version: 1, values: { theme: "nope", mode: "dark", accent: "red", notifications: "no" } }))
+    expect(healSettings({ version: 1, values: { theme: "nope", mode: "dark", accent: "red" } }))
       .toEqual({ ...defaultSettings(), mode: "dark" });
   });
   it("a wrong-version envelope gives defaults, a bad version too", () => {
@@ -48,7 +48,7 @@ describe("healSettingsPatch", () => {
     });
   });
   it("drops invalid values", () => {
-    expect(healSettingsPatch({ theme: "x", mode: "auto", accent: "#12345", closeToTray: 1, notifications: "true" })).toEqual({});
+    expect(healSettingsPatch({ theme: "x", mode: "auto", accent: "#12345", closeToTray: 1 })).toEqual({});
   });
   it("accent: valid hex is lower-cased, null clears, anything else is dropped", () => {
     expect(healSettingsPatch({ accent: "#ABCDEF" })).toEqual({ accent: "#abcdef" });

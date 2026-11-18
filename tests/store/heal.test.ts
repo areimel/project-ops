@@ -1,15 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { COLLECTIONS } from "../../shared/collections";
 import { isoDate } from "../../shared/collections/heal";
-import { notes } from "../../shared/collections/notes";
-import { snippets } from "../../shared/collections/snippets";
-import { tasks } from "../../shared/collections/tasks";
+import { notes, tasks } from "./fixtures";
 
 const garbage = [undefined, null, 0, 1, "x", true, [], [1], () => 1];
 
 describe("collection heal", () => {
   it("never throws, and non-objects are unusable", () => {
-    for (const spec of Object.values(COLLECTIONS)) for (const g of garbage) expect(spec.heal(g)).toBeNull();
+    for (const spec of [notes, tasks]) for (const g of garbage) expect(spec.heal(g)).toBeNull();
   });
 
   it("notes: defaults, trims to limits, drops unknown keys", () => {
@@ -24,12 +21,6 @@ describe("collection heal", () => {
     expect(tasks.heal({ title: "a", due: "2026-02-30" })).toEqual({ title: "a", done: false, due: null });
     expect(tasks.heal({ title: "a", due: "2026-02-28", done: true })).toEqual({ title: "a", done: true, due: "2026-02-28" });
     expect(tasks.heal({ title: "x".repeat(600) })?.title).toHaveLength(500);
-  });
-
-  it("snippets: needs text, label optional", () => {
-    expect(snippets.heal({ label: "l" })).toBeNull();
-    expect(snippets.heal({ text: "hi" })).toEqual({ label: "", text: "hi" });
-    expect(snippets.heal({ label: "l".repeat(200), text: "t".repeat(20_001) })).toEqual({ label: "l".repeat(100), text: "t".repeat(20_000) });
   });
 
   it("isoDate accepts only real calendar dates", () => {

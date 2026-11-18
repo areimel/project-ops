@@ -8,7 +8,6 @@ export interface Settings {
   mode: ModeSetting;
   accent: string | null;     // ^#[0-9a-f]{6}$ override of --accent, null = theme accent
   closeToTray: boolean;      // default false
-  notifications: boolean;    // default true
 }
 export const SETTINGS_VERSION = 1;               // file settings.json = { version, values }
 
@@ -19,7 +18,7 @@ export function defaultSettings(): Settings {     // theme/mode from brand
   return {
     theme: isThemeId(brand.defaultTheme) ? brand.defaultTheme : "blueprint",
     mode: brand.defaultMode,
-    accent: null, closeToTray: false, notifications: true,
+    accent: null, closeToTray: false,
   };
 }
 
@@ -32,7 +31,6 @@ export function healSettingsPatch(raw: unknown): Partial<Settings> {
   if (raw.accent === null) out.accent = null;
   else if (typeof raw.accent === "string" && HEX.test(raw.accent)) out.accent = raw.accent.toLowerCase();
   if (typeof raw.closeToTray === "boolean") out.closeToTray = raw.closeToTray;
-  if (typeof raw.notifications === "boolean") out.notifications = raw.notifications;
   return out;
 }
 

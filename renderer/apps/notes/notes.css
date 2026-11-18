@@ -1,7 +1,0 @@
-.notes-list-pane { display: flex; flex-direction: column; }
-.notes-search { padding: var(--sp-3); border-bottom: var(--line-w) solid var(--line); }
-.notes-date { font-variant-numeric: tabular-nums; }
-.notes-new { padding: var(--sp-3); }
-.notes-new .btn { width: 100%; justify-content: center; }
-.notes-editor { display: flex; flex-direction: column; height: 100%; min-height: 0; }
-.notes-fields { display: flex; flex: 1; flex-direction: column; gap: var(--sp-3); min-height: 0; padding: var(--sp-4); }

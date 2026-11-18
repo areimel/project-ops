@@ -13,7 +13,7 @@ describe("buildCsp", () => {
     expect(d["connect-src"]).toBe("'none'");
     expect(d["font-src"]).toBe("'self'");
     expect(d["img-src"]).toBe("'self' data:");
-    expect(d["media-src"]).toBe(`${brand.mediaScheme}: blob:`);
+    expect(d["media-src"]).toBe("'none'");
     expect(d["base-uri"]).toBe("'none'");
     expect(d["object-src"]).toBe("'none'");
     expect(d["frame-ancestors"]).toBe("'none'");

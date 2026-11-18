@@ -47,12 +47,6 @@ describe("v checks", () => {
       expect(() => v.recordId(x, at)).toThrow(IpcArgError);
     }
   });
-  it("collection: allowlisted names only, no prototype keys", () => {
-    expect(v.collection("notes", at)).toBe("notes");
-    for (const x of ["settings", "constructor", "__proto__", "toString", "", 1]) {
-      expect(() => v.collection(x, at)).toThrow(IpcArgError);
-    }
-  });
   it("raw passes anything", () => {
     const o = {};
     expect(v.raw(o, at)).toBe(o);
@@ -60,7 +54,7 @@ describe("v checks", () => {
 });
 
 describe("v.args and v.none", () => {
-  const check = v.args(v.collection, v.recordId, v.raw);
+  const check = v.args(v.oneOf(["tasks", "notes"]), v.recordId, v.raw);
   it("returns checked values and numbers the failing position", () => {
     expect(check(["tasks", "0123456789abcdef", { a: 1 }])).toEqual(["tasks", "0123456789abcdef", { a: 1 }]);
     expect(() => check(["tasks", "nope", 1])).toThrow(/#2/);

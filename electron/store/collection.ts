@@ -1,4 +1,4 @@
-import { COLLECTIONS, type CollectionName, type FieldsOf } from "../../shared/collections";
+import type { CollectionSpec } from "../../shared/collections/base";
 import { createCollection, type Collection } from "./collectionCore";
 import { log } from "../features/logger";
 import { quarantineJson, readJsonFile, removeJson, writeJson } from "./jsonStore";
@@ -6,13 +6,12 @@ import { quarantineJson, readJsonFile, removeJson, writeJson } from "./jsonStore
 export type { Collection };
 export { createCollection };
 
-const cache = new Map<CollectionName, Collection<unknown>>();
+const cache = new Map<string, Collection<unknown>>();
 
-/** Lazily created, one per name; reads and writes `userData/<name>.json` as `{ version, items }`. */
-export function collection<N extends CollectionName>(name: N): Collection<FieldsOf<N>> {
-  let c = cache.get(name);
+/** Lazily created, one per spec name; reads and writes `userData/<name>.json` as `{ version, items }`. */
+export function openCollection<F>(spec: CollectionSpec<F>): Collection<F> {
+  let c = cache.get(spec.name);
   if (!c) {
-    const spec = COLLECTIONS[name];
     const file = `${spec.name}.json`;
     c = createCollection<unknown>(spec as { name: string; version: number; max: number; heal(raw: unknown): unknown }, {
       read: () => {
@@ -28,7 +27,7 @@ export function collection<N extends CollectionName>(name: N): Collection<Fields
       },
       remove: () => removeJson(file),
     });
-    cache.set(name, c);
+    cache.set(spec.name, c);
   }
-  return c as Collection<FieldsOf<N>>;
+  return c as Collection<F>;
 }

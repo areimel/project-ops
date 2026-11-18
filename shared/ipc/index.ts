@@ -1,12 +1,8 @@
 import { appIpc } from "./app"; import { dataIpc } from "./data"; import { settingsIpc } from "./settings";
-import { editorIpc } from "./editor"; import { clipboardIpc } from "./clipboard"; import { timerIpc } from "./timer";
-import { systemIpc } from "./system"; import { newsIpc } from "./news"; import { playerIpc } from "./player";
 import type { InvokeSpec, DropSpec, EventSpec } from "./define";
 
-export const IPC_PARTS = { app: appIpc, data: dataIpc, settings: settingsIpc, editor: editorIpc, clipboard: clipboardIpc,
-  timer: timerIpc, system: systemIpc, news: newsIpc, player: playerIpc } as const;
-export const IPC = { ...appIpc, ...dataIpc, ...settingsIpc, ...editorIpc, ...clipboardIpc, ...timerIpc,
-  ...systemIpc, ...newsIpc, ...playerIpc } as const;
+export const IPC_PARTS = { app: appIpc, data: dataIpc, settings: settingsIpc } as const;
+export const IPC = { ...appIpc, ...dataIpc, ...settingsIpc } as const;
 type Ipc = typeof IPC;
 type ChannelsOf<K> = { [C in keyof Ipc]: Ipc[C] extends K ? C : never }[keyof Ipc];
 export type InvokeChannel = ChannelsOf<InvokeSpec<any, any>>;

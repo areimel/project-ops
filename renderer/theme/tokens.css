@@ -16,20 +16,12 @@
   --shadow-float: 0 6px 20px color-mix(in srgb, var(--text) 18%, transparent);  /* floating panels and dialogs only */
 }
 
-/* A surface that is dark in every theme and mode (the Player's picture area), in the theme's hue.
-   --media-ink is readable on it. */
-:root {
-  --media-bg: color-mix(in srgb, black 84%, var(--text));
-  --media-ink: color-mix(in srgb, white 90%, var(--media-bg));
-}
-
 :root {
   /* Type */
   --font-text: "Barlow", system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --font-display: "Barlow Condensed", "Barlow", "Arial Narrow", sans-serif;
   --font-mono: ui-monospace, "DejaVu Sans Mono", monospace;   /* the Editor's text area only */
   --fs-xs: 12px; --fs-sm: 13px; --fs-md: 14px; --fs-lg: 16px; --fs-xl: 20px; --fs-2xl: 26px; --fs-3xl: 34px;
-  --fs-display: 160px;   /* the Timer clock only */
   --fw-regular: 400; --fw-medium: 500; --fw-bold: 600;
   --lh-tight: 1.2; --lh-body: 1.5;
 

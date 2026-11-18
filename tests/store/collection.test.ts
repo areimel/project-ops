@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createCollection, type CollectionIo } from "../../electron/store/collectionCore";
-import { tasks } from "../../shared/collections/tasks";
-import { notes } from "../../shared/collections/notes";
+import { notes, tasks } from "./fixtures";
 
 /** An in-memory io with a counter clock and sequential ids. */
 function memory(initial?: unknown) {

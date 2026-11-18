@@ -28,7 +28,7 @@ describe("IPC channel map", () => {
   });
 
   it("pushes are events and requests are invokes", () => {
-    for (const name of ["data:changed", "settings:changed"] as const) expect(IPC[name].kind).toBe("event");
-    expect(IPC["data:list"].kind).toBe("invoke");
+    expect(IPC["settings:changed"].kind).toBe("event");
+    expect(IPC["data:export"].kind).toBe("invoke");
   });
 });

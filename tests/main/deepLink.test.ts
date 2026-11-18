@@ -40,19 +40,15 @@ describe("parseDeepLink", () => {
 });
 
 describe("argvTargets", () => {
-  it("finds the first deep link and text file, skipping flags and the executable", () => {
-    const r = argvTargets(["/usr/bin/app", "--no-sandbox", "app-template://open/editor", "notes.md", "b.txt"], "/home/u");
-    expect(r).toEqual({ link: { view: "app", appId: "editor" }, file: "/home/u/notes.md" });
+  it("finds the first deep link, skipping flags and the executable", () => {
+    const r = argvTargets(["/usr/bin/app", "--no-sandbox", "app-template://open/editor", "app-template://home"]);
+    expect(r).toEqual({ link: { view: "app", appId: "editor" } });
   });
-  it("keeps absolute paths and ignores other arguments", () => {
-    expect(argvTargets(["electron", ".", "/tmp/a.MD"], "/x")).toEqual({ link: null, file: "/tmp/a.MD" });
-    expect(argvTargets(["electron", ".", "app.sh", "app-template://bad"], "/x")).toEqual({ link: null, file: null });
-  });
-  it("never takes a URL-shaped argument as a file", () => {
-    expect(argvTargets(["app", "app-template://open/../../etc/x.md"], "/x")).toEqual({ link: null, file: null });
-    expect(argvTargets(["app", "file:///etc/passwd.txt", "https://a.example/b.md", "other:thing.md"], "/x")).toEqual({ link: null, file: null });
+  it("ignores other arguments, including files and URL-shaped strings", () => {
+    expect(argvTargets(["electron", ".", "/tmp/a.MD", "app.sh", "app-template://bad"])).toEqual({ link: null });
+    expect(argvTargets(["app", "file:///etc/passwd.txt", "https://a.example/b.md"])).toEqual({ link: null });
   });
   it("stops at a -- separator", () => {
-    expect(argvTargets(["app", "--", "a.md"], "/x")).toEqual({ link: null, file: null });
+    expect(argvTargets(["app", "--", "app-template://home"])).toEqual({ link: null });
   });
 });

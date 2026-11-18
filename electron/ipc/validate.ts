@@ -1,4 +1,3 @@
-import { COLLECTIONS, type CollectionName } from "../../shared/collections";
 import { isRecordId } from "../../shared/collections/base";
 import type { Check } from "./handle";
 
@@ -25,7 +24,6 @@ export const v: {
   /** A plain object with exactly these fields, each checked. Other keys are dropped from the result. */
   object<S extends Record<string, Check<unknown>>>(shape: S): Check<{ [K in keyof S]: ReturnType<S[K]> }>;
   recordId: Check<string>;            // isRecordId
-  collection: Check<CollectionName>;  // key of COLLECTIONS
   raw: Check<unknown>;                // only for payloads that go straight into a heal()
 } = {
   none: (a) => {
@@ -62,7 +60,5 @@ export const v: {
     return Object.fromEntries(Object.entries(shape).map(([k, check]) => [k, check(o[k], `${at}.${k}`)])) as { [K in keyof S]: ReturnType<S[K]> };
   },
   recordId: (x, at) => (isRecordId(x) ? x : bad(at, "a record id")),
-  collection: (x, at) =>
-    typeof x === "string" && Object.hasOwn(COLLECTIONS, x) ? (x as CollectionName) : bad(at, "a collection name"),
   raw: (x) => x,
 };

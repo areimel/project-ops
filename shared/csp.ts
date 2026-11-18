@@ -8,7 +8,7 @@ export const APP_ORIGIN = `${appScheme}://${APP_HOST}`;
 /**
  * The one Content-Security-Policy, set from the main process as a response header (a `<meta>` tag cannot carry
  * frame-ancestors). Packaged: everything from the app's own origin, no network at all (connect-src 'none'),
- * media from the media scheme, fonts from the page itself and never data:.
+ * no media, fonts from the page itself and never data:.
  * `devOrigin` (the Vite dev server, e.g. http://localhost:5173) is the only difference: its origin is the page's
  * own, HMR needs its WebSocket, and the React refresh preamble is an inline script. Remote images and fetch
  * calls to other hosts still fail in dev, as they do packaged.
@@ -22,7 +22,7 @@ export function buildCsp(devOrigin?: string): string {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data:",
     "font-src 'self'",
-    `media-src ${brand.mediaScheme}: blob:`,
+    "media-src 'none'",
     `connect-src ${ws ? `'self' ${ws}` : "'none'"}`,
     "base-uri 'none'",
     "object-src 'none'",
