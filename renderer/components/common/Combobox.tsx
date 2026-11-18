@@ -41,7 +41,7 @@ export function Combobox({ label, hideLabel, value, onChange, suggestions, place
         autoComplete="off" spellCheck={false} value={value} placeholder={placeholder} maxLength={maxLength}
         onChange={(e) => { onChange(e.target.value); setOpen(true); setActive(-1); }}
         onKeyDown={onKeyDown} onBlur={() => { setOpen(false); setActive(-1); }} />
-      {showing && <SuggestionList id={`${id}-list`} label={`${label} suggestions`} items={items} active={active} onPick={pick} onHover={setActive} />}
+      {showing && <SuggestionList id={`${id}-list`} label={`${label} suggestions`} items={items} active={active} onPick={pick} onHover={setActive} onClose={() => { setOpen(false); setActive(-1); }} />}
     </div>
   );
 }

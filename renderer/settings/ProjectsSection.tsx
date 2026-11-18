@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ROOT_LIMIT } from "../../shared/projects/roots";
 import type { Settings } from "../../shared/settings";
-import type { LauncherKind } from "../../shared/launchers";
+import { installedFor, type LauncherKind } from "../../shared/launchers";
 import { Button } from "../components/common/Button";
 import { Dropdown } from "../components/common/Dropdown";
 import { EmptyState } from "../components/common/EmptyState";
@@ -12,16 +12,16 @@ import { Spinner } from "../components/common/Spinner";
 import { useLaunchers, useRoots, useScanState, reloadLaunchers } from "../hooks/useProjectRoots";
 import { useProjects } from "../hooks/useProjects";
 import { useSetting } from "../hooks/useSettings";
+import { useAttempt } from "../hooks/useAttempt";
 import { useShell } from "../shell/ShellContext";
-import { errorMessage } from "../utils/errorMessage";
-import { isSuperseded } from "../../shared/superseded";
-import { launcherChoices, projectCountLabel, scanSummary, settingFromValue } from "./projectsSettingsModel";
+import { projectCount, scanMessage } from "../utils/projectText";
+import { launcherChoices, settingFromValue } from "./projectsSettingsModel";
 
 /** One picker for the program a project opens in: the same field for the editor and the terminal. */
 function LauncherField(p: { kind: LauncherKind; settingKey: "editor" | "terminal"; label: string; hint: string }) {
   const [setting, setSetting] = useSetting(p.settingKey);
   const launchers = useLaunchers();
-  const installed = launchers ? (p.kind === "editor" ? launchers.editors : launchers.terminals) : null;
+  const installed = launchers ? installedFor(p.kind, launchers) : null;
   const c = launcherChoices(p.kind, window.app.platform, installed, setting);
   return (
     <Field label={p.label} hint={p.hint}>
@@ -32,25 +32,22 @@ function LauncherField(p: { kind: LauncherKind; settingKey: "editor" | "terminal
 }
 
 function ScanFolders() {
-  const { confirm, toast } = useShell();
+  const { confirm } = useShell();
+  const attempt = useAttempt();
   const { roots, add, remove: removeRoot } = useRoots();
   const { scan } = useProjects();
   const scanning = useScanState();
   const full = roots.length >= ROOT_LIMIT;
 
-  const fail = (what: string, e: unknown) => {
-    if (isSuperseded(e)) return;
-    console.error(what, e); toast("error", `${what} ${errorMessage(e)}`); };
-
-  const addRoot = () => add().catch((e: unknown) => fail("Could not add that folder.", e));
-  const rescan = () => scan().then((r) => toast("success", scanSummary(r)), (e: unknown) => fail("Could not scan.", e));
+  const addRoot = () => void attempt(add, undefined, (m) => `Could not add that folder. ${m}`);
+  const rescan = () => void attempt(scan, scanMessage, (m) => `Could not scan. ${m}`);
   const remove = async (id: string, folder: string) => {
     const ok = await confirm({
       title: "Remove scan folder", confirmLabel: "Remove folder",
       body: `Project Ops will stop looking inside ${folder}. Its projects stay in the list, and nothing on disk is changed.`,
     });
     if (!ok) return;
-    try { await removeRoot(id); } catch (e) { fail("Could not remove that folder.", e); }
+    await attempt(() => removeRoot(id), undefined, (m) => `Could not remove that folder. ${m}`);
   };
 
   return (
@@ -61,7 +58,7 @@ function ScanFolders() {
           : (
             <List label="Scan folders">
               {roots.map((r) => (
-                <ListRow key={r.id} title={r.folder} meta={projectCountLabel(r.projectCount)}
+                <ListRow key={r.id} title={r.folder} meta={projectCount(r.projectCount)}
                   trailing={<IconButton icon="trash" label={`Remove ${r.folder}`} onClick={() => remove(r.id, r.folder)} />} />
               ))}
             </List>

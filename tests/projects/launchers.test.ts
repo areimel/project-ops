@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  EDITOR_IDS, EDITORS, TERMINAL_IDS, TERMINALS, isEditorId, isTerminalId, launchCommand, launchersFor,
+  EDITOR_IDS, EDITORS, TERMINAL_IDS, TERMINALS, installedFor, isEditorId, isTerminalId, launchCommand, launcherTable,
+  launchersFor,
   type LaunchPlatform,
 } from "../../shared/launchers";
 
@@ -15,6 +16,13 @@ function carriesDir(args: string[]): boolean {
 }
 
 describe("launcher table", () => {
+  it("launcherTable and installedFor pick by kind", () => {
+    expect(launcherTable("editor")).toBe(EDITORS);
+    expect(launcherTable("terminal")).toBe(TERMINALS);
+    const installed = { editors: ["zed"], terminals: ["kitty"] };
+    expect(installedFor("editor", installed)).toEqual(["zed"]);
+    expect(installedFor("terminal", installed)).toEqual(["kitty"]);
+  });
   it("ids are unique and the guards match the table", () => {
     expect(new Set(EDITOR_IDS).size).toBe(EDITORS.length);
     expect(new Set(TERMINAL_IDS).size).toBe(TERMINALS.length);

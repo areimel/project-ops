@@ -1,7 +1,5 @@
-// Pure helpers for the Projects settings section: option lists for the editor and terminal pickers, and
-// the wording of a scan result.
+// Pure helpers for the Projects settings section: option lists for the editor and terminal pickers.
 import { launchersFor, type LaunchPlatform, type LauncherKind } from "../../shared/launchers";
-import type { ScanResult } from "../../shared/ipc/projects";
 
 export const AUTO = "auto";
 
@@ -39,14 +37,3 @@ export function launcherChoices(
 
 /** The setting a picker value stands for. */
 export const settingFromValue = (value: string): string | null => (value === AUTO ? null : value);
-
-const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
-
-/** The toast text after a rescan. */
-export function scanSummary(r: Pick<ScanResult, "added" | "missing">): string {
-  const found = r.added > 0 ? `Found ${plural(r.added, "new project", "new projects")}` : "No new projects";
-  if (r.missing <= 0) return found;
-  return `${found}. ${plural(r.missing, "project is", "projects are")} no longer on disk.`;
-}
-
-export const projectCountLabel = (n: number): string => plural(n, "project", "projects");

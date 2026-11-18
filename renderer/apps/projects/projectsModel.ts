@@ -1,6 +1,7 @@
 // Search, filter, sort and facet logic for the project list. Pure: no React, no DOM.
 import { PROJECT_STATUSES, type ProjectStatus } from "../../../shared/projects/record";
 import type { ProjectView } from "../../../shared/projects/view";
+import { plural } from "../../utils/plural";
 
 /** Category filter value for projects whose category is empty. */
 export const UNCATEGORISED = "\u0000uncategorised";
@@ -40,6 +41,8 @@ export interface Facets {
   statuses: Facet[];
   stack: Facet[];
   total: number;
+  /** Does any project carry a tag (whatever the filters), so the rail can tell "no tags yet" from "none match". */
+  tagsExist: boolean;
 }
 
 export function defaultFilters(): ProjectFilters {
@@ -137,7 +140,10 @@ export function sortProjects(projects: readonly ProjectView[], key: SortKey): Pr
 
 interface Entry { value: string; label: string }
 
-/** Count one group over the projects passing every other filter; selected values stay even at 0. */
+/**
+ * Count one group; selected values stay even at 0. By default a value counts the projects passing every
+ * filter except this group's own ("what would clicking it give"). `countsFor` replaces that test per value key.
+ */
 function buildFacet(
   projects: readonly ProjectView[],
   filters: ProjectFilters,
@@ -145,6 +151,7 @@ function buildFacet(
   entriesOf: (p: ProjectView) => Entry[],
   selected: readonly string[],
   extra: Entry[] = [],
+  countsFor?: (p: ProjectView, key: string) => boolean,
 ): Facet[] {
   const map = new Map<string, Facet>();
   const sel = new Set(selected.map(fold));
@@ -159,11 +166,12 @@ function buildFacet(
   }
   for (const e of extra) add(e, 0);
   for (const p of projects) {
-    if (!passes(p, filters, group)) continue;
+    const base = countsFor ? true : passes(p, filters, group);
+    if (!base) continue;
     const seen = new Set<string>();
     for (const e of entriesOf(p)) {
       const k = fold(e.value);
-      if (seen.has(k)) continue;
+      if (seen.has(k) || (countsFor && !countsFor(p, k))) continue;
       seen.add(k);
       map.get(k)!.count += 1;
     }
@@ -184,8 +192,15 @@ export function facets(projects: readonly ProjectView[], filters: ProjectFilters
     catSelected,
   ).map((f) => (f.value === UNCATEGORISED ? { ...f, label: "Uncategorised" } : f));
   const excluded = new Set(filters.excludeTags.map(fold));
+  // Included tags are AND filters, so a tag's count is the size of the result if it were added (the projects
+  // that pass every filter and carry it). An included tag therefore shows the whole result; an excluded tag
+  // shows how many projects its own exclusion is hiding.
+  const tagCount = (p: ProjectView, key: string) =>
+    excluded.has(key)
+      ? passes(p, { ...filters, excludeTags: filters.excludeTags.filter((t) => fold(t) !== key) })
+      : passes(p, filters);
   const tags = buildFacet(
-    projects, filters, "tags", (p) => p.tags.map((t) => ({ value: t, label: t })), [...filters.tags, ...filters.excludeTags],
+    projects, filters, "tags", (p) => p.tags.map((t) => ({ value: t, label: t })), [...filters.tags, ...filters.excludeTags], [], tagCount,
   ).map((t) => (excluded.has(fold(t.value)) ? { ...t, selected: false, excluded: true } : t));
   const stack = buildFacet(projects, filters, "stack", (p) => p.stack.map((s) => ({ value: s, label: s })), filters.stack);
   const statuses: Facet[] = PROJECT_STATUSES.map((s) => ({
@@ -194,7 +209,7 @@ export function facets(projects: readonly ProjectView[], filters: ProjectFilters
     count: projects.filter((p) => p.status === s && passes(p, filters, "statuses")).length,
     selected: filters.statuses.includes(s),
   }));
-  return { categories, tags, statuses, stack, total: filterProjects(projects, filters).length };
+  return { categories, tags, statuses, stack, total: filterProjects(projects, filters).length, tagsExist: projects.some((p) => p.tags.length > 0) };
 }
 
 /** Distinct existing values for autocomplete: first-seen spelling, sorted. */
@@ -216,11 +231,11 @@ const DAY = 86_400_000;
 export function relativeTime(ms: number | null, now: number): string {
   if (ms === null) return "never";
   const days = Math.floor((now - ms) / DAY);
-  const plural = (n: number, unit: string) => `${n} ${unit}${n === 1 ? "" : "s"} ago`;
+  const ago = (n: number, one: string, many: string) => `${plural(n, one, many)} ago`;
   if (days <= 0) return "today";
   if (days === 1) return "yesterday";
-  if (days < 7) return plural(days, "day");
-  if (days < 30) return plural(Math.floor(days / 7), "week");
-  if (days < 365) return plural(Math.floor(days / 30), "month");
-  return plural(Math.floor(days / 365), "year");
+  if (days < 7) return ago(days, "day", "days");
+  if (days < 30) return ago(Math.floor(days / 7), "week", "weeks");
+  if (days < 365) return ago(Math.floor(days / 30), "month", "months");
+  return ago(Math.floor(days / 365), "year", "years");
 }

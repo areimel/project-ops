@@ -7,7 +7,7 @@ import { Icon } from "../../components/common/Icon";
 import { IconButton } from "../../components/common/IconButton";
 import { KeyValue, KeyValueList } from "../../components/common/KeyValue";
 import { StatusDot } from "../../components/common/StatusDot";
-import { capList, cardCategory, cardMuted, cardNumber, cardStatus, stackLabel } from "./cardModel";
+import { GIT_UNREAD_NOTE, capList, cardCategory, cardMuted, cardNumber, cardStatus, gitInfo, splitFolder, stackLabel } from "./cardModel";
 import { relativeTime } from "./projectsModel";
 
 /** Everything a card can ask for, addressed by project id so one stable object serves every card. */
@@ -38,6 +38,8 @@ function ProjectCardImpl({ project: p, index, selected, now, actions: a }: Props
   const links = PROJECT_LINK_KEYS.filter((k) => p.links[k] !== null);
   const gone = p.missing;
   const category = cardCategory(p);
+  const git = gitInfo(p);
+  const folder = splitFolder(p.folder);
 
   return (
     <Card as="li" className="projects-card" muted={cardMuted(p)} selected={selected} data-project-id={p.id} aria-label={p.name}>
@@ -67,14 +69,19 @@ function ProjectCardImpl({ project: p, index, selected, now, actions: a }: Props
 
         <KeyValueList className="projects-card-traits">
           <KeyValue label="Branch" title={p.dirty ? `${p.branch ?? "No branch"}: uncommitted changes` : p.branch ?? undefined}>
-            {p.branch ?? <span className="projects-none">None</span>}
+            {git === "none" ? <span className="projects-none">No git</span> : p.branch ?? <span className="projects-none">None</span>}
             {p.dirty && <span className="bullet projects-dirty" title="Uncommitted changes"><span className="visually-hidden">, uncommitted changes</span></span>}
           </KeyValue>
-          <KeyValue label="Last commit" title={p.lastCommitAt ? new Date(p.lastCommitAt).toLocaleString() : undefined}>
-            {p.lastCommitAt === null ? <span className="projects-none">None</span> : relativeTime(p.lastCommitAt, now)}
+          <KeyValue label="Last commit" title={git === "read" ? new Date(p.lastCommitAt!).toLocaleString() : git === "unread" ? GIT_UNREAD_NOTE : "Not a git repository."}>
+            {git === "read" ? relativeTime(p.lastCommitAt, now) : <span className="projects-none">{git === "unread" ? "Unknown" : "No git"}</span>}
           </KeyValue>
           <KeyValue label="Stack">{p.stack.length ? p.stack.map(stackLabel).join(", ") : <span className="projects-none">None</span>}</KeyValue>
-          <KeyValue label="Folder">{p.folder}</KeyValue>
+          <KeyValue label="Folder" title={p.folder}>
+            <span className="projects-path">
+              {folder.head && <span className="projects-path-head">{folder.head}</span>}
+              <span className="projects-path-tail">{folder.tail}</span>
+            </span>
+          </KeyValue>
           <KeyValue label="Links" title="">
             {links.length === 0 ? <span className="projects-none">None</span> : links.map((k) => (
               <button key={k} type="button" className="projects-link" title={p.links[k] ?? undefined} onClick={() => a.openLink(p.id, k)}>
@@ -91,7 +98,7 @@ function ProjectCardImpl({ project: p, index, selected, now, actions: a }: Props
         <IconButton icon="terminal" label="Open terminal here" disabled={gone} onClick={() => a.open(p.id, "terminal")} />
         <IconButton icon="copy" label="Copy path" onClick={() => a.copyPath(p.id)} />
         <span className="projects-card-foot-end">
-          <IconButton icon="pin" label={p.pinned ? "Unpin" : "Pin to the top"} aria-pressed={p.pinned}
+          <IconButton icon="pin" label="Pin to the top" aria-pressed={p.pinned}
             onClick={() => a.togglePin(p.id)} />
           <IconButton icon="pencil" label="Edit project" onClick={() => a.edit(p.id)} />
         </span>

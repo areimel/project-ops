@@ -1,3 +1,5 @@
+import { cx } from "../../utils/cx";
+
 export type BadgeVariant = "outline" | "solid" | "quiet";
 
 interface Props {
@@ -17,7 +19,7 @@ interface Props {
 
 /** A small mono label chip: plain, a toggle filter, a removable tag, or both of the last two. */
 export function Badge({ children, variant = "outline", onClick, pressed, excluded, onRemove, count, title, className = "" }: Props) {
-  const cls = `badge badge-${variant} ${pressed ? "is-pressed" : ""} ${excluded ? "is-excluded" : ""} ${className}`.replace(/\s+/g, " ").trim();
+  const cls = cx("badge", `badge-${variant}`, pressed && "is-pressed", excluded && "is-excluded", className);
   const inner = (
     <>
       <span className="badge-text">{children}</span>

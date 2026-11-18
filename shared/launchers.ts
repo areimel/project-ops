@@ -62,16 +62,22 @@ export const TERMINAL_IDS: readonly TerminalId[] = TERMINALS.map((l) => l.id);
 export const isEditorId = (x: unknown): x is EditorId => EDITOR_IDS.includes(x as EditorId);
 export const isTerminalId = (x: unknown): x is TerminalId => TERMINAL_IDS.includes(x as TerminalId);
 
+/** The table for a kind: EDITORS or TERMINALS. */
+export const launcherTable = (kind: LauncherKind): readonly Launcher[] => (kind === "editor" ? EDITORS : TERMINALS);
+
+/** The detected ids of one kind from an `{ editors, terminals }` pair (as `projects:launchers` returns it). */
+export const installedFor = (
+  kind: LauncherKind, installed: { editors: readonly string[]; terminals: readonly string[] },
+): readonly string[] => (kind === "editor" ? installed.editors : installed.terminals);
+
 /** The table entry for an id of that kind, or undefined. */
 export function findLauncher(kind: LauncherKind, id: unknown): Launcher | undefined {
-  const table: readonly Launcher[] = kind === "editor" ? EDITORS : TERMINALS;
-  return table.find((l) => l.id === id);
+  return launcherTable(kind).find((l) => l.id === id);
 }
 
 /** Entries that have a command on `platform`, in table order (for pickers and PATH lookup). */
 export function launchersFor(kind: LauncherKind, platform: LaunchPlatform): Launcher[] {
-  const table: readonly Launcher[] = kind === "editor" ? EDITORS : TERMINALS;
-  return table.filter((l) => l.platforms[platform] !== undefined);
+  return launcherTable(kind).filter((l) => l.platforms[platform] !== undefined);
 }
 
 /** The argv to spawn, or null for an unknown id or one with no entry on `platform`. */

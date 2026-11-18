@@ -1,3 +1,4 @@
+import { cx } from "../../utils/cx";
 import type { ElementType, HTMLAttributes, ReactNode } from "react";
 
 interface CardProps extends HTMLAttributes<HTMLElement> {
@@ -12,7 +13,7 @@ interface CardProps extends HTMLAttributes<HTMLElement> {
 /** A flat, hairline-bordered square. Compose with CardHeader, CardBody and CardFooter. Give it an `aria-label` when it is a landmark. */
 export function Card({ as = "article", muted, selected, className = "", ...rest }: CardProps) {
   const Tag: ElementType = as;
-  return <Tag className={`card ${muted ? "is-muted" : ""} ${selected ? "is-selected" : ""} ${className}`.replace(/\s+/g, " ").trim()} {...rest} />;
+  return <Tag className={cx("card", muted && "is-muted", selected && "is-selected", className)} {...rest} />;
 }
 
 /** A mono-label strip: `start` on the left ("01 / Personal"), `end` on the right (a StatusDot). */

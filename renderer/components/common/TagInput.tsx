@@ -57,7 +57,7 @@ export function TagInput({ label, hideLabel, value, onChange, suggestions = [], 
           }}
           onBlur={() => { if (text.trim()) add(text); else reset(); }} />
       </div>
-      {showing && <SuggestionList id={`${id}-list`} label={`${label} suggestions`} items={items} active={active} onPick={add} onHover={setActive} />}
+      {showing && <SuggestionList id={`${id}-list`} label={`${label} suggestions`} items={items} active={active} onPick={add} onHover={setActive} onClose={() => { setOpen(false); setActive(-1); }} />}
     </div>
   );
 }

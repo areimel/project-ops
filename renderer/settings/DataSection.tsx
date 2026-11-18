@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { Button } from "../components/common/Button";
 import { Field } from "../components/common/Field";
+import { useAttempt } from "../hooks/useAttempt";
 import { useShell } from "../shell/ShellContext";
 
 /** Export, import, show folder and reset. Each action says what happened in a toast, with the same words as its button. */
 export function DataSection() {
   const { confirm, toast } = useShell();
+  const attempt = useAttempt();
   const [busy, setBusy] = useState(false);
 
+  /** One action at a time; a failure shows `failure` (a fixed, instructive sentence) rather than the raw error. */
   async function run(task: () => Promise<void>, failure: string): Promise<void> {
     setBusy(true);
-    try { await task(); } catch (e) {
-      console.error(failure, e);
-      toast("error", failure);
-    } finally { setBusy(false); }
+    try { await attempt(task, undefined, () => failure); } finally { setBusy(false); }
   }
 
   const exportData = () => run(async () => {

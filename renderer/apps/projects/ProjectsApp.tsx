@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { isSuperseded } from "../../../shared/superseded";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../components/common/Button";
 import { EmptyState } from "../../components/common/EmptyState";
 import { Spinner } from "../../components/common/Spinner";
+import { useAttempt } from "../../hooks/useAttempt";
 import { useLatest } from "../../hooks/useLatest";
 import { useProjects, useRoots, useScanState } from "../../hooks/useProjects";
 import { useCommandHandlers, useShell, useTitleInfo } from "../../shell/ShellContext";
-import { errorMessage } from "../../utils/errorMessage";
-import { projectCount, scanMessage } from "./cardModel";
+import { projectCount, scanMessage } from "../../utils/projectText";
 import { FilterRail } from "./FilterRail";
 import { categoryValue, includeTag, revealFilters } from "./filterState";
 import { ProjectCard, type CardActions } from "./ProjectCard";
@@ -24,6 +23,7 @@ export default function ProjectsApp() {
   const roots = useRoots();
   const scanning = useScanState();
   const { toast, route } = useShell();
+  const attempt = useAttempt();
   const view = useProjectFilters(projects);
   const searchRef = useRef<HTMLInputElement>(null);
   const [editing, setEditing] = useState<string | null>(null);
@@ -34,22 +34,9 @@ export default function ProjectsApp() {
 
   useTitleInfo({ count: status === "ready" ? projectCount(projects.length) : undefined });
 
-  /** Runs one mutation; a failure becomes an error toast with main's message, a superseded request is ignored. True when it worked. */
-  const attempt = useCallback(async <T,>(work: () => Promise<T>, success?: string | ((r: T) => string | null)): Promise<boolean> => {
-    try {
-      const r = await work();
-      const message = typeof success === "function" ? success(r) : success;
-      if (message) toast("success", message);
-      return true;
-    } catch (e) {
-      if (!isSuperseded(e)) toast("error", errorMessage(e));
-      return false;
-    }
-  }, [toast]);
-
   // ---- focus a project: a deep link, or a folder just added ----
-  const recordId = route.view === "app" ? route.recordId : null;
-  useEffect(() => { if (recordId) setPendingFocus(recordId); }, [recordId]);
+  // The router makes a new route object for every navigation, so opening the same project again refocuses it.
+  useEffect(() => { if (route.view === "app" && route.recordId) setPendingFocus(route.recordId); }, [route]);
   const latestFilters = useLatest(view.filters);
   useEffect(() => {
     if (!pendingFocus || status !== "ready") return;

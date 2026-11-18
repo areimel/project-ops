@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { AUTO, launcherChoices, projectCountLabel, scanSummary, settingFromValue } from "../renderer/settings/projectsSettingsModel";
+import { AUTO, launcherChoices, settingFromValue } from "../renderer/settings/projectsSettingsModel";
 
 describe("launcherChoices", () => {
   it("lists automatic first, then the platform's entries", () => {
@@ -36,24 +36,5 @@ describe("settingFromValue", () => {
   it("maps automatic to null", () => {
     expect(settingFromValue(AUTO)).toBeNull();
     expect(settingFromValue("zed")).toBe("zed");
-  });
-});
-
-describe("scanSummary", () => {
-  it("reports new projects", () => {
-    expect(scanSummary({ added: 3, missing: 0 })).toBe("Found 3 new projects");
-    expect(scanSummary({ added: 1, missing: 0 })).toBe("Found 1 new project");
-  });
-  it("reports none, and newly missing ones", () => {
-    expect(scanSummary({ added: 0, missing: 0 })).toBe("No new projects");
-    expect(scanSummary({ added: 0, missing: 2 })).toBe("No new projects. 2 projects are no longer on disk.");
-    expect(scanSummary({ added: 2, missing: 1 })).toBe("Found 2 new projects. 1 project is no longer on disk.");
-  });
-});
-
-describe("projectCountLabel", () => {
-  it("pluralises", () => {
-    expect(projectCountLabel(0)).toBe("0 projects");
-    expect(projectCountLabel(1)).toBe("1 project");
   });
 });

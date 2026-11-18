@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  capList, cardCategory, cardMuted, cardNumber, cardStatus, projectCount, scanMessage, stackLabel,
+  capList, cardCategory, cardMuted, cardNumber, cardStatus, gitInfo, splitFolder, stackLabel,
 } from "../../renderer/apps/projects/cardModel";
 import {
   VIEW_STATE_KEY, categoryValue, cycleTag, healViewState, includeTag, revealFilters, tagState, visibleTags,
@@ -126,11 +126,16 @@ describe("card model", () => {
   it("labels stack ids", () => {
     expect([stackLabel("c-cpp"), stackLabel("typescript"), stackLabel("zig")]).toEqual(["C/C++", "TypeScript", "zig"]);
   });
-  it("words the scan result and the count", () => {
-    expect(scanMessage({ added: 0, missing: 0, total: 3 })).toBe("No new projects");
-    expect(scanMessage({ added: 1, missing: 0, total: 3 })).toBe("Found 1 new project");
-    expect(scanMessage({ added: 3, missing: 1, total: 3 })).toBe("Found 3 new projects. 1 folder is missing.");
-    expect(scanMessage({ added: 0, missing: 2, total: 3 })).toBe("No new projects. 2 folders are missing.");
-    expect([projectCount(1), projectCount(42)]).toEqual(["1 project", "42 projects"]);
+  it("decides what the git rows say", () => {
+    expect(gitInfo({ branch: null, lastCommitAt: null })).toBe("none");
+    expect(gitInfo({ branch: "main", lastCommitAt: null })).toBe("unread");
+    expect(gitInfo({ branch: "main", lastCommitAt: 5 })).toBe("read");
+    expect(gitInfo({ branch: null, lastCommitAt: 5 })).toBe("read");
+  });
+  it("splits a folder so the last segment can stay visible", () => {
+    expect(splitFolder("~/code/projects/app")).toEqual({ head: "~/code/projects/", tail: "app" });
+    expect(splitFolder("C:\\Users\\me\\app")).toEqual({ head: "C:\\Users\\me\\", tail: "app" });
+    expect(splitFolder("app")).toEqual({ head: "", tail: "app" });
+    expect(splitFolder("~/code/")).toEqual({ head: "", tail: "~/code/" });
   });
 });

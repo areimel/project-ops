@@ -1,7 +1,6 @@
-// What a project card shows, decided once: numbering, status light, tag cap, stack labels, scan toast.
+// What a project card shows, decided once: numbering, status light, tag cap, stack labels, git rows, folder split.
 // Pure: no React, no DOM.
 import type { StatusTone } from "../../components/common/StatusDot";
-import type { ScanResult } from "../../../shared/ipc/projects";
 import type { ProjectView } from "../../../shared/projects/view";
 
 /** "01".."99", then "100": the card's position in the current result, counting from 1. */
@@ -38,13 +37,18 @@ const STACK_LABELS: Record<string, string> = {
 /** Display name for a stack id from the scan table; an unknown id is shown as it is. */
 export const stackLabel = (id: string): string => STACK_LABELS[id] ?? id;
 
-const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+export type GitInfo = "none" | "unread" | "read";
 
-/** The toast after Rescan. */
-export function scanMessage(r: ScanResult): string {
-  const found = r.added > 0 ? `Found ${plural(r.added, "new project", "new projects")}` : "No new projects";
-  return r.missing > 0 ? `${found}. ${plural(r.missing, "folder is", "folders are")} missing.` : found;
+/** What the git rows can say: "none" (no branch, no commit time: not a repository), "unread" (a branch but no commit time: git was not run) or "read". */
+export function gitInfo(p: Pick<ProjectView, "branch" | "lastCommitAt">): GitInfo {
+  if (p.lastCommitAt !== null) return "read";
+  return p.branch === null ? "none" : "unread";
 }
 
-/** Title-block count: "1 project", "42 projects". */
-export const projectCount = (n: number): string => plural(n, "project", "projects");
+export const GIT_UNREAD_NOTE = "Git details are not read for repositories with custom git configuration.";
+
+/** The Folder row split so the end (the distinguishing folder name) can stay visible while the front is cut. */
+export function splitFolder(folder: string): { head: string; tail: string } {
+  const i = Math.max(folder.lastIndexOf("/"), folder.lastIndexOf("\\"));
+  return i < 0 || i === folder.length - 1 ? { head: "", tail: folder } : { head: folder.slice(0, i + 1), tail: folder.slice(i + 1) };
+}

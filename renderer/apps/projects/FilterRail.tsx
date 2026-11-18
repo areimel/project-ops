@@ -3,6 +3,7 @@ import type { ProjectStatus } from "../../../shared/projects/record";
 import { Badge } from "../../components/common/Badge";
 import { Button } from "../../components/common/Button";
 import { Icon } from "../../components/common/Icon";
+import { cx } from "../../utils/cx";
 import { stackLabel } from "./cardModel";
 import { cycleTag, visibleTags } from "./filterState";
 import { toggle, type Facet, type Facets, type ProjectFilters } from "./projectsModel";
@@ -36,7 +37,7 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
 function RailRow({ label, count, selected, check, onClick }: { label: string; count: number; selected: boolean; check?: boolean; onClick(): void }) {
   return (
     <li>
-      <button type="button" className={`projects-cat ${selected ? "is-selected" : ""} ${check ? "is-check" : ""}`.replace(/\s+/g, " ").trim()}
+      <button type="button" className={cx("projects-cat", selected && "is-selected", check && "is-check")}
         aria-pressed={selected} onClick={onClick}>
         {check && <span className="projects-check" aria-hidden="true" />}
         <span className="projects-cat-name">{label}</span>
@@ -83,7 +84,9 @@ export function FilterRail({ facets, filters, filtered, onChange, onClear }: Pro
           </ul>
         </Group>
 
-        {facets.tags.length > 0 && (
+        {facets.tags.length === 0 && !facets.tagsExist ? (
+          <Group title="Tags"><p className="projects-rail-hint">No tags yet. Edit a project to add some.</p></Group>
+        ) : facets.tags.length > 0 && (
           <Group title="Tags">
             <div className="projects-chips">
               {tags.shown.map((t) => (

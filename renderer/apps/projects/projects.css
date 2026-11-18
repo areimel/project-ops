@@ -73,9 +73,11 @@
 .projects-card.is-selected { z-index: 2; }
 
 .projects-card .card-header { min-height: 37px; }
-.projects-card-num { color: var(--text); }
+.projects-card-num { flex: none; color: var(--text); }
+.projects-card .card-header-start > [aria-hidden] { flex: none; }
+.projects-card .card-header-end { white-space: nowrap; }
 .projects-card-cat {
-  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  flex: 0 1 auto; min-width: 0; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   margin: 0; padding: 0; border: 0; background: none; color: inherit;
   font: inherit; letter-spacing: inherit; text-transform: inherit;
   transition: color var(--dur-fast) var(--ease);
@@ -103,6 +105,11 @@
 /* Trait rows sit at the bottom of the body so rows line up across a grid row. */
 .projects-card-traits { margin-top: auto; }
 .projects-card-traits .kv-row { padding: 6px 0; }
+/* Folder row: the front is cut with an ellipsis first, so the folder name at the end stays readable. */
+.projects-path { display: flex; justify-content: flex-end; min-width: 0; }
+.projects-path-head { flex: 0 1000 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.projects-path-tail { flex: 0 1 auto; min-width: 4ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.projects-rail-hint { margin: 0; color: var(--text-muted); font-size: var(--fs-sm); line-height: 1.5; }
 .projects-none { color: var(--text-muted); }
 .projects-dirty { margin-left: var(--sp-2); vertical-align: 1px; }
 .projects-link {

@@ -1,4 +1,5 @@
 /** Pure rules for the tag input: normalising, adding, filtering suggestions and what a key press means. */
+import { line } from "../../../shared/collections/heal";
 
 export interface TagLimits {
   /** Most tags allowed in total. */
@@ -9,8 +10,7 @@ export interface TagLimits {
 
 /** Trim, collapse inner whitespace, cut to `maxLength`. Empty string means "not a tag". */
 export function normalizeTag(raw: string, maxLength?: number): string {
-  const t = raw.replace(/\s+/g, " ").trim();
-  return maxLength !== undefined && maxLength > 0 ? t.slice(0, maxLength).trim() : t;
+  return line(raw, maxLength !== undefined && maxLength > 0 ? maxLength : Infinity);
 }
 
 /** Add the tags in `raw` (comma or line separated) to `current`. Duplicates (any case) keep the first spelling. */

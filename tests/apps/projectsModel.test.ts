@@ -134,24 +134,44 @@ describe("facets", () => {
     expect(r.total).toBe(1);
     // categories ignore the category filter but apply tags=tui
     expect(r.categories.map((c) => [c.label, c.count, c.selected])).toEqual([["Work", 1, true]]);
-    // tags ignore the tags filter but apply category=Work
-    expect(get(r.tags, "CLI")?.count).toBe(2);
+    // tags count the result as it stands: only A passes, and it carries CLI and TUI
+    expect(get(r.tags, "CLI")?.count).toBe(1);
     expect(get(r.tags, "TUI")).toMatchObject({ count: 1, selected: true });
     expect(get(r.tags, "web")).toBeUndefined();
   });
   it("keeps selected values at zero", () => {
     const r = facets(ps, f({ tags: ["web", "tui"] }));
     expect(r.total).toBe(0);
-    expect(get(r.tags, "TUI")).toMatchObject({ count: 1, selected: true });
+    expect(get(r.tags, "TUI")).toMatchObject({ count: 0, selected: true });
     const r2 = facets(ps, f({ category: "Nowhere", stack: ["go"] }));
     expect(get(r2.categories, "Nowhere")).toMatchObject({ count: 0, selected: true });
     expect(get(r2.stack, "go")).toMatchObject({ count: 0, selected: true });
+  });
+  it("counts an unselected tag as the result size if it were included (AND)", () => {
+    const q = [project({ name: "P1", tags: ["a", "b"] }), project({ name: "P2", tags: ["b"] }), project({ name: "P3", tags: ["c"] })];
+    const none = facets(q, defaultFilters());
+    expect(none.tags.map((t) => [t.value, t.count])).toEqual([["b", 2], ["a", 1], ["c", 1]]);
+    const a = facets(q, f({ tags: ["a"] }));
+    expect(a.total).toBe(1);
+    expect(a.tags.map((t) => [t.value, t.count, t.selected])).toEqual([["a", 1, true], ["b", 1, false]]); // c: clicking it gives 0, so hidden
+    const b = facets(q, f({ tags: ["b"] }));
+    expect(get(b.tags, "a")?.count).toBe(1); // P1 only
+    expect(get(b.tags, "b")?.count).toBe(2); // included: the whole result
+    expect(get(b.tags, "c")).toBeUndefined();
+  });
+  it("shows an excluded tag's count as the projects its exclusion hides", () => {
+    const q = [project({ tags: ["a", "b"] }), project({ tags: ["b"] }), project({ tags: ["c"] })];
+    const r = facets(q, f({ excludeTags: ["b"] }));
+    expect(r.total).toBe(1);
+    expect(get(r.tags, "b")).toMatchObject({ count: 2, excluded: true });
+    expect(get(r.tags, "a")).toBeUndefined(); // carried only by a hidden project
+    expect(get(r.tags, "c")?.count).toBe(1);
   });
   it("marks excluded tags and counts them as if included, while other groups apply the exclusion", () => {
     const r = facets(ps, f({ excludeTags: ["tui"] }));
     expect(r.total).toBe(2);
     expect(get(r.tags, "TUI")).toMatchObject({ count: 1, selected: false, excluded: true });
-    expect(get(r.tags, "CLI")).toMatchObject({ count: 2, selected: false });
+    expect(get(r.tags, "CLI")).toMatchObject({ count: 1, selected: false });
     expect(r.tags.find((t) => t.value === "CLI")?.excluded).toBeUndefined();
     expect(get(r.stack, "rust")).toBeUndefined(); // A (rust) carries TUI
     const zero = facets(ps, f({ excludeTags: ["gone"] }));
