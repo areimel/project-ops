@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { emptyScan, type ProjectFields } from "../../shared/projects/record";
 import type { ProjectRecord } from "../../shared/projects/view";
 import {
-  MAX_DEPTH, categoryHint, detectMeta, detectScan, detectStack, isProjectDir, mergeScan, shouldDescend,
+  MAX_DEPTH, categoryHint, detectDescription, detectScan, detectStack, isProjectDir, mergeScan, shouldDescend,
   type FoundProject,
 } from "../../electron/features/projectScanCore";
 
@@ -48,15 +48,19 @@ describe("detectStack", () => {
   });
 });
 
-describe("detectMeta / detectScan", () => {
-  it("takes sane strings only", () => {
-    expect(detectMeta("d", { name: "my-app", description: "Does things" })).toEqual({ name: "my-app", description: "Does things" });
-    expect(detectMeta("d", { name: 5, description: "" })).toEqual({ name: null, description: null });
-    expect(detectMeta("d", [])).toEqual({ name: null, description: null });
+describe("detectDescription / detectScan", () => {
+  it("takes a sane description string only", () => {
+    expect(detectDescription({ name: "my-app", description: "Does things" })).toBe("Does things");
+    expect(detectDescription({ description: "" })).toBeNull();
+    expect(detectDescription({ description: 5 })).toBeNull();
+    expect(detectDescription([])).toBeNull();
+    expect(detectDescription(null)).toBeNull();
   });
-  it("falls back to the folder name", () => {
+  it("names a project after its folder, never the package.json name", () => {
     expect(detectScan("folder", ["Cargo.toml"], null)).toEqual({ name: "folder", description: null, stack: ["rust"] });
-    expect(detectScan("folder", [], { name: "pkg" }).name).toBe("pkg");
+    expect(detectScan("client-site", ["package.json"], { name: "astro-template", description: "Site" }))
+      .toEqual({ name: "client-site", description: "Site", stack: ["node"] });
+    expect(detectScan("a".repeat(200), [], null).name).toHaveLength(120);
   });
 });
 
@@ -143,5 +147,14 @@ describe("mergeScan", () => {
   });
   it("does not count an already-missing record again", () => {
     expect(mergeScan([rec({ path: "/r/g", missing: true })], [], ["r1"], 1).missing).toBe(0);
+  });
+  it("does not count a hidden record in missing", () => {
+    const r = mergeScan([rec({ path: "/r/g", hidden: true })], [], ["r1"], 1);
+    expect(r.missing).toBe(0);
+    expect(r.next[0]).toMatchObject({ hidden: true, missing: true });
+  });
+  it("re-adopts a found scan record whose root is gone", () => {
+    expect(mergeScan([rec({ path: "/r/a", rootId: null })], [found("/r/a")], ["r1"], 1).next[0]).toMatchObject({ rootId: "r1" });
+    expect(mergeScan([rec({ path: "/r/a", rootId: "r9" })], [found("/r/a")], ["r1"], 1).next[0]).toMatchObject({ rootId: "r1" });
   });
 });

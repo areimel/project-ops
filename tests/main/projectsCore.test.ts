@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { emptyScan, type ProjectFields } from "../../shared/projects/record";
 import type { ProjectRecord } from "../../shared/projects/view";
 import type { GitInfo } from "../../electron/features/gitInfoCore";
-import type { FoundProject } from "../../electron/features/projectScanCore";
+import { mergeScan, type FoundProject } from "../../electron/features/projectScanCore";
 import {
   afterRootRemoved, countByRoot, finishScan, gitTargets, newManualProject, scanFacts, statTargets, toRootViews,
   visibleCount, zipMap,
@@ -41,13 +41,43 @@ describe("countByRoot and toRootViews", () => {
 });
 
 describe("afterRootRemoved", () => {
-  it("keeps the root's projects with rootId null, purges its tombstones, leaves others alone", () => {
+  it("keeps the root's projects and tombstones with rootId null, leaves others alone", () => {
     const keep = rec();
     const tomb = rec({ hidden: true });
     const other = rec({ rootId: R2 });
     const otherTomb = rec({ rootId: R2, hidden: true });
     const out = afterRootRemoved([keep, tomb, other, otherTomb], R1, 99);
-    expect(out).toEqual([{ ...keep, rootId: null, updatedAt: 99 }, other, otherTomb]);
+    expect(out).toEqual([{ ...keep, rootId: null, updatedAt: 99 }, { ...tomb, rootId: null, updatedAt: 99 }, other, otherTomb]);
+  });
+});
+
+describe("nested roots (A contains B)", () => {
+  const A = R1;
+  const B = R2;
+  it("a project removed by the user stays hidden after A goes and B is scanned", () => {
+    const p = rec({ path: "/a/b/p", rootId: A, hidden: true });
+    const afterRemove = afterRootRemoved([p], A, 50);
+    const merged = mergeScan(afterRemove, [found("/a/b/p", B)], [B], 60);
+    expect(merged.next).toHaveLength(1);
+    expect(merged.next[0]).toMatchObject({ path: "/a/b/p", hidden: true, rootId: B });
+    expect(merged.added).toBe(0);
+    expect(countByRoot(merged.next)).toEqual(new Map());
+  });
+  it("B adopts A's projects it also covers, so the root counts stay right", () => {
+    const q = rec({ path: "/a/b/q", rootId: A });
+    const onlyA = rec({ path: "/a/x", rootId: A });
+    const merged = mergeScan(afterRootRemoved([q, onlyA], A, 50), [found("/a/b/q", B)], [B], 60);
+    expect(merged.next.map((r) => r.rootId)).toEqual([B, null]);
+    expect(countByRoot(merged.next)).toEqual(new Map([[B, 1]]));
+  });
+  it("a record of a current root keeps its root when another current root finds it too", () => {
+    const q = rec({ path: "/a/b/q", rootId: A });
+    const merged = mergeScan([q], [found("/a/b/q", B)], [A, B], 60);
+    expect(merged.next[0]).toMatchObject({ rootId: A });
+  });
+  it("a manual record is never adopted", () => {
+    const m = rec({ path: "/a/b/m", origin: "manual", rootId: null });
+    expect(mergeScan([m], [found("/a/b/m", B)], [B], 60).next[0]).toMatchObject({ origin: "manual", rootId: null });
   });
 });
 

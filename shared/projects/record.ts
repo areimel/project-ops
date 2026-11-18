@@ -34,8 +34,8 @@ export type OpenTarget = (typeof OPEN_TARGETS)[number];
 
 /** Detected facts, replaced wholesale on every scan or refresh. Never edited by the user. */
 export interface ProjectScan {
-  name: string | null;           // manifest name or folder name; null = not scanned yet
-  description: string | null;    // manifest description
+  name: string | null;           // the folder name; null = not scanned yet
+  description: string | null;    // package.json description
   repoUrl: string | null;        // origin remote converted to https
   branch: string | null;         // null when detached or not a repo
   lastCommitAt: number | null;   // ms
@@ -60,9 +60,21 @@ export interface ProjectFields {
   scan: ProjectScan;
 }
 
-/** POSIX `/x`, Windows `C:\x` or `C:/x`, or UNC `\\server\share`. Pure string test (no node:path in shared). */
+/**
+ * A network (UNC) path: two separators at the start, `\\server\share`, `//server/share` or a mix (also the
+ * `\\?\` and `\\.\` device forms). Refused in stored records because on Windows merely stat-ing one opens a
+ * network connection (and can hand out credentials). A project on a network share must be mapped to a drive letter.
+ * (Untested on Windows: main realpaths the chosen folder, and the native realpath may turn a mapped drive back into
+ * its UNC form, in which case such a folder is refused too.)
+ */
+export const isNetworkPath = (x: string): boolean => /^[\\/]{2}/.test(x);
+
+/**
+ * A local absolute path: POSIX `/x`, Windows `C:\x` or `C:/x`; network paths (isNetworkPath) are not. Pure string
+ * test (no node:path in shared). Folders from the dialog are realpaths, so a local folder never starts with `//`.
+ */
 export function isAbsolutePath(x: unknown): x is string {
-  return typeof x === "string" && (x.startsWith("/") || /^[A-Za-z]:[\\/]/.test(x) || x.startsWith("\\\\"));
+  return typeof x === "string" && !isNetworkPath(x) && (x.startsWith("/") || /^[A-Za-z]:[\\/]/.test(x));
 }
 
 /** The last segment of a path (`/a/b/` gives `b`); the path itself when it has no segment (`/`). */

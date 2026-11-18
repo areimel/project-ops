@@ -26,26 +26,22 @@ export function toRootViews(
 export const visibleCount = (projects: readonly ProjectFields[]): number => projects.filter((p) => !p.hidden).length;
 
 /**
- * The project list after a root is removed: its projects stay with rootId null (updatedAt bumped), and its
- * hidden tombstones are dropped (nothing would find them again to keep hidden). Other records are untouched.
+ * The project list after a root is removed: its projects, hidden tombstones included, stay with rootId null
+ * (updatedAt bumped). A tombstone is kept because another root may cover the same folder (nested or overlapping
+ * roots): dropping it would bring back a project the user removed. Other records are untouched.
  */
 export function afterRootRemoved(projects: readonly ProjectRecord[], rootId: string, now: number): ProjectRecord[] {
-  const out: ProjectRecord[] = [];
-  for (const p of projects) {
-    if (p.rootId !== rootId) out.push(p);
-    else if (!p.hidden) out.push({ ...p, rootId: null, updatedAt: now });
-  }
-  return out;
+  return projects.map((p) => (p.rootId === rootId ? { ...p, rootId: null, updatedAt: now } : p));
+}
+
+/** `scan` with its git facts replaced by `git` and scannedAt stamped. */
+function withGit(scan: ProjectScan, git: GitInfo, now: number): ProjectScan {
+  return { ...scan, branch: git.branch, lastCommitAt: git.lastCommitAt, dirty: git.dirty, repoUrl: git.repoUrl, scannedAt: now };
 }
 
 /** Scan facts from a folder read: detected parts replace the old ones (kept when the read failed), git replaces git. */
 export function scanFacts(prev: ProjectScan, detected: DetectedScan | null, git: GitInfo, now: number): ProjectScan {
-  return {
-    ...prev,
-    ...(detected ?? {}),
-    branch: git.branch, lastCommitAt: git.lastCommitAt, dirty: git.dirty, repoUrl: git.repoUrl,
-    scannedAt: now,
-  };
+  return withGit({ ...prev, ...(detected ?? {}) }, git, now);
 }
 
 /** A record for a folder added by hand. */
@@ -88,9 +84,7 @@ export function finishScan<T extends ProjectFields>(
   let newlyMissing = 0;
   const next = merged.map((rec) => {
     const g = git.get(rec.path);
-    if (g) {
-      return { ...rec, scan: { ...rec.scan, branch: g.branch, lastCommitAt: g.lastCommitAt, dirty: g.dirty, repoUrl: g.repoUrl, scannedAt: now } };
-    }
+    if (g) return { ...rec, scan: withGit(rec.scan, g, now) };
     const present = exists.get(rec.path);
     if (present === undefined || present === !rec.missing) return rec;
     if (!present) newlyMissing++;

@@ -1,4 +1,4 @@
-// Pure scan decisions (no fs, no electron): what makes a project, what to skip, stack and meta detection,
+// Pure scan decisions (no fs, no electron): what makes a project, what to skip, stack and description detection,
 // category hint, and the merge of a scan into the stored records. The file walk is projectScan.ts.
 import { isObject } from "../../shared/collections/heal";
 import {
@@ -73,21 +73,24 @@ export function detectStack(entryNames: readonly string[], packageJson: unknown)
   return out.slice(0, PROJECT_LIMITS.stack);
 }
 
-/** package.json name and description when they are usable strings, else null. `dirName` is unused for now. */
-export function detectMeta(_dirName: string, packageJson: unknown): { name: string | null; description: string | null } {
-  if (!isObject(packageJson)) return { name: null, description: null };
-  return {
-    name: overrideText(packageJson.name, PROJECT_LIMITS.name),
-    description: overrideText(packageJson.description, PROJECT_LIMITS.description),
-  };
+/** package.json description when it is a usable string, else null. */
+export function detectDescription(packageJson: unknown): string | null {
+  return isObject(packageJson) ? overrideText(packageJson.description, PROJECT_LIMITS.description) : null;
 }
 
 /** The detected part of a scan (no git, no scannedAt). */
 export type DetectedScan = Pick<ProjectScan, "name" | "description" | "stack">;
 
+/**
+ * The name is always the folder name (cut to PROJECT_LIMITS.name): the owner organises projects by folder, and
+ * cloned templates often share one package.json `name`, which would make their cards indistinguishable.
+ */
 export function detectScan(dirName: string, entryNames: readonly string[], packageJson: unknown): DetectedScan {
-  const meta = detectMeta(dirName, packageJson);
-  return { name: meta.name ?? dirName, description: meta.description, stack: detectStack(entryNames, packageJson) };
+  return {
+    name: overrideText(dirName, PROJECT_LIMITS.name),
+    description: detectDescription(packageJson),
+    stack: detectStack(entryNames, packageJson),
+  };
 }
 
 export interface FoundProject {
@@ -121,7 +124,10 @@ export interface MergeResult {
  * - A hidden (tombstoned) record stays hidden, found or not; its scan is still refreshed.
  * - A new path becomes origin "scan", category = hint, defaults elsewhere. At most PROJECT_LIMITS.max records in
  *   total; extra new ones are dropped.
- * - A scan-origin record whose rootId is in scannedRootIds and whose path was not found gets missing=true.
+ * - A found scan-origin record whose rootId is null or not a current root (its root was removed) is re-adopted by the
+ *   root that found it, so root counts stay right with overlapping roots. scannedRootIds is every current root.
+ * - A scan-origin record whose rootId is in scannedRootIds and whose path was not found gets missing=true; `missing`
+ *   counts only visible records newly marked.
  * - Duplicates in `found` (overlapping roots) collapse to the first.
  */
 export function mergeScan(
@@ -137,10 +143,11 @@ export function mergeScan(
     seen.add(rec.path);
     const f = byPath.get(rec.path);
     if (f) {
-      return { ...rec, missing: false, scan: { ...rec.scan, ...f.scan, scannedAt: now } };
+      const orphan = rec.origin === "scan" && (rec.rootId === null || !scanned.has(rec.rootId));
+      return { ...rec, rootId: orphan ? f.rootId : rec.rootId, missing: false, scan: { ...rec.scan, ...f.scan, scannedAt: now } };
     }
     if (rec.origin === "scan" && rec.rootId !== null && scanned.has(rec.rootId)) {
-      if (!rec.missing) missing++;
+      if (!rec.missing && !rec.hidden) missing++;
       return { ...rec, missing: true };
     }
     return rec;

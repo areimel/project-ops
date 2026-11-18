@@ -2,10 +2,11 @@
 // the page gets path-free views (toProjectView / toRootView with displayPath) and addresses records by id.
 // Folders come only from the directory dialog (or the dev stand-in), always realpath'd and checked to be folders.
 import { clipboard } from "electron";
-import { realpath, stat } from "node:fs/promises";
+import { realpath } from "node:fs/promises";
 import type { InstalledLaunchers } from "../../shared/ipc/projects";
+import { installedFor } from "../../shared/launchers";
 import {
-  applyProjectPatch, effectiveLinks, healProjectPatch, toProjectView, toProjectViews,
+  applyProjectPatch, effectiveLinks, healProjectPatch, isNetworkPath, toProjectView, toProjectViews,
   type OpenTarget, type ProjectLinkKey, type ProjectRecord, type ProjectView, type RootView,
 } from "../../shared/projects";
 import { emit } from "../ipc/handle";
@@ -14,6 +15,7 @@ import { getSettings } from "../store/settings";
 import { getWindow } from "../window";
 import { pickFolder } from "./files";
 import { displayPath } from "./filesCore";
+import { isDirectory } from "./fsUtil";
 import { killGitChildren, readGitInfo } from "./gitInfo";
 import { homeDir } from "./home";
 import { installedLaunchers, launch, openFolder } from "./launch";
@@ -33,15 +35,14 @@ function record(id: string): ProjectRecord {
   return rec;
 }
 
-/** A chosen folder as its real path; throws when it is gone or not a folder. */
+/** A chosen folder as its real path; throws when it is gone, not a folder or on a network share (see isNetworkPath). */
 async function realDir(picked: string): Promise<string> {
   let real: string;
   try { real = await realpath(picked); } catch { throw new Error("That folder could not be found."); }
-  if (!(await stat(real)).isDirectory()) throw new Error("That is not a folder.");
+  if (isNetworkPath(real)) throw new Error("Folders on a network share are not supported. Map the share to a drive letter first.");
+  if (!(await isDirectory(real))) throw new Error("That is not a folder.");
   return real;
 }
-
-const isDir = (path: string): Promise<boolean> => stat(path).then((s) => s.isDirectory(), () => false);
 
 // ---- views and pushes
 
@@ -109,7 +110,7 @@ export async function addFolder(): Promise<{ id: string } | null> {
 /** Re-reads one folder (detected facts and git); a folder that is gone is marked missing. */
 export async function refresh(id: string): Promise<void> {
   const { path } = record(id);
-  const present = await isDir(path);
+  const present = await isDirectory(path);
   const detected = present ? await inspectFolder(path) : null;
   const git = present ? await readGitInfo(path) : null;
   const current = projectsStore().get(id);
@@ -132,7 +133,7 @@ export async function addRoot(): Promise<RootView | null> {
   return rootViews().find((v) => v.id === rec.id) ?? null;
 }
 
-/** The root goes; its projects stay with rootId null and its hidden tombstones are purged. A running scan is dropped. */
+/** The root goes; its projects and hidden tombstones stay with rootId null. A running scan is dropped. */
 export function removeRoot(id: string): void {
   const roots = rootsStore();
   if (!roots.get(id)) throw new Error("Not found");
@@ -147,8 +148,7 @@ export function removeRoot(id: string): void {
 export async function open(id: string, target: OpenTarget): Promise<void> {
   const { path } = record(id);
   if (target === "folder") return openFolder(path);
-  const installed = installedLaunchers();
-  const chosen = resolveLauncher(target, getSettings()[target], target === "editor" ? installed.editors : installed.terminals);
+  const chosen = resolveLauncher(target, getSettings()[target], installedFor(target, installedLaunchers()));
   if (!chosen) {
     throw new Error(target === "editor"
       ? "No code editor was found. Install one, then choose it in Settings."

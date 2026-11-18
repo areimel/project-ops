@@ -2,11 +2,11 @@
 // being removed, or shutdown) supersedes the running one, which then throws supersededError() at its next check
 // and never touches the store. The merge happens synchronously after the last await, against the store as it
 // is then, so an edit made while git was running is never overwritten by a stale list.
-import { stat } from "node:fs/promises";
 import type { ScanResult } from "../../shared/ipc/projects";
 import { isSuperseded, supersededError } from "../../shared/superseded";
 import { emit } from "../ipc/handle";
 import { projectsStore, rootsStore } from "../store/projects";
+import { isDirectory } from "./fsUtil";
 import { readGitInfos } from "./gitInfo";
 import { log } from "./logger";
 import { scanRoot } from "./projectScan";
@@ -26,8 +26,6 @@ export function invalidateScan(): void {
   latest++;
   if (active) setScanning(false);
 }
-
-const isDir = (path: string): Promise<boolean> => stat(path).then((s) => s.isDirectory(), () => false);
 
 export async function scan(): Promise<ScanResult> {
   const mine = ++latest;
@@ -54,7 +52,7 @@ export async function scan(): Promise<ScanResult> {
     const statPaths = statTargets(before, found, scannedRootIds);
     const infos = await readGitInfos(gitPaths);
     check();
-    const present = await Promise.all(statPaths.map(isDir));
+    const present = await Promise.all(statPaths.map(isDirectory));
     check();
 
     // From here to replaceAll there is no await.

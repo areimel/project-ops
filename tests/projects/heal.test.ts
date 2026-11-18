@@ -37,6 +37,15 @@ describe("project heal", () => {
     expect(healProject({ path: "C:\\Users\\me\\proj" })?.path).toBe("C:\\Users\\me\\proj");
   });
 
+  it("refuses network (UNC) paths in every spelling", () => {
+    for (const path of ["\\\\server\\share\\p", "//server/share/p", "\\/server/share", "/\\server\\share", "\\\\?\\C:\\p", "\\\\.\\pipe\\x"]) {
+      expect(healProject({ path }), path).toBeNull();
+      expect(healRoot({ path }), path).toBeNull();
+    }
+    expect(healProject({ path: "C:/Users/me/proj" })?.path).toBe("C:/Users/me/proj");
+    expect(healRoot({ path: "/home/x" })).toEqual({ path: "/home/x" });
+  });
+
   it("fills defaults and drops unknown keys", () => {
     expect(healProject({ path: PATH, id: "x", extra: 1 })).toEqual({
       path: PATH, origin: "manual", rootId: null, missing: false, hidden: false, name: null, description: null,

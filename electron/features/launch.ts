@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { realpath, stat } from "node:fs/promises";
+import { realpath } from "node:fs/promises";
 import { basename } from "node:path";
 import { app, shell } from "electron";
 import { brand } from "../../shared/brand";
@@ -7,6 +7,7 @@ import {
   findLauncher, launchCommand, launchersFor,
   type EditorId, type LaunchPlatform, type LauncherKind, type TerminalId,
 } from "../../shared/launchers";
+import { isDirectory } from "./fsUtil";
 import { log } from "./logger";
 import { childEnv, isBundleName, isInside, launchError } from "./launchCore";
 import { which } from "./which";
@@ -55,9 +56,7 @@ export function clearLauncherCache(): void {
 const dryRun = (): boolean => !app.isPackaged && process.env[`${brand.envPrefix}_LAUNCH_DRY`] === "1";
 
 async function assertDir(dir: string): Promise<void> {
-  let isDir = false;
-  try { isDir = (await stat(dir)).isDirectory(); } catch { /* reported below */ }
-  if (!isDir) throw new Error("Folder not found");
+  if (!(await isDirectory(dir))) throw new Error("Folder not found");
 }
 
 /** Open `dir` in the system file manager. shell.openPath reports failure as a message, turned into an Error here. */

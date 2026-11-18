@@ -1,5 +1,5 @@
 import { brand } from "../../shared/brand";
-import { EDITOR_IDS, TERMINAL_IDS, type LauncherKind } from "../../shared/launchers";
+import { launcherTable, type LauncherKind } from "../../shared/launchers";
 
 // Pure helpers for launch.ts: the environment handed to spawned programs, the PATH lookup, error wording and
 // the choice of launcher. No child_process or electron here, so vitest can load it.
@@ -98,8 +98,8 @@ export function launchError(label: string, code: string | undefined): string {
  * Which launcher to use: the preferred id when it is valid for the kind (even if not detected, so the error
  * says so honestly), else the first detected one in table order, else null.
  */
-export function resolveLauncher(kind: LauncherKind, preferred: unknown, installed: string[]): string | null {
-  const ids: readonly string[] = kind === "editor" ? EDITOR_IDS : TERMINAL_IDS;
+export function resolveLauncher(kind: LauncherKind, preferred: unknown, installed: readonly string[]): string | null {
+  const ids = launcherTable(kind).map((l) => l.id);
   if (typeof preferred === "string" && ids.includes(preferred)) return preferred;
   return ids.find((id) => installed.includes(id)) ?? null;
 }
