@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { displayFolder, elideMiddle, safeFileName } from "../../electron/features/filesCore";
+import { displayFolder, displayPath, elideMiddle, safeFileName } from "../../electron/features/filesCore";
 
 const bytes = (s: string): Uint8Array => new TextEncoder().encode(s);
 
@@ -45,5 +45,30 @@ describe("displayFolder, long paths", () => {
     expect(out.startsWith("~/…/")).toBe(true);
     expect(out.length).toBeLessThanOrEqual(40);
     expect(out).not.toContain("/home/al");
+  });
+});
+
+describe("displayPath", () => {
+  it("shows the folder itself, home as ~", () => {
+    expect(displayPath("/home/al/work/app", "/home/al")).toBe("~/work/app");
+    expect(displayPath("/home/al", "/home/al")).toBe("~");
+    expect(displayPath("/home/alex/app", "/home/al")).toBe("/home/alex/app");
+    expect(displayPath("/srv/app", "")).toBe("/srv/app");
+  });
+  it("keeps the head and the last two segments of a long path", () => {
+    const home = "/home/alec";
+    expect(displayPath("/home/alec/code_projects/desktop-app-projects/project-ops", home))
+      .toBe("~/…/desktop-app-projects/project-ops");
+    expect(displayPath("/var/lib/some/very/long/chain/of/folders/client/site", "/home/al")).toBe("/…/client/site");
+  });
+  it("never contains the home folder and stays within the limit", () => {
+    const out = displayPath(`/home/al/a/b/${"x".repeat(30)}/${"y".repeat(30)}`, "/home/al");
+    expect(out).not.toContain("/home/al");
+    expect(out.length).toBeLessThanOrEqual(40);
+    expect(out.endsWith("y".repeat(10))).toBe(true);
+  });
+  it("handles Windows paths", () => {
+    expect(displayPath("C:\\Users\\al\\Documents\\projects\\clients\\acme-corp\\website", "C:\\Users\\al"))
+      .toBe("~\\…\\acme-corp\\website");
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { healLink } from "../../shared/projects/record";
-import { parseCommitTime, parseStatus, remoteToHttps } from "../../electron/features/gitInfoCore";
+import { parseCommitTime, parseHeadFile, parseOriginUrl, parseStatus, remoteToHttps, riskyConfigKeys } from "../../electron/features/gitInfoCore";
 
 describe("parseStatus", () => {
   it("reads a clean branch", () => {
@@ -63,5 +63,56 @@ describe("remoteToHttps", () => {
       expect(out).not.toBeNull();
       expect(healLink(out)).toBe(out);
     }
+  });
+});
+
+describe("riskyConfigKeys", () => {
+  it("a clean config has none", () => {
+    const names = [
+      "core.repositoryformatversion", "core.filemode", "core.bare", "core.logallrefupdates",
+      "remote.origin.url", "remote.origin.fetch", "branch.main.remote", "branch.main.merge", "user.name", "diff.renames",
+    ];
+    expect(riskyConfigKeys(names)).toEqual([]);
+  });
+  it.each([
+    "filter.lfs.clean", "filter.x.smudge", "filter.x.process", "core.fsmonitor", "core.hooksPath", "diff.pdf.textconv",
+    "diff.x.command", "diff.external", "core.sshCommand", "core.editor", "core.pager", "core.attributesFile",
+    "gpg.program", "gpg.ssh.program", "log.showSignature", "alias.st", "include.path", "includeIf.gitdir:~/w/.path",
+    "pager.log", "merge.ours.driver", "credential.helper", "sequence.editor", "uploadpack.packObjectsHook",
+  ])("flags %s", (key) => {
+    expect(riskyConfigKeys([key])).toEqual([key.toLowerCase()]);
+  });
+  it("is case-insensitive and ignores blank lines", () => {
+    expect(riskyConfigKeys(["", "CORE.FSMONITOR", "Core.Bare", " Alias.co "])).toEqual(["core.fsmonitor", "alias.co"]);
+  });
+});
+
+describe("parseHeadFile", () => {
+  it("reads a branch ref", () => {
+    expect(parseHeadFile("ref: refs/heads/main\n")).toBe("main");
+    expect(parseHeadFile("ref: refs/heads/feature/x\r\n")).toBe("feature/x");
+  });
+  it("is null for a detached hash or junk", () => {
+    expect(parseHeadFile("0123456789abcdef0123456789abcdef01234567\n")).toBeNull();
+    expect(parseHeadFile("ref: refs/tags/v1\n")).toBeNull();
+    expect(parseHeadFile("")).toBeNull();
+  });
+});
+
+describe("parseOriginUrl", () => {
+  it("reads url from the origin section only", () => {
+    const text = [
+      "[core]", "\tbare = false", "[remote \"upstream\"]", "\turl = git@x.example:u/up.git",
+      "[remote \"origin\"]", "\tfetch = +refs/heads/*:refs/remotes/origin/*", "\turl = git@github.com:u/repo.git",
+    ].join("\n");
+    expect(parseOriginUrl(text)).toBe("git@github.com:u/repo.git");
+  });
+  it("ignores case of section and key, strips quotes and comments", () => {
+    expect(parseOriginUrl("[Remote \"origin\"]\n  URL = \"https://h.example/a\" ; note\n")).toBe("https://h.example/a");
+  });
+  it("is null without an origin url", () => {
+    expect(parseOriginUrl("[remote \"Origin\"]\nurl = x\n")).toBeNull();
+    expect(parseOriginUrl("[core]\nurl = https://h.example/a\n")).toBeNull();
+    expect(parseOriginUrl("")).toBeNull();
   });
 });

@@ -35,12 +35,32 @@ export function elideMiddle(dir: string, max = FOLDER_DISPLAY_MAX): string {
   return `${head}…${sep}${rest}`;
 }
 
+/** `path` with the home directory shown as "~" (exact folder or a child of it; a lookalike prefix is left alone). */
+function shortenHome(path: string, home: string): string {
+  if (!home) return path;
+  if (path === home) return "~";
+  return path.startsWith(`${home}/`) || path.startsWith(`${home}\\`) ? `~${path.slice(home.length)}` : path;
+}
+
 /**
- * Display-only folder text: the home directory shows as "~" and a long path is elided in the middle.
+ * Display-only text for a folder itself: home shown as "~", and a path longer than `max` keeps its head and its
+ * last two segments (`~/…/desktop-app-projects/project-ops`). When even that is too long, elideMiddle cuts further.
  * The renderer gets this short form, never the absolute path, and never sends it back.
  */
+export function displayPath(path: string, home: string, max = FOLDER_DISPLAY_MAX): string {
+  const short = shortenHome(path, home);
+  if (short.length <= max) return short;
+  const sep = short.includes("/") ? "/" : "\\";
+  const parts = short.split(sep).filter((p, i) => p !== "" || i === 0);
+  const head = parts[0] === "" ? sep : `${parts[0]}${sep}`;
+  if (parts.length > 3) {
+    const kept = `${head}…${sep}${parts.slice(-2).join(sep)}`;
+    if (kept.length <= max) return kept;
+  }
+  return elideMiddle(short, max);
+}
+
+/** Display-only text for the folder that holds the file `path` (see displayPath). */
 export function displayFolder(path: string, home: string): string {
-  const dir = dirname(path);
-  const short = home && (dir === home || dir.startsWith(`${home}/`) || dir.startsWith(`${home}\\`)) ? `~${dir.slice(home.length)}` : dir;
-  return elideMiddle(short);
+  return displayPath(dirname(path), home);
 }

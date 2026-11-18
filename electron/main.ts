@@ -5,11 +5,20 @@ import { deliverDeepLink, markRendererGone, registerDeepLinks } from "./features
 import { argvTargets } from "./features/deepLinkParse";
 import { log } from "./features/logger";
 import { APP_SCHEME_ENTRY, applyDevCsp, registerAppProtocol } from "./features/appProtocol";
+import { initProjects, shutdownProjects } from "./features/projects";
 import { createTray, hasTray } from "./features/tray";
 import { registerIpc } from "./ipc/index";
 import { buildMenu } from "./menu";
 import { applySettingsToNative } from "./store/settings";
 import { createWindow, getWindow, handleBeforeQuit, lockDownContents, lockDownSession, showWindow } from "./window";
+
+/**
+ * Stops background work. Runs from the real exit paths only: will-quit (the quit is going ahead; before-quit can
+ * still be cancelled by the unsaved-changes guard) and SIGINT/SIGTERM. Safe to call twice.
+ */
+function shutdown(): void {
+  shutdownProjects();
+}
 
 function openMainWindow(): void {
   createWindow({ canHideToTray: hasTray, onClosed: markRendererGone });
@@ -37,10 +46,11 @@ if (!app.requestSingleInstanceLock()) {
   app.on("web-contents-created", (_e, contents) => lockDownContents(contents));
   app.on("activate", () => { if (!getWindow()) openMainWindow(); });                // macOS dock click
   app.on("before-quit", (e) => { handleBeforeQuit(e); });
+  app.on("will-quit", () => shutdown());
   // The app stays alive without a window on macOS only. With close-to-tray the window is hidden, not closed.
   app.on("window-all-closed", () => { if (process.platform !== "darwin") app.quit(); });
   for (const sig of ["SIGINT", "SIGTERM"] as const) {
-    process.on(sig, () => app.exit(0));
+    process.on(sig, () => { shutdown(); app.exit(0); });
   }
   registerDeepLinks(deliverDeepLink);
 
@@ -50,6 +60,7 @@ if (!app.requestSingleInstanceLock()) {
     const dev = process.env.VITE_DEV_SERVER_URL;
     if (dev) applyDevCsp(dev); else registerAppProtocol();
     registerIpc();
+    initProjects();        // pushes only; no scan at startup (scans run when a root is added and on demand)
     openMainWindow();
     applySettingsToNative();
     const win = getWindow();

@@ -1,29 +1,57 @@
 // Reads git facts by running the git binary with fixed arguments. Never throws: any failure gives nulls.
+//
+// Scanned folders may hold repositories the owner did not create, and a repository's local config can name
+// programs git runs (filters, fsmonitor, hooks, textconv, aliases, pagers, gpg ...). So the local config key
+// names are listed first (that listing runs nothing) and, when any risky key is present, no other git command
+// runs in that repo: the branch and origin URL are read from .git/HEAD and .git/config on disk instead, and the
+// last-commit time and dirty flag stay null. git itself is resolved to an absolute file once (never a bare name
+// searched in the project folder).
 import { execFile, type ChildProcess } from "node:child_process";
-import { stat } from "node:fs/promises";
+import { lstat } from "node:fs/promises";
 import { join } from "node:path";
-import { parseCommitTime, parseStatus, remoteToHttps } from "./gitInfoCore";
+import { log } from "./logger";
+import {
+  type GitInfo, parseCommitTime, parseHeadFile, parseOriginUrl, parseStatus, remoteToHttps, riskyConfigKeys,
+} from "./gitInfoCore";
+import { readSmallFile } from "./smallFile";
+import { which } from "./which";
 
-export interface GitInfo {
-  branch: string | null;
-  lastCommitAt: number | null;
-  dirty: boolean | null;
-  repoUrl: string | null;
-}
+export type { GitInfo };
 
 const TIMEOUT_MS = 5000;
 const MAX_BUFFER = 1024 * 1024;
+const GIT_FILE_MAX = 64 * 1024;   // .git/HEAD and .git/config read from disk
 const running = new Set<ChildProcess>();
+const NONE: GitInfo = { branch: null, lastCommitAt: null, dirty: null, repoUrl: null };
+
+let gitPath: string | null | undefined;   // undefined = not looked up yet; null = not found (behave as "no git")
+
+function gitBinary(): string | null {
+  if (gitPath === undefined) {
+    gitPath = which("git");
+    if (!gitPath) log.warn("git", "git was not found on PATH; projects get no git info");
+  }
+  return gitPath;
+}
+
+// Neutralise what the user's own (global) config or the environment could add, on every call.
+const SAFE_ARGS = [
+  "--no-optional-locks",
+  "-c", "core.fsmonitor=false", "-c", "core.untrackedCache=false",
+  "-c", "core.hooksPath=/dev/null", "-c", "log.showSignature=false",
+];
 
 /** stdout, or null on any failure (no git, not a repo, timeout, too much output, non-zero exit). */
 function git(path: string, args: string[]): Promise<string | null> {
+  const bin = gitBinary();
+  if (!bin) return Promise.resolve(null);
   return new Promise((resolve) => {
     try {
       const child = execFile(
-        "git", ["--no-optional-locks", "-c", "core.fsmonitor=false", "-C", path, ...args],
+        bin, [...SAFE_ARGS, "-C", path, ...args],
         {
-          timeout: TIMEOUT_MS, maxBuffer: MAX_BUFFER, windowsHide: true, encoding: "utf8",
-          env: { ...process.env, GIT_TERMINAL_PROMPT: "0", GIT_OPTIONAL_LOCKS: "0" },
+          timeout: TIMEOUT_MS, maxBuffer: MAX_BUFFER, windowsHide: true, encoding: "utf8", shell: false,
+          env: { ...process.env, GIT_TERMINAL_PROMPT: "0", GIT_OPTIONAL_LOCKS: "0", GIT_CONFIG_NOSYSTEM: "1" },
         },
         (err, stdout) => { running.delete(child); resolve(err ? null : stdout); },
       );
@@ -51,22 +79,49 @@ export async function mapLimit<T, R>(items: readonly T[], limit: number, fn: (it
   return out;
 }
 
-/** Skips git when the folder has no `.git` entry. Three sequential calls, so one repo uses one process at a time. */
+/**
+ * The risky path: facts from disk only, no git process. A `.git` that is a file (a worktree or submodule pointer to
+ * another folder) gives no info rather than following the pointer.
+ */
+async function readFromDisk(dotGit: string, isDir: boolean): Promise<GitInfo> {
+  if (!isDir) return NONE;
+  const head = await readSmallFile(join(dotGit, "HEAD"), GIT_FILE_MAX);
+  const config = await readSmallFile(join(dotGit, "config"), GIT_FILE_MAX);
+  const origin = config === null ? null : parseOriginUrl(config);
+  return {
+    branch: head === null ? null : parseHeadFile(head),
+    lastCommitAt: null,
+    dirty: null,
+    repoUrl: origin === null ? null : remoteToHttps(origin),
+  };
+}
+
+/** Skips git when the folder has no `.git` entry. Sequential calls, so one repo uses one process at a time. */
 export async function readGitInfo(path: string): Promise<GitInfo> {
-  const none: GitInfo = { branch: null, lastCommitAt: null, dirty: null, repoUrl: null };
+  if (!gitBinary()) return NONE;
+  const dotGit = join(path, ".git");
+  let isDir: boolean;
   try {
-    await stat(join(path, ".git"));
+    const st = await lstat(dotGit);
+    if (!st.isDirectory() && !st.isFile()) return NONE;
+    isDir = st.isDirectory();
   } catch {
-    return none;
+    return NONE;
+  }
+  const names = await git(path, ["config", "--local", "--list", "--name-only"]);
+  const risky = names === null ? null : riskyConfigKeys(names.split(/\r?\n/));
+  if (risky === null || risky.length > 0) {
+    if (risky) log.warn("git", `not running git in a project folder: its config sets ${risky.slice(0, 5).join(", ").replace(/[^\x20-\x7e]/g, "?")}`);
+    return readFromDisk(dotGit, isDir);
   }
   const status = await git(path, ["status", "--porcelain=v2", "--branch"]);
-  const log = await git(path, ["log", "-1", "--format=%ct"]);
+  const commit = await git(path, ["log", "-1", "--format=%ct", "--no-show-signature"]);
   const remote = await git(path, ["config", "--get", "remote.origin.url"]);
   const parsed = status === null ? null : parseStatus(status);
   return {
     branch: parsed?.branch ?? null,
     dirty: parsed?.dirty ?? null,
-    lastCommitAt: log === null ? null : parseCommitTime(log),
+    lastCommitAt: commit === null ? null : parseCommitTime(commit),
     repoUrl: remote === null ? null : remoteToHttps(remote),
   };
 }

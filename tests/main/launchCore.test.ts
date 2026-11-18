@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { childEnv, launchError, onPath, resolveLauncher } from "../../electron/features/launchCore";
+import { childEnv, isInside, launchError, onPath, resolveLauncher, resolveOnPath } from "../../electron/features/launchCore";
 
 describe("childEnv", () => {
   it("restores the desktop variable and drops the ORIGINAL_ key", () => {
@@ -48,6 +48,47 @@ describe("onPath", () => {
     const found = onPath("code.cmd", "C:\\bin", (f) => { seen.push(f); return f === "C:\\bin\\code.cmd"; }, "win32", ".EXE;.CMD");
     expect(found).toBe(true);
     expect(seen).toEqual(["C:\\bin\\code.cmd"]);
+  });
+});
+
+describe("resolveOnPath", () => {
+  const has = (...files: string[]) => (f: string) => files.includes(f);
+  it("returns the absolute file from the first PATH folder that has it", () => {
+    expect(resolveOnPath("git", "/usr/local/bin:/usr/bin", has("/usr/bin/git", "/usr/local/bin/git"), "linux")).toBe("/usr/local/bin/git");
+    expect(resolveOnPath("git", "/a/:/usr/bin", has("/a/git"), "linux")).toBe("/a/git");
+  });
+  it("skips empty and relative entries, which would search the current folder", () => {
+    const seen: string[] = [];
+    const exists = (f: string) => { seen.push(f); return true; };
+    expect(resolveOnPath("code", ":.:bin:./node_modules/.bin::/usr/bin", exists, "linux")).toBe("/usr/bin/code");
+    expect(seen).toEqual(["/usr/bin/code"]);
+    expect(resolveOnPath("code", ".:bin:", () => true, "linux")).toBeNull();
+  });
+  it("on win32 accepts drive and UNC entries only and tries PATHEXT", () => {
+    const exists = has("C:\\bin\\code.cmd", "\\\\srv\\tools\\zed.exe");
+    expect(resolveOnPath("code", ".;bin;C:\\bin", exists, "win32", ".EXE;.CMD")).toBe("C:\\bin\\code.cmd");
+    expect(resolveOnPath("zed", "\"\\\\srv\\tools\"", exists, "win32", ".EXE")).toBe("\\\\srv\\tools\\zed.exe");
+    expect(resolveOnPath("code", ".;tools", () => true, "win32", ".EXE")).toBeNull();
+  });
+  it("rejects a command with a path separator or an empty command", () => {
+    expect(resolveOnPath("/bin/sh", "/bin", () => true, "linux")).toBeNull();
+    expect(resolveOnPath("", "/bin", () => true, "linux")).toBeNull();
+  });
+});
+
+describe("isInside", () => {
+  it("is true for the folder itself and anything below it", () => {
+    expect(isInside("/p/proj", "/p/proj", "linux")).toBe(true);
+    expect(isInside("/p/proj/node_modules/.bin/code", "/p/proj", "linux")).toBe(true);
+    expect(isInside("/p/proj/x", "/p/proj/", "linux")).toBe(true);
+  });
+  it("is false for siblings and lookalike prefixes", () => {
+    expect(isInside("/p/project-two/code", "/p/proj", "linux")).toBe(false);
+    expect(isInside("/usr/bin/code", "/p/proj", "linux")).toBe(false);
+  });
+  it("ignores case and slash style on win32", () => {
+    expect(isInside("c:/Work/App/bin/code.exe", "C:\\work\\app", "win32")).toBe(true);
+    expect(isInside("C:\\work\\apple\\code.exe", "C:\\work\\app", "win32")).toBe(false);
   });
 });
 

@@ -25,21 +25,28 @@ export function childEnv(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
 
 const DEFAULT_PATHEXT = ".COM;.EXE;.BAT;.CMD";
 
+const isAbsoluteDir = (dir: string, win: boolean): boolean =>
+  win ? /^[A-Za-z]:[\\/]/.test(dir) || dir.startsWith("\\\\") : dir.startsWith("/");
+
 /**
- * Is `command` a file in one of the PATH folders? `exists` is injected (the caller checks the file system).
+ * The absolute file `command` resolves to in the PATH folders, or null. `exists` is injected (the caller checks
+ * the file system). Only absolute PATH entries are considered: an empty or relative entry (`.`, `bin`, `::`)
+ * would search the current folder, which for a project launch is a folder we did not write (CWE-427).
  * A command with a path separator is never accepted, so this cannot be pointed at an arbitrary file.
  */
-export function onPath(
+export function resolveOnPath(
   command: string,
   pathVar: string,
   exists: (file: string) => boolean,
   platform: NodeJS.Platform,
   pathExt?: string,
-): boolean {
-  if (!command || command.includes("/") || command.includes("\\")) return false;
+): string | null {
+  if (!command || command.includes("/") || command.includes("\\")) return null;
   const win = platform === "win32";
   const sep = win ? ";" : ":";
-  const dirs = pathVar.split(sep).filter(Boolean).map((d) => (win ? d.replace(/^"(.*)"$/, "$1") : d));
+  const dirs = pathVar.split(sep)
+    .map((d) => (win ? d.replace(/^"(.*)"$/, "$1") : d))
+    .filter((d) => d !== "" && isAbsoluteDir(d, win));
   let names = [command];
   if (win) {
     const exts = (pathExt || DEFAULT_PATHEXT).split(";").filter(Boolean).map((e) => e.toLowerCase());
@@ -47,7 +54,34 @@ export function onPath(
     if (!hasExt) names = exts.map((e) => command + e);
   }
   const join = (dir: string, name: string) => (dir.endsWith(win ? "\\" : "/") ? dir + name : dir + (win ? "\\" : "/") + name);
-  return dirs.some((dir) => names.some((name) => exists(join(dir, name))));
+  for (const dir of dirs) {
+    for (const name of names) {
+      const file = join(dir, name);
+      if (exists(file)) return file;
+    }
+  }
+  return null;
+}
+
+/** Is `command` on PATH (absolute entries only)? See resolveOnPath. */
+export function onPath(
+  command: string, pathVar: string, exists: (file: string) => boolean, platform: NodeJS.Platform, pathExt?: string,
+): boolean {
+  return resolveOnPath(command, pathVar, exists, platform, pathExt) !== null;
+}
+
+/** Is `file` the folder `dir` or inside it? Plain string test on real paths; case-insensitive on win32. */
+export function isInside(file: string, dir: string, platform: NodeJS.Platform): boolean {
+  const win = platform === "win32";
+  const norm = (p: string) => {
+    const s = win ? p.replace(/\//g, "\\").toLowerCase() : p;
+    const sep = win ? "\\" : "/";
+    return s.length > 1 && s.endsWith(sep) ? s.slice(0, -1) : s;
+  };
+  const f = norm(file);
+  const d = norm(dir);
+  const sep = win ? "\\" : "/";
+  return f === d || f.startsWith(d.endsWith(sep) ? d : d + sep);
 }
 
 /** The message for a failed spawn. `code` is the Node error code (ENOENT, EACCES, ...). */

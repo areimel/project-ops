@@ -1,5 +1,6 @@
 import { brand } from "./brand";
 import { isObject } from "./collections/heal";
+import { isEditorId, isTerminalId, type EditorId, type TerminalId } from "./launchers";
 import { isThemeId, type ThemeId } from "./theme";
 
 export type ModeSetting = "system" | "light" | "dark";
@@ -8,8 +9,12 @@ export interface Settings {
   mode: ModeSetting;
   accent: string | null;     // ^#[0-9a-f]{6}$ override of --accent, null = theme accent
   closeToTray: boolean;      // default false
+  editor: EditorId | null;   // shared/launchers.ts id; null = the first one installed
+  terminal: TerminalId | null;
 }
-export const SETTINGS_VERSION = 1;               // file settings.json = { version, values }
+// file settings.json = { version, values }. Adding a key with a default needs no bump: an older file simply
+// lacks it and heals to the default. Bump only when a stored key changes meaning, with a migration here.
+export const SETTINGS_VERSION = 1;
 
 const MODES: readonly ModeSetting[] = ["system", "light", "dark"];
 const HEX = /^#[0-9a-fA-F]{6}$/;
@@ -19,6 +24,7 @@ export function defaultSettings(): Settings {     // theme/mode from brand
     theme: isThemeId(brand.defaultTheme) ? brand.defaultTheme : "kojima",
     mode: brand.defaultMode,
     accent: null, closeToTray: false,
+    editor: null, terminal: null,
   };
 }
 
@@ -31,6 +37,8 @@ export function healSettingsPatch(raw: unknown): Partial<Settings> {
   if (raw.accent === null) out.accent = null;
   else if (typeof raw.accent === "string" && HEX.test(raw.accent)) out.accent = raw.accent.toLowerCase();
   if (typeof raw.closeToTray === "boolean") out.closeToTray = raw.closeToTray;
+  if (raw.editor === null || isEditorId(raw.editor)) out.editor = raw.editor;
+  if (raw.terminal === null || isTerminalId(raw.terminal)) out.terminal = raw.terminal;
   return out;
 }
 

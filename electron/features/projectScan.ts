@@ -1,27 +1,20 @@
 // The folder walk (file system side of projectScanCore.ts). Read-only: it never writes or follows symlinked folders.
-import { open, readdir, realpath } from "node:fs/promises";
+import { readdir, realpath } from "node:fs/promises";
 import { basename, join } from "node:path";
 import { supersededError } from "../../shared/superseded";
 import { PROJECT_LIMITS } from "../../shared/projects/record";
 import {
   MAX_DEPTH, categoryHint, detectScan, isProjectDir, shouldDescend, type DetectedScan, type FoundProject,
 } from "./projectScanCore";
+import { readSmallFile } from "./smallFile";
 
 const PACKAGE_JSON_MAX = 512 * 1024;
 
-/** The parsed package.json, or null when missing, too big, unreadable or not JSON. */
+/** The parsed package.json, or null when missing, not a regular file (symlinks refused), too big or not JSON. */
 async function readPackageJson(dir: string): Promise<unknown> {
-  let handle;
-  try {
-    handle = await open(join(dir, "package.json"), "r");
-    const { size } = await handle.stat();
-    if (size > PACKAGE_JSON_MAX) return null;
-    return JSON.parse(await handle.readFile("utf8")) as unknown;
-  } catch {
-    return null;
-  } finally {
-    await handle?.close().catch(() => undefined);
-  }
+  const text = await readSmallFile(join(dir, "package.json"), PACKAGE_JSON_MAX);
+  if (text === null) return null;
+  try { return JSON.parse(text) as unknown; } catch { return null; }
 }
 
 async function names(dir: string): Promise<{ names: string[]; dirs: string[] } | null> {

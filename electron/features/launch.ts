@@ -1,14 +1,14 @@
 import { spawn } from "node:child_process";
-import { accessSync, constants, existsSync } from "node:fs";
-import { stat } from "node:fs/promises";
-import { app } from "electron";
+import { realpath, stat } from "node:fs/promises";
+import { app, shell } from "electron";
 import { brand } from "../../shared/brand";
 import {
   findLauncher, launchCommand, launchersFor,
   type EditorId, type LaunchPlatform, type LauncherKind, type TerminalId,
 } from "../../shared/launchers";
 import { log } from "./logger";
-import { childEnv, launchError, onPath } from "./launchCore";
+import { childEnv, isInside, launchError } from "./launchCore";
+import { which } from "./which";
 
 // Opens a folder in an editor or terminal from the fixed table in shared/launchers.ts. The page never supplies
 // a command or a path of its own; `id` is looked up in the table and `dir` is passed as one argv element with
@@ -25,21 +25,12 @@ let cache: { at: number; value: { editors: EditorId[]; terminals: TerminalId[] }
 const platformKey = (): LaunchPlatform | null =>
   process.platform === "linux" || process.platform === "darwin" || process.platform === "win32" ? process.platform : null;
 
-function isExecutable(file: string): boolean {
-  try {
-    if (process.platform === "win32") return existsSync(file);
-    accessSync(file, constants.X_OK);
-    return true;
-  } catch { return false; }
-}
-
 function detect(kind: LauncherKind, platform: LaunchPlatform): string[] {
-  const pathVar = process.env.PATH ?? process.env.Path ?? "";
   return launchersFor(kind, platform)
     .filter((l) => {
       const command = launchCommand(kind, l.id, platform, "/")?.command ?? "";
       // macOS entries run `open -a <App>`; "open" is always there, so the app itself cannot be checked cheaply.
-      return onPath(command, pathVar, isExecutable, platform, process.env.PATHEXT);
+      return which(command) !== null;
     })
     .map((l) => l.id);
 }
@@ -59,6 +50,26 @@ export function clearLauncherCache(): void {
   cache = null;
 }
 
+/** Dev only, never packaged: APP_LAUNCH_DRY=1 logs what would start instead of starting it. */
+const dryRun = (): boolean => !app.isPackaged && process.env[`${brand.envPrefix}_LAUNCH_DRY`] === "1";
+
+async function assertDir(dir: string): Promise<void> {
+  let isDir = false;
+  try { isDir = (await stat(dir)).isDirectory(); } catch { /* reported below */ }
+  if (!isDir) throw new Error("Folder not found");
+}
+
+/** Open `dir` in the system file manager. shell.openPath reports failure as a message, turned into an Error here. */
+export async function openFolder(dir: string): Promise<void> {
+  await assertDir(dir);
+  if (dryRun()) {
+    log.info("launch", `[open-folder] ${dir}`);
+    return;
+  }
+  const error = await shell.openPath(dir);
+  if (error !== "") throw new Error(`The folder could not be opened: ${error}`);
+}
+
 /** Open `dir` in the editor or terminal `id`. Resolves once the program has started, rejects with a message. */
 export async function launch(kind: LauncherKind, id: unknown, dir: string): Promise<void> {
   const platform = platformKey();
@@ -67,17 +78,26 @@ export async function launch(kind: LauncherKind, id: unknown, dir: string): Prom
   const cmd = launchCommand(kind, id, platform, dir);
   if (!cmd) throw new Error(`${launcher.label} is not available on this system. Choose another in Settings.`);
 
-  let isDir = false;
-  try { isDir = (await stat(dir)).isDirectory(); } catch { /* reported below */ }
-  if (!isDir) throw new Error("Folder not found");
+  await assertDir(dir);
+  // Spawn an absolute file found on the absolute PATH entries only, never a bare name: with cwd set to the project
+  // folder, a bare name could run a program planted there (CWE-427). A program that lies inside the project
+  // folder itself (a PATH entry pointing into it) is refused too.
+  const program = which(cmd.command);
+  if (!program) throw new Error(launchError(launcher.label, "ENOENT"));
+  const realDir = await realpath(dir);
+  const realProgram = await realpath(program).catch(() => program);
+  if ([program, realProgram].some((p) => isInside(p, realDir, process.platform))) {
+    log.warn("launch", `refused ${program}: inside the project folder`);
+    throw new Error(`${launcher.label} resolves to a program inside this project folder, so it was not started.`);
+  }
 
-  if (!app.isPackaged && process.env[`${brand.envPrefix}_LAUNCH_DRY`] === "1") {
-    log.info("launch", `[launch] ${cmd.command} ${JSON.stringify(cmd.args)} cwd=${dir}`);
+  if (dryRun()) {
+    log.info("launch", `[launch] ${program} ${JSON.stringify(cmd.args)} cwd=${dir}`);
     return;
   }
 
   await new Promise<void>((resolve, reject) => {
-    const child = spawn(cmd.command, cmd.args, {
+    const child = spawn(program, cmd.args, {
       cwd: dir,
       env: childEnv(process.env),
       detached: true,
@@ -86,7 +106,7 @@ export async function launch(kind: LauncherKind, id: unknown, dir: string): Prom
       windowsHide: true,
     });
     child.once("error", (e: NodeJS.ErrnoException) => {
-      log.warn("launch", `${cmd.command} failed: ${e.code ?? e.message}`);
+      log.warn("launch", `${program} failed: ${e.code ?? e.message}`);
       reject(new Error(launchError(launcher.label, e.code)));
     });
     child.once("spawn", () => {

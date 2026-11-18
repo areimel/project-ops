@@ -1,7 +1,8 @@
 import { register as app } from "./app";
 import { register as data } from "./data";
+import { register as projects } from "./projects";
 import { register as settings } from "./settings";
 
 export function registerIpc(): void {
-  for (const register of [app, data, settings]) register();
+  for (const register of [app, data, settings, projects]) register();
 }

@@ -1,6 +1,14 @@
 // Pure parsers for git output and remote URLs.
 import { healLink } from "../../shared/projects/record";
 
+/** Git facts for one folder; every field null when it is not a repo or git could not be used. */
+export interface GitInfo {
+  branch: string | null;
+  lastCommitAt: number | null;
+  dirty: boolean | null;
+  repoUrl: string | null;
+}
+
 /** From `git status --porcelain=v2 --branch`. Detached HEAD gives a null branch; any non-header line is a change. */
 export function parseStatus(porcelainV2: string): { branch: string | null; dirty: boolean } {
   let branch: string | null = null;
@@ -51,4 +59,62 @@ export function remoteToHttps(remote: string): string | null {
   path = path.replace(/^\/+/, "").replace(/\/+$/, "").replace(/\.git$/i, "");
   if (host === "" || path === "" || path.split("/").some((p) => p === "." || p === "..")) return null;
   return healLink(`https://${host}/${path}`);
+}
+
+// Local config keys that make git run a program (or pull in more config that could). A scanned folder may hold a
+// repository the owner did not create, so when any of these is set no git command runs in it (gitInfo.ts reads
+// HEAD and config from disk instead). Matched case-insensitively on the names `git config --list --name-only` prints.
+const RISKY_KEYS: readonly RegExp[] = [
+  /^filter\./,                                   // clean, smudge, process
+  /^diff\.external$/, /^diff\..+\.(textconv|command)$/,
+  /^merge\..+\.driver$/,
+  /^core\.(fsmonitor|hookspath|sshcommand|editor|pager|askpass|gitproxy|attributesfile)$/,
+  /^sequence\.editor$/,
+  /^credential\./,
+  /^gpg\./,                                      // gpg.program, gpg.<format>.program
+  /^log\.showsignature$/,
+  /^alias\./,
+  /^pager\./,
+  /^include\.path$/, /^includeif\./,             // pull in further config
+  /(command|textconv|program|helper|editor|pager|askpass|driver|hook|hookspath|fsmonitor)$/,   // any other *command key
+];
+
+/** The names in `names` (one per line of `config --local --list --name-only`) that are risky, lower-cased, in order. */
+export function riskyConfigKeys(names: readonly string[]): string[] {
+  const out: string[] = [];
+  for (const raw of names) {
+    const name = raw.trim().toLowerCase();
+    if (name !== "" && RISKY_KEYS.some((re) => re.test(name))) out.push(name);
+  }
+  return out;
+}
+
+/** The branch from a `.git/HEAD` file: `ref: refs/heads/<name>` gives the name; a bare hash or anything else, null. */
+export function parseHeadFile(text: string): string | null {
+  const m = /^ref:\s*refs\/heads\/(\S+)\s*$/.exec(text.split(/\r?\n/)[0] ?? "");
+  if (!m) return null;
+  const name = m[1]!;
+  return name.length > 255 || /[\x00-\x1f\x7f]/.test(name) ? null : name;
+}
+
+/** `url` of `[remote "origin"]` in a `.git/config` file (raw, unconverted), or null. Section and key names ignore case. */
+export function parseOriginUrl(text: string): string | null {
+  let inOrigin = false;
+  for (const rawLine of text.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (line === "" || line.startsWith("#") || line.startsWith(";")) continue;
+    const section = /^\[\s*([A-Za-z0-9.-]+)(?:\s+"((?:[^"\\]|\\.)*)")?\s*\]/.exec(line);
+    if (section) {
+      inOrigin = section[1]!.toLowerCase() === "remote" && section[2] === "origin";
+      continue;
+    }
+    if (!inOrigin) continue;
+    const kv = /^([A-Za-z][A-Za-z0-9-]*)\s*=\s*(.*)$/.exec(line);
+    if (kv && kv[1]!.toLowerCase() === "url") {
+      let value = kv[2]!.replace(/\s+[#;].*$/, "").trim();
+      if (value.length >= 2 && value.startsWith("\"") && value.endsWith("\"")) value = value.slice(1, -1);
+      return value === "" ? null : value;
+    }
+  }
+  return null;
 }
