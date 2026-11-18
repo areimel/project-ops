@@ -14,7 +14,7 @@ extraResources:
     to: THIRD_PARTY_NOTICES.md
   - from: build/tray.png
     to: tray.png
-# Deep links: project-ops://open/notes
+# Deep links: project-ops://open/projects/<id>
 protocols:
   - name: Project Ops
     schemes:

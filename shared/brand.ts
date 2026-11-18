@@ -3,7 +3,7 @@ export const brand = {
   tagline: "Find, filter and open your coding projects.",
   packageName: "project-ops", // package.json "name", .deb name, executable
   appId: "com.areimel.projectops",     // electron-builder appId, Windows AppUserModelId
-  scheme: "project-ops",               // deep links: project-ops://open/notes
+  scheme: "project-ops",               // deep links: project-ops://open/projects/<id>
   envPrefix: "APP",                     // APP_CAPTURE, APP_LOG_LEVEL, APP_WINDOW_BOUNDS
   author: "Alec Reimel",
   copyright: "Copyright © Alec Reimel. MIT licence.",

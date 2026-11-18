@@ -44,7 +44,6 @@ const PATHS = {
   warning: "M12 3L2.5 20h19z M12 10v5 M12 17.5h.01",
   info: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 11v6 M12 7.5h.01",
 
-  // Player
 } as const;
 
 export type IconName = keyof typeof PATHS;

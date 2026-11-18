@@ -5,7 +5,7 @@ import type { HandlerRegistry } from "./handlerRegistry";
 import { useLatest } from "../hooks/useLatest";
 
 export type SaveState = "saved" | "saving" | "unsaved" | "error";
-export interface TitleInfo { count?: string; saveState?: SaveState }      // count: "12 notes"
+export interface TitleInfo { count?: string; saveState?: SaveState }      // count: "12 projects"
 export interface ConfirmOptions { title: string; body?: string; confirmLabel: string; cancelLabel?: string; danger?: boolean }
 export interface ShellApi {
   route: Route;

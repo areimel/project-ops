@@ -4,9 +4,9 @@
  * native menu, button tooltips, the command palette and the shortcut-help overlay.
  */
 export interface CommandSpec {
-  id: string;                 // "shell.palette" | "go.notes" | "<appId>.<name>", e.g. "notes.new"
+  id: string;                 // "shell.palette" | "go.projects" | "<appId>.<name>", e.g. "projects.focus-search"
   label: string;              // sentence case: "New note"
-  group: string;              // heading in menu, palette and help: "View", "Notes"
+  group: string;              // heading in menu, palette and help: "View", "Projects"
   keys?: readonly string[];   // renderer-handled plain keys: "n", "Shift+E", "?", "Delete", " "
   accelerator?: string;       // menu-handled: "CmdOrCtrl+K"; the menu sends menu:command
   menu?: boolean;             // in the native menu (default true)

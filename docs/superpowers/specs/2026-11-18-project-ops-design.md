@@ -300,8 +300,8 @@ Added after the build, checked against the source on 2026-11-18. The text above 
 - The view carries `overrides` (the owner's stored `name`, `description` and `links`) and `detected` (`name`, `description`, `repo`) instead of `nameIsDetected` and `descriptionIsDetected`, plus `scannedAt`. The edit dialog fills its fields from `overrides` and shows `detected` as placeholders.
 - `links` in the view are effective links. The repo link falls back to the detected remote (`scan.repoUrl`) at read time (`effectiveLinks`); a scan never writes `links.repo`. The design said a scan prefills it. Opening Repo uses the same fallback.
 - `folder` is `displayPath(path, home)` with a 40-character limit: `~` for the home folder, and when too long and more than three segments the first segment, `…` and the last two segments.
-- Detection always fills `scan.name` (the manifest name or the folder name), so it is only null before the first scan.
-- Removing a scan root also deletes that root's hidden tombstones (new; nothing would find them again). Its other projects stay with `rootId: null` and are re-checked for `missing` by the next scan (`statTargets`), not by refresh.
+- Detection always fills `scan.name`, so it is only null before the first scan. Correction (later): it is always the folder name; `package.json` supplies the description and stack only, because cloned template sites share one package name. The design's "manifest name or folder name" (the `scan` field text above) no longer applies.
+- Correction (later): removing a scan root keeps its hidden tombstones too (so a removed project does not return through another root and root counts stay right); all its projects stay with `rootId: null`, and a found scan record whose root is gone is adopted by the root that found it. They are re-checked for `missing` by the next scan (`statTargets`), not by refresh.
 - A hidden project is brought back by Undo, or by adding the same folder again with "Add folder" (it is un-hidden, as designed for manual folders, and this works for scanned ones too). There is still no view of hidden projects.
 
 ### Scan and git
@@ -310,6 +310,7 @@ Added after the build, checked against the source on 2026-11-18. The text above 
 - Name and description are read from `package.json` only. `Cargo.toml` and `pyproject.toml` are not read.
 - `package.json`, `.git/HEAD` and `.git/config` are read through `smallFile.ts` (regular files, no symlinks, byte caps: 512 KB for `package.json`, 64 KB for git files). New.
 - **Plain-config rule (new).** Git runs only when `.git` is a real directory whose `config` has nothing but allowlisted keys and plain values, with no `config.worktree`, `commondir`, `modules` or `.gitmodules`. Otherwise no git process runs; branch and remote come from `.git/HEAD` and `.git/config`, and last commit and dirty stay null. A `.git` pointer file gives nothing. See `CLAUDE.md` and `docs/guides/projects.md`.
+- Correction (later): git is also pinned to the validated folder (`--git-dir`, `--work-tree`, ceiling directory, `.git/HEAD`, `objects/` and `refs/` must exist, inherited `GIT_*` stripped). The allowlist also has `branch.<name>.github-pr-base-branch` and `core.hookspath` (hooks are overridden by `-c core.hooksPath=/dev/null` on every call).
 - Where git runs: an absolute `git` found once by `which`, extra `-c` options that switch off fsmonitor, hooks, attributes files and submodule recursion, `--ignore-submodules=all` on status, `GIT_CONFIG_NOSYSTEM=1`, 5 s timeout, 1 MB output cap, four repositories at a time.
 - Hidden records are not read with git during a scan (`gitTargets` leaves them out). Records the scan does not settle (manual ones, ones whose root was removed) get a folder-exists check (`statTargets`).
 - One scan runs at a time; import, reset, root removal and shutdown supersede it, as well as a newer scan. The merge and the single `replaceAll` have no `await` between them.
@@ -321,10 +322,12 @@ Added after the build, checked against the source on 2026-11-18. The text above 
 - Windows `.cmd` entries will probably not start with `shell: false`; this is left as is on purpose (comment in `launch.ts`).
 - `APP_LAUNCH_DRY=1` also covers the folder target. On macOS a bundle folder is revealed in its parent instead of opened (new).
 - Settings: programs that were not found stay selectable, marked "not found", and the default "Automatic" names the program it would use. The design said not-found entries are disabled.
+- Network (UNC) paths are refused in project and root records (`isNetworkPath`) and at the folder dialog; import heals them away. Import restores collections it already replaced if a later write fails (`applyCollections`).
 - Dev only: `APP_PICK_FOLDER=/abs/dir` stands in for the folder dialog.
 
 ### Renderer
 
+- Tag counts in the rail show what a click would give (an excluded tag shows how many it hides); an open suggestion list closes on the first Escape before the dialog does. Shared helpers: `useAttempt`, `utils/plural`, `utils/projectText`, `utils/cx`, `electron/features/fsUtil.ts`.
 - Filters have an exclude list for tags (`excludeTags`): clicking a tag in the rail cycles off, include, exclude; the design had include only. Sort has a fourth option, "Last edited" (`updatedAt`). Search also matches branch and folder.
 - Commands: `projects.search` (`/`), `projects.add-folder` (Ctrl/Cmd+O), `projects.rescan` (F5), `projects.clear-filters` (no key; active only when a filter is set).
 - Links are shown as a "Links" trait row on the card (Repo, Site, Docs, each with an arrow), not in the footer. The footer holds open folder, open in editor, open terminal, copy path, pin and edit.
@@ -338,7 +341,7 @@ Added after the build, checked against the source on 2026-11-18. The text above 
 
 - Kojima as designed, including radius 0 and no shadows. `--accent-ink` is charcoal in both modes.
 - The CSP's `media-src` is `'none'` (the design's earlier text, inherited from the template, named the media scheme). The page's scheme is `project-ops-app://renderer/`.
-- `electron/features/tray.ts` still exists and the `closeToTray` setting stays, but `setTrayStatus` has no caller.
+- `electron/features/tray.ts` still exists and the `closeToTray` setting stays, but `setTrayStatus` had no caller and was removed afterwards; the tray menu is Show and Quit.
 
 ### Known trade-offs: changes
 

@@ -7,6 +7,6 @@ export interface AppDefinition {
   name: string;                   // "Projects"
   icon: IconName;
   summary: string;                // one line: what the app is for
-  component: LazyExoticComponent<ComponentType>;   // lazy(() => import("./NotesApp"))
+  component: LazyExoticComponent<ComponentType>;   // lazy(() => import("./ProjectsApp"))
   commands?: readonly CommandSpec[];               // static; ids start with `${id}.`
 }

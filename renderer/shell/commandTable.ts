@@ -14,7 +14,7 @@ export function menuContext(app: AppDefinition | null, apps: readonly AppDefinit
   };
 }
 
-/** Tooltip text for a command id ("Go to Notes (Ctrl+1)"); falls back to the id's label if unknown. */
+/** Tooltip text for a command id ("Go to Projects (Ctrl+1)"); falls back to the id's label if unknown. */
 export function hintFor(commands: readonly CommandSpec[], id: string, mac: boolean): string {
   const c = commands.find((x) => x.id === id);
   return c ? hint(c, mac) : id;
