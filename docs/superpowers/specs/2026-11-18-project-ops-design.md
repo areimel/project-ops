@@ -275,3 +275,71 @@ The 2 px radius and "no all-caps, no mono labels, no arrows" rules in the old Bl
 ## Left to the builder
 
 Exact component APIs and props, file splits within the 300-line rule, the shape of `pushStore`, icon drawings, copy wording, the empty state's text and action ("Add a scan folder"), how the toolbar shows the last scan time, and test selection beyond the list above. Anything marked **(call)** may be changed if the code argues for it; record the change in this file.
+
+## As built
+
+Added after the build, checked against the source on 2026-11-18. The text above is the design as written and is left as it was. Where it differs from what follows, the code wins. Items marked "new" are things the design did not mention.
+
+### Files and names
+
+- The shared project code is a folder, `shared/projects/` (`record.ts`, `patch.ts`, `view.ts`, `roots.ts`, `index.ts`), not `shared/projects.ts` and `shared/projectRoots.ts`. The launcher table is `shared/launchers.ts` as designed.
+- The roots collection is named `project-roots` (`rootSpec.name`). In an export, `collections` holds `projects` and `"project-roots"`, not `projectRoots`.
+- Limits as designed (`PROJECT_LIMITS`, root limit 20 in `ROOT_LIMIT`); new: `branch` 255, `stack` 24 ids of 32 characters per project.
+
+### IPC (`shared/ipc/projects.ts`)
+
+- `projects:list` returns `ProjectView[]` only. Roots have their own channel, `projects:roots-list`, and their own push, `projects:roots-changed` (sent only when the root views actually changed, so a project edit that changes no count sends nothing). `projects:changed` carries `ProjectView[]`, not `{projects, roots}`. New push: `projects:scan-state` (`{scanning}`), used to disable Rescan.
+- `projects:restore` and `projects:refresh` return nothing (the page follows the `projects:changed` push), not a `Project`. `projects:add-folder` returns `{id} | null` and does not refresh anything beyond reading the folder once; the page focuses the new card by id. `projects:roots-add` returns the `RootView` (or null) and starts a scan in the background without waiting.
+- `projects:scan` returns `{added, missing, total}` (total is the visible count), not `{found, added, missing}`.
+- `projects:launchers` returns `{editors: string[], terminals: string[]}`, the ids found on `PATH`, not `{id, label, installed}` objects; labels come from the table in `shared/launchers.ts`. The result is cached in main for 30 seconds; Settings has a "Check again" button, and nothing refreshes it when Settings opens.
+- `projects:update` takes the patch as an unvalidated value (`v.raw`) and heals it in main with `healProjectPatch`, as designed.
+- A missing folder makes `projects:open` fail with `Folder not found`, not the longer message in the design. A program that was not found fails with `<Label> was not found. Choose another in Settings.`
+
+### Record and view
+
+- The view carries `overrides` (the owner's stored `name`, `description` and `links`) and `detected` (`name`, `description`, `repo`) instead of `nameIsDetected` and `descriptionIsDetected`, plus `scannedAt`. The edit dialog fills its fields from `overrides` and shows `detected` as placeholders.
+- `links` in the view are effective links. The repo link falls back to the detected remote (`scan.repoUrl`) at read time (`effectiveLinks`); a scan never writes `links.repo`. The design said a scan prefills it. Opening Repo uses the same fallback.
+- `folder` is `displayPath(path, home)` with a 40-character limit: `~` for the home folder, and when too long and more than three segments the first segment, `…` and the last two segments.
+- Detection always fills `scan.name` (the manifest name or the folder name), so it is only null before the first scan.
+- Removing a scan root also deletes that root's hidden tombstones (new; nothing would find them again). Its other projects stay with `rootId: null` and are re-checked for `missing` by the next scan (`statTargets`), not by refresh.
+- A hidden project is brought back by Undo, or by adding the same folder again with "Add folder" (it is un-hidden, as designed for manual folders, and this works for scanned ones too). There is still no view of hidden projects.
+
+### Scan and git
+
+- Skip list: `node_modules vendor dist build out target venv .venv __pycache__` and every dot-folder. `coverage` is not in it. Markers added to the design's list: `requirements.txt`, `Makefile`, `build.gradle.kts`, `deno.jsonc`, `pubspec.yaml`, `mix.exs`, and `.sln` or `.csproj` files by pattern. Stack ids: node, typescript, react, vue, svelte, astro, next, electron, vite, tauri, rust, python, go, php, ruby, java, dotnet, c-cpp, dart, elixir, deno, docker.
+- Name and description are read from `package.json` only. `Cargo.toml` and `pyproject.toml` are not read.
+- `package.json`, `.git/HEAD` and `.git/config` are read through `smallFile.ts` (regular files, no symlinks, byte caps: 512 KB for `package.json`, 64 KB for git files). New.
+- **Plain-config rule (new).** Git runs only when `.git` is a real directory whose `config` has nothing but allowlisted keys and plain values, with no `config.worktree`, `commondir`, `modules` or `.gitmodules`. Otherwise no git process runs; branch and remote come from `.git/HEAD` and `.git/config`, and last commit and dirty stay null. A `.git` pointer file gives nothing. See `CLAUDE.md` and `docs/guides/projects.md`.
+- Where git runs: an absolute `git` found once by `which`, extra `-c` options that switch off fsmonitor, hooks, attributes files and submodule recursion, `--ignore-submodules=all` on status, `GIT_CONFIG_NOSYSTEM=1`, 5 s timeout, 1 MB output cap, four repositories at a time.
+- Hidden records are not read with git during a scan (`gitTargets` leaves them out). Records the scan does not settle (manual ones, ones whose root was removed) get a folder-exists check (`statTargets`).
+- One scan runs at a time; import, reset, root removal and shutdown supersede it, as well as a newer scan. The merge and the single `replaceAll` have no `await` between them.
+
+### Launchers
+
+- A table entry is `{id, label, platforms}` where `platforms` maps `linux`, `darwin` and `win32` to a builder from the folder to `{command, args}`, not a flat `{id, label, platform, command, args}`. Editors: VS Code, Cursor, Zed, Sublime Text, VSCodium. Terminals as designed, plus Windows Terminal and macOS Terminal entries (untested).
+- **Absolute program resolution (new).** The command is resolved to an absolute file from absolute `PATH` entries only (`which.ts`, `resolveOnPath`); a bare name is never spawned, because the child's working directory is the project folder. A program inside the project folder is refused.
+- Windows `.cmd` entries will probably not start with `shell: false`; this is left as is on purpose (comment in `launch.ts`).
+- `APP_LAUNCH_DRY=1` also covers the folder target. On macOS a bundle folder is revealed in its parent instead of opened (new).
+- Settings: programs that were not found stay selectable, marked "not found", and the default "Automatic" names the program it would use. The design said not-found entries are disabled.
+- Dev only: `APP_PICK_FOLDER=/abs/dir` stands in for the folder dialog.
+
+### Renderer
+
+- Filters have an exclude list for tags (`excludeTags`): clicking a tag in the rail cycles off, include, exclude; the design had include only. Sort has a fourth option, "Last edited" (`updatedAt`). Search also matches branch and folder.
+- Commands: `projects.search` (`/`), `projects.add-folder` (Ctrl/Cmd+O), `projects.rescan` (F5), `projects.clear-filters` (no key; active only when a filter is set).
+- Links are shown as a "Links" trait row on the card (Repo, Site, Docs, each with an arrow), not in the footer. The footer holds open folder, open in editor, open terminal, copy path, pin and edit.
+- Remove exists only in the edit dialog, followed by an Undo toast. There is no per-card remove or refresh button; `projects:refresh` is wired in the hook but the screen has no control for it.
+- The project count is in the footer's title block, not an `INDEX / 42 PROJECTS` row in the title bar. The toolbar shows the result count (`18 / 42`) and no last-scan time. The wordmark is a button that goes home. Escape leaves Settings.
+- Filters, search and sort are stored in `localStorage` under `projects.view.v1`, healed on read. A deep link to a project resets filters that hide it, scrolls to it and marks it.
+- `pushStore` is used by `useProjects`, `useRoots`, `useScanState`, `useLaunchers` and `useSettings`.
+- New common components beyond the design's list: `StatusDot`, `Combobox` and `SuggestionList` (shared by `TagInput`), and the card's `CardHeader`, `CardBody` and `CardFooter`.
+
+### Theme, brand and CSP
+
+- Kojima as designed, including radius 0 and no shadows. `--accent-ink` is charcoal in both modes.
+- The CSP's `media-src` is `'none'` (the design's earlier text, inherited from the template, named the media scheme). The page's scheme is `project-ops-app://renderer/`.
+- `electron/features/tray.ts` still exists and the `closeToTray` setting stays, but `setTrayStatus` has no caller.
+
+### Known trade-offs: changes
+
+The moved-folder, exports-contain-paths and git-freshness trade-offs stand. The "only by undo" trade-off is softened as described above. Added: a repository with a non-plain config shows no last-commit time or uncommitted-changes marker.

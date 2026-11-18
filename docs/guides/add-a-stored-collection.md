@@ -1,68 +1,51 @@
-# Add a stored collection
+# Add a main-only stored collection
 
-A collection is a list of records saved as `<name>.json` in the app's data folder. Notes, Tasks and Clipboard snippets use one. You declare the shape once in `shared/collections/`; the main process store, the IPC channels, export/import/reset and the `useCollection` hook already handle any collection in that list.
+A collection is a list of records saved as `<name>.json` in the app's data folder, with the store, healing, atomic writes and change listeners already written. The two that exist, `projects` and `project-roots`, are **main-only**: no channel lets the page read or write a collection by name. The page gets path-free views through dedicated `projects:*` channels. A new collection follows the same pattern.
 
-Example name: `habits`. Names are lowercase letters, digits and hyphens (the file name must match `^[a-z0-9-]+\.json$`).
+Example name: `groups`. Names are lowercase letters, digits and hyphens (file name `^[a-z0-9-]+\.json$`).
 
 ## Files to touch
 
 | File | What |
 | --- | --- |
-| `shared/collections/habits.ts` | the spec: name, version, max, `heal()`, and the field types |
-| `shared/collections/index.ts` | add it to `COLLECTIONS` |
-| `renderer/apps/<app>/...` | use `useCollection("habits")` |
-| `tests/store/heal.test.ts` | a test for your `heal()` |
-| `renderer/settings/DataSection.tsx` | the import warning text names the collections (line 27); update it |
-
-Nothing in `electron/` changes: `electron/ipc/data.ts` loops over `COLLECTIONS`, and the `data:*` channels check the collection name against that list.
+| `shared/<area>/groups.ts` | the `CollectionSpec`: name, version, max, `heal()`, field types, and a view type if the page sees it |
+| `electron/store/<area>.ts` | `export const groupsStore = () => openCollection(groupSpec)` (see `electron/store/projects.ts`) |
+| `electron/features/...`, `shared/ipc/...`, `electron/ipc/...` | the logic and the channels that expose a view (`add-an-ipc-channel.md`) |
+| `electron/store/bundle.ts` | add the spec's name to `COLLECTION_NAMES` if it belongs in export and import |
+| `electron/store/dataTransfer.ts` | add it to `targets()` so export, import and reset include it |
+| `tests/` | a heal test beside `tests/projects/heal.test.ts` |
+| `renderer/settings/DataSection.tsx` | the import and reset text names what is included; update it |
 
 ## Steps
 
-1. Write the spec. Copy `shared/collections/tasks.ts`:
-
+1. Write the spec (see `shared/projects/roots.ts`, the smallest one):
    ```ts
-   import type { CollectionSpec, RecordBase } from "./base";
-   import { bool, isObject, str } from "./heal";
-
-   export interface HabitFields { name: string; done: boolean }
-   export type Habit = RecordBase & HabitFields;
-   export const habits: CollectionSpec<HabitFields> = {
-     name: "habits", version: 1, max: 500,
+   export interface GroupFields { name: string }
+   export const groupSpec: CollectionSpec<GroupFields> = {
+     name: "groups", version: 1, max: 100,
      heal: (raw) => {
-       if (!isObject(raw)) return null;            // not an object: unusable
-       const name = str(raw.name, 200);
-       if (name.trim() === "") return null;        // a habit without a name is unusable
-       return { name, done: bool(raw.done, false) };
+       if (!isObject(raw)) return null;
+       const name = line(raw.name, 80);
+       return name === "" ? null : { name };
      },
    };
    ```
-
-   `heal` takes `unknown` and returns the fields only (not `id`, `createdAt`, `updatedAt`; the store adds those), filling defaults, cutting strings to limits and dropping unknown keys. It returns `null` when the record cannot be saved. It runs on every file read, create, update, restore and import, so it is the one place that decides what a valid record is. It must never throw and must return `null` for non-objects (`tests/store/heal.test.ts` checks this for every collection).
-
-2. Register it in `shared/collections/index.ts`: import it and add `habits` to `COLLECTIONS`. The types (`CollectionName`, `RecordOf<"habits">`) follow from that.
-
-3. Use it in the page:
-
-   ```tsx
-   const { items, status, error, create, update, remove, restore, reorder, reload } = useCollection("habits");
-   ```
-
-   `items` changes only when main pushes `data:changed`, so a mutation shows up after the promise resolves. `status` is `loading`, `ready` or `error`; draw all three (`reload()` is for a "Try again" button). `remove` returns `{ record, index }`; pass it to `restore` for an Undo toast (see Tasks). `reorder(ids)` takes a permutation of the current ids; order in the file is the order of the array.
-
-4. Test your `heal` in `tests/store/heal.test.ts` (defaults, limits, unusable input).
-
-5. Update the import text in `DataSection.tsx` so it names your collection.
+   `heal` takes `unknown` and returns the fields only (the store adds `id`, `createdAt`, `updatedAt`), fills defaults, cuts to limits, drops unknown keys and returns `null` when the record cannot be saved. It runs on every file read, create, update and `replaceAll`, so it is the one place that decides what a valid record is. It must never throw. Helpers: `shared/collections/heal.ts` (`line`, `str`, `bool`, `strList`, `oneOf`, `timestamp`).
+2. Open it in main: `openCollection(spec)` returns the `Collection` (`list`, `get`, `create`, `update`, `remove`, `restore`, `reorder`, `replaceAll`, `clear`, `onChange`; `restore` takes a record, so never wire it to a page-supplied value). It is cached per spec name.
+3. Never hand the page a record that holds a path, and never let it write one. Send a view built by a pure function (`toProjectView`) and take edits as a patch healed to the user-editable fields (`healProjectPatch`).
+4. If the page should follow changes, `emit` a push from an `onChange` listener (see `initProjects` in `electron/features/projects.ts`) and read it with a `pushStore`.
+5. Test `heal` for defaults, limits and unusable input.
 
 ## Rules
 
-- Do not put paths or URLs in a record that main would later open. The page is untrusted; anything it can store, it can forge.
 - `max` is a hard cap: create beyond it throws `Limit reached: <max> <name>`.
-- Changing the shape later: raise `version` only together with a migration inside `heal()` that reads the old shape. A file with a higher `version` than the code is treated as written by a newer app: read-only, error message, never overwritten. A damaged file is moved aside as `<name>.json.unreadable-<timestamp>` before the first save.
-- Export, import and "Reset all data" include the new collection automatically.
+- Changing the shape later: raise `version` only together with a migration in `heal()`. A file with a higher `version` is "newer": read as an error, never overwritten. A damaged file is moved aside as `<name>.json.unreadable-<timestamp>` before the first write.
+- A field with a default needs no version bump: an old file heals to the default.
+- Export, import and reset cover only the collections listed in `COLLECTION_NAMES` and `targets()`.
 
 ## Checklist
 
 - [ ] `pnpm typecheck && pnpm test`
-- [ ] create a record, quit, start again: it is still there (`pnpm dev`)
-- [ ] hand-edit the data file to invalid JSON: the app starts empty and the broken file is kept as `.unreadable-<timestamp>`
-- [ ] Settings > Data: export, reset, import round-trip includes your records
+- [ ] create a record, quit, start again: it is still there
+- [ ] hand-edit the file to invalid JSON: the app starts empty and the broken file is kept as `.unreadable-<timestamp>`
+- [ ] Settings > Data: export, reset, import round-trip includes it
