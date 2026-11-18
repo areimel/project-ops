@@ -1,0 +1,48 @@
+{
+  "name": "electron-app-template",
+  "productName": "App Template",
+  "version": "0.1.0",
+  "description": "A starter for desktop apps, one sheet per skill",
+  "main": "dist-electron/main.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.electron.json --noEmit",
+    "build:electron": "node scripts/build-electron.mjs",
+    "build": "pnpm typecheck && vite build --configLoader runner && pnpm build:electron",
+    "test": "vitest run --configLoader runner",
+    "dist": "pnpm build && electron-builder --linux deb --x64",
+    "dist:win": "pnpm build && electron-builder --win nsis --x64",
+    "dist:mac": "pnpm build && electron-builder --mac dmg"
+  },
+  "dependencies": {
+    "@fontsource/barlow": "^5.3.0",
+    "@fontsource/barlow-condensed": "^5.3.0",
+    "markdown-it": "^15.0.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.2.0",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "electron": "^45.3.0",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5",
+    "wait-on": "^9.5.1"
+  },
+  "author": "Alec Reimel",
+  "homepage": "https://example.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/areimel/electron-app-template.git"
+  },
+  "packageManager": "pnpm@11.22.0",
+  "desktopName": "electron-app-template.desktop"
+}

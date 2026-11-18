@@ -1,0 +1,43 @@
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; height: 100%; }
+html { background: var(--bg); }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-text);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+  font-variant-numeric: tabular-nums;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
+#root { overflow: hidden; }
+
+h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); font-weight: var(--fw-bold); line-height: var(--lh-tight); }
+h1 { font-size: var(--fs-3xl); }
+h2 { font-size: var(--fs-2xl); }
+h3 { font-size: var(--fs-xl); }
+h4 { font-size: var(--fs-lg); }
+p { margin: 0; }
+a { color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: var(--line-w); }
+a:hover { text-decoration-thickness: 2px; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; user-select: none; }
+button:disabled { cursor: default; }
+svg { display: block; flex: none; }
+::selection { background: color-mix(in srgb, var(--accent) 32%, transparent); }
+
+/* Thin scrollbars that stay on the sheet's colours. */
+* { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+
+:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}

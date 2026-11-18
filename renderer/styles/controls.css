@@ -1,0 +1,79 @@
+/* Buttons, icon buttons, switch, segmented control, key caps. Sliders: slider.css. Text inputs: fields.css. */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  height: var(--control-h); padding: 0 var(--sp-4);
+  border: var(--line-w) solid transparent; border-radius: var(--r);
+  background: none; color: var(--text);
+  font-size: var(--fs-md); font-weight: var(--fw-medium); line-height: 1; white-space: nowrap;
+  transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.btn:disabled, .icon-btn:disabled { opacity: 0.45; }
+
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 86%, var(--text)); }
+.btn-primary:active:not(:disabled) { background: color-mix(in srgb, var(--accent) 74%, var(--text)); }
+
+.btn-quiet { border-color: var(--control-border); }
+.btn-quiet:hover:not(:disabled) { background: var(--hover); }
+.btn-quiet:active:not(:disabled) { background: color-mix(in srgb, var(--text) 13%, transparent); }
+
+.btn-danger { background: var(--danger); border-color: var(--danger); color: var(--danger-ink); }
+.btn-danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 86%, var(--text)); }
+.btn-danger:active:not(:disabled) { background: color-mix(in srgb, var(--danger) 74%, var(--text)); }
+
+.btn-link {
+  height: auto; padding: 0; border: 0; color: var(--accent-text); font-weight: var(--fw-regular);
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: var(--line-w);
+}
+.btn-link:hover:not(:disabled) { text-decoration-thickness: 2px; }
+
+/* Toggle buttons: `aria-pressed` drives the look. */
+.btn[aria-pressed="true"], .btn[aria-pressed="true"]:hover:not(:disabled) {
+  background: var(--selected); border-color: var(--accent-text); color: var(--accent-text);
+}
+
+/* Icon button: borderless, square. `.dropdown-btn` lets it carry text. */
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  width: var(--control-h); height: var(--control-h); padding: 0;
+  border: var(--line-w) solid transparent; border-radius: var(--r);
+  background: none; color: var(--text);
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.icon-btn:hover:not(:disabled) { background: var(--hover); }
+.icon-btn.is-active, .icon-btn[aria-pressed="true"] { background: var(--selected); color: var(--accent-text); }
+
+/* Switch */
+.switch {
+  position: relative; flex: none; width: 38px; height: 22px; padding: 0;
+  border: var(--line-w) solid var(--control-border); border-radius: var(--r); background: none;
+  transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.switch-knob {
+  position: absolute; top: 3px; left: 3px; width: 14px; height: 14px;
+  border-radius: 1px; background: var(--control-border);
+  transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+.switch.is-on { background: var(--accent); border-color: var(--accent); }
+.switch.is-on .switch-knob { transform: translateX(16px); background: var(--accent-ink); }
+
+/* Segmented control */
+.segmented { display: inline-flex; border: var(--line-w) solid var(--control-border); border-radius: var(--r); }
+.segmented > button {
+  height: calc(var(--control-h) - 2px); padding: 0 var(--sp-4); border: 0; background: none;
+  font-size: var(--fs-md); font-weight: var(--fw-medium); color: var(--text); white-space: nowrap;
+  transition: background-color var(--dur-fast) var(--ease);
+}
+.segmented > button + button { border-left: var(--line-w) solid var(--control-border); }
+.segmented > button:hover:not(.is-selected) { background: var(--hover); }
+.segmented > button.is-selected { background: var(--selected); color: var(--accent-text); box-shadow: inset 0 -2px 0 var(--accent-text); }
+.segmented > button:focus-visible { outline-offset: -2px; }
+
+/* Key cap */
+kbd {
+  display: inline-block; min-width: 20px; padding: 1px 6px;
+  border: var(--line-w) solid var(--control-border); border-radius: var(--r);
+  background: var(--surface-raised); color: var(--text-muted);
+  font: inherit; font-size: var(--fs-xs); line-height: 1.5; text-align: center;
+}

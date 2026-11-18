@@ -1,0 +1,50 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+import PageHeading from "../components/PageHeading.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import Card from "../components/Card.astro";
+import CommandBlock from "../components/CommandBlock.astro";
+import SignupSection from "../components/SignupSection.astro";
+import { installCommand, product, debFileName, url } from "../config/site";
+import { download } from "../config/pages/download";
+---
+<SiteLayout title={download.title} description={download.description}>
+  <PageHeading title={download.heading} lede={download.lede} />
+  <section class="container split download-content">
+    <Card as="section">
+      <SectionHeading title={download.install.heading} level={2}>
+        <p>{download.install.text}</p>
+      </SectionHeading>
+      <CommandBlock command={installCommand} label={download.install.commandLabel} />
+      <h3>{download.manual.heading}</h3>
+      <p>
+        {download.manual.beforeReleases} <a href={product.releasesUrl}>{download.manual.releasesLinkText}</a>{" "}
+        {download.manual.afterReleases} <code>{debFileName()}</code>. {download.manual.beforeInstall}{" "}
+        <code>sudo apt install ./{debFileName()}</code>. {download.manual.afterInstall}
+      </p>
+      <p>
+        {download.manual.beforeScript} <a href={url("install.sh")}>{download.manual.scriptLinkText}</a> {download.manual.afterScript}
+      </p>
+    </Card>
+    <aside>
+      <SectionHeading title={download.requirements.heading} level={2} />
+      <dl>
+        {download.requirements.items.map((item) => (
+          <div><dt>{item.term}</dt><dd>{item.detail}</dd></div>
+        ))}
+      </dl>
+      <p>{download.source.before} <a href={product.repositoryUrl}>{download.source.linkText}</a> {download.source.after}</p>
+      <p>{download.bugReport.before} <a href={product.issuesUrl}>{download.bugReport.linkText}</a> {download.bugReport.after}</p>
+    </aside>
+  </section>
+  <SignupSection id="release-updates" />
+</SiteLayout>
+<style>
+  .download-content { padding-block: var(--space-6) var(--space-8); }
+  h3 { font-size: var(--step-1); margin: var(--space-6) 0 var(--space-3); }
+  code { overflow-wrap: anywhere; }
+  dl { margin: 0 0 var(--space-5); border-top: var(--line-width) solid var(--line); }
+  dl div { padding: var(--space-3) 0; border-bottom: var(--line-width) solid var(--line); }
+  dt { font-weight: 600; }
+  dd { margin: var(--space-1) 0 0; color: var(--text-muted); }
+</style>

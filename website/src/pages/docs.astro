@@ -1,0 +1,54 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+import PageHeading from "../components/PageHeading.astro";
+import Card from "../components/Card.astro";
+import { Content, getHeadings } from "../content/guide.md";
+import { url } from "../config/site";
+import { docs } from "../config/pages/docs";
+
+const headings = getHeadings().filter((heading) => heading.depth === 2);
+---
+<SiteLayout title={docs.title} description={docs.description}>
+  <PageHeading title={docs.heading} lede={docs.lede} />
+  <div class="container docs-layout">
+    <Card as="aside" class="toc">
+      <nav aria-label={docs.onThisPage}>
+        <p class="toc-title">{docs.onThisPage}</p>
+        <ul>
+          {headings.map((heading) => (
+            <li><a href={`#${heading.slug}`}>{heading.text}</a></li>
+          ))}
+        </ul>
+      </nav>
+      <p class="help">
+        {docs.help.before} <a href={url("contact/")}>{docs.help.linkText}</a> {docs.help.after}
+      </p>
+    </Card>
+    <article class="prose"><Content /></article>
+  </div>
+</SiteLayout>
+<style>
+  .docs-layout {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: var(--space-7);
+    align-items: start;
+    padding-bottom: var(--space-9);
+  }
+  .toc {
+    position: sticky;
+    top: var(--space-5);
+    padding: var(--space-4);
+  }
+  .toc-title { margin: 0 0 var(--space-3); font-family: var(--font-display); font-weight: 600; font-size: var(--step-1); }
+  .toc ul { list-style: none; margin: 0; padding: 0; }
+  .toc li + li { margin-top: var(--space-2); }
+  .toc a { text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .help { margin: var(--space-4) 0 0; font-size: var(--step--1); color: var(--text-muted); }
+  .prose { min-width: 0; }
+  @media (max-width: 760px) {
+    .docs-layout { grid-template-columns: 1fr; gap: var(--space-5); }
+    .toc { position: static; }
+  }
+</style>

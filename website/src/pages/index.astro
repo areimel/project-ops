@@ -1,0 +1,91 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+import SignupSection from "../components/SignupSection.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import SheetIndex from "../components/SheetIndex.astro";
+import WindowFrame from "../components/WindowFrame.astro";
+import Button from "../components/Button.astro";
+import { absoluteUrl, product, url } from "../config/site";
+import { features, screenshots } from "../config/content";
+import { home } from "../config/pages/home";
+
+const shot = screenshots.home;
+const softwareApplication = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: product.name,
+  description: product.description,
+  applicationCategory: product.applicationCategory,
+  operatingSystem: product.operatingSystem,
+  url: absoluteUrl(),
+  downloadUrl: absoluteUrl("download/"),
+  screenshot: absoluteUrl(shot.src),
+  license: product.licenseUrl,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  author: { "@type": "Person", name: product.author.name, url: product.author.url },
+};
+---
+<SiteLayout description={home.description}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(softwareApplication)} />
+  <section class="hero grid-paper">
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <h1>{home.hero.title}</h1>
+        <p class="lede">{home.hero.lede}</p>
+        <div class="actions">
+          <Button href={url("download/")} variant="primary">{home.hero.primaryCta}</Button>
+          <Button href={url("docs/")} variant="secondary">{home.hero.secondaryCta}</Button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <WindowFrame title={home.screenshotTitle} src={url(shot.src)} width={shot.width} height={shot.height} alt={shot.alt} caption={shot.caption} loading="eager" />
+      </div>
+    </div>
+  </section>
+
+  <section class="container section" aria-labelledby="sheet-index-heading">
+    <SectionHeading title={home.sheetIndex.heading} id="sheet-index-heading"><p class="muted">{home.sheetIndex.intro}</p></SectionHeading>
+    <SheetIndex headingId="sheet-index-heading" columns={home.sheetIndex.columns} />
+  </section>
+
+  <section class="container section" aria-labelledby="features-heading">
+    <SectionHeading title={home.features.heading} id="features-heading"><p class="muted">{home.features.intro}</p></SectionHeading>
+    <ul class="features">
+      {features.map((f) => (
+        <li><h3>{f.title}</h3><p class="muted">{f.copy}</p></li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="container section" aria-labelledby="yours-heading">
+    <div class="split">
+      <div>
+        <SectionHeading title={home.makeItYours.heading} id="yours-heading"><p class="muted">{home.makeItYours.intro}</p></SectionHeading>
+        <ol class="steps">
+          {home.makeItYours.steps.map((s) => <li>{s}</li>)}
+        </ol>
+      </div>
+      <WindowFrame title={home.screenshotTitle} src={url(screenshots.themes.src)} width={screenshots.themes.width} height={screenshots.themes.height} alt={screenshots.themes.alt} caption={screenshots.themes.caption} loading="lazy" />
+    </div>
+  </section>
+
+  <SignupSection id="updates" />
+</SiteLayout>
+<style>
+  .hero { border-bottom: var(--line-width) solid var(--line); }
+  .hero-inner { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--space-7); align-items: center; padding-block: var(--space-8); }
+  .hero-copy h1 { max-width: 14ch; margin-bottom: var(--space-4); }
+  .hero-copy .lede { margin-bottom: var(--space-5); }
+  .hero-copy .actions { margin-block: 0; }
+  @media (max-width: 1000px) { .hero-inner { grid-template-columns: minmax(0, 1fr); gap: var(--space-6); padding-block: var(--space-7); } }
+  .features { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 var(--space-6); }
+  .features li { padding-block: var(--space-4) var(--space-3); border-top: var(--line-width) solid var(--line); }
+  .features h3 { margin-bottom: var(--space-2); }
+  .features p { margin: 0; }
+  @media (max-width: 1000px) { .features { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 760px) { .features { grid-template-columns: minmax(0, 1fr); } }
+  .steps { margin: 0; padding: 0; list-style: none; counter-reset: step; max-width: var(--measure); }
+  .steps li { counter-increment: step; display: grid; grid-template-columns: 2.5rem 1fr; padding-block: var(--space-3); border-top: var(--line-width) solid var(--line); }
+  .steps li::before { content: counter(step); font-family: var(--font-display); font-weight: 600; font-size: var(--step-2); line-height: 1.1; }
+  .steps li:last-child { border-bottom: var(--line-width) solid var(--line); }
+</style>

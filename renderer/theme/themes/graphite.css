@@ -1,0 +1,31 @@
+/* Graphite: plain greys that sit quietly next to native apps. */
+:root[data-theme="graphite"][data-mode="light"],
+[data-theme="graphite"][data-mode="light"] {
+  --bg: #f1f2f4;
+  --surface: #fcfcfd;
+  --surface-raised: #ffffff;
+  --text: #1e2329;
+  --text-muted: #5c6570;
+  --line: #b9c0c8;
+  --accent: #2558c9;
+  --accent-text: #2558c9;
+  --accent-ink: #ffffff;
+  --danger: #b42318;
+  --danger-ink: #ffffff;
+  --success: #1f7a4d;
+}
+:root[data-theme="graphite"][data-mode="dark"],
+[data-theme="graphite"][data-mode="dark"] {
+  --bg: #23272c;
+  --surface: #2c3137;
+  --surface-raised: #353b42;
+  --text: #e8eaed;
+  --text-muted: #a3abb5;
+  --line: #555e69;
+  --accent: #7aa7ff;
+  --accent-text: #7aa7ff;
+  --accent-ink: #10161f;
+  --danger: #ff8a80;
+  --danger-ink: #10161f;
+  --success: #7fd8a4;
+}

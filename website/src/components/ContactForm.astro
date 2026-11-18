@@ -1,0 +1,97 @@
+---
+import Button from "./Button.astro";
+import { consentField, formSettings, forms } from "../config/forms";
+
+interface Props {
+  id: string;
+  kind: "signup" | "inquiry";
+}
+
+const { id, kind } = Astro.props;
+const signup = kind === "signup";
+const copy = forms[kind];
+const accessKey = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY?.trim() ?? "";
+const configured = accessKey.length > 0;
+---
+
+<form
+  id={id}
+  action={formSettings.endpoint}
+  method="POST"
+  data-contact-form
+  data-form-kind={kind}
+  data-configured={String(configured)}
+  aria-describedby={`${id}-privacy ${id}-status`}
+>
+  <input type="hidden" name="access_key" value={accessKey} />
+  <input type="hidden" name="subject" value={signup ? formSettings.signupSubject : formSettings.inquirySubject} />
+  <input type="hidden" name="from_name" value={formSettings.fromName} />
+  <input type="checkbox" name="botcheck" class="honeypot" tabindex="-1" aria-hidden="true" />
+  <fieldset disabled={!configured}>
+    <legend class="sr-only">{copy.legend}</legend>
+    {!signup && (
+      <label for={`${id}-name`}>
+        {forms.inquiry.nameLabel}
+        <input id={`${id}-name`} name="name" autocomplete="name" maxlength="120" required />
+      </label>
+    )}
+    <label for={`${id}-email`}>
+      {copy.emailLabel}
+      <input
+        id={`${id}-email`}
+        name="email"
+        type="email"
+        autocomplete="email"
+        placeholder={copy.emailPlaceholder}
+        maxlength="254"
+        required
+      />
+    </label>
+    {!signup && (
+      <label for={`${id}-message`}>
+        {forms.inquiry.messageLabel}
+        <textarea id={`${id}-message`} name="message" rows="5" maxlength="5000" required />
+      </label>
+    )}
+    {signup && (
+      <label class="consent" for={`${id}-consent`}>
+        <input id={`${id}-consent`} name={consentField} type="checkbox" value={forms.signup.consentValue} required />
+        <span>{forms.signup.consentLabel}</span>
+      </label>
+    )}
+    <Button type="submit">{copy.button}</Button>
+  </fieldset>
+  <p id={`${id}-privacy`} class="form-note muted">{copy.privacy}</p>
+  <p id={`${id}-status`} class="form-status" role="status" aria-live="polite" aria-atomic="true" data-form-status>
+    {!configured && forms.status.unconfigured}
+  </p>
+  {configured && <noscript><p class="form-note">{forms.status.noscript}</p></noscript>}
+</form>
+
+<script>
+  import "../scripts/forms";
+</script>
+
+<style>
+  form { width: 100%; }
+  fieldset { display: grid; gap: var(--space-4); min-width: 0; padding: 0; margin: 0; border: 0; }
+  label { display: grid; gap: var(--space-2); font-size: var(--step--1); font-weight: 600; }
+  input:not([type="checkbox"]), textarea {
+    width: 100%; min-width: 0; padding: var(--space-3);
+    border: var(--line-width) solid var(--line); border-radius: var(--radius);
+    background: var(--surface-raised); color: var(--text); font: inherit; font-weight: 400;
+  }
+  input:focus-visible, textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  input::placeholder { color: var(--text-muted); }
+  textarea { resize: vertical; }
+  .consent { display: flex; align-items: flex-start; gap: var(--space-3); font-weight: 400; line-height: 1.5; }
+  .consent input { flex: 0 0 auto; width: 1.1rem; height: 1.1rem; margin: 0.15rem 0 0; accent-color: var(--accent); }
+  fieldset :global(.btn) { justify-self: start; }
+  fieldset:disabled { opacity: 0.75; }
+  fieldset:disabled :global(.btn) { cursor: not-allowed; opacity: 0.6; }
+  .form-note { font-size: var(--step--1); line-height: 1.6; margin: var(--space-4) 0 0; }
+  .form-status { min-height: 1.5em; font-size: var(--step--1); margin: var(--space-2) 0 0; }
+  .form-status[data-state="error"] { color: var(--danger); }
+  .form-status[data-state="success"] { color: var(--success); }
+  .honeypot { display: none; }
+</style>

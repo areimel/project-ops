@@ -1,0 +1,64 @@
+# Keeps its own copy of the identity values; tests/brand.test.ts fails when they drift from shared/brand.ts.
+appId: com.example.apptemplate
+productName: App Template
+copyright: Copyright © Alec Reimel. MIT licence.
+directories:
+  output: release
+  buildResources: build
+files:
+  - dist-electron/**
+  - dist-renderer/**
+  - package.json
+extraResources:
+  - from: THIRD_PARTY_NOTICES.md
+    to: THIRD_PARTY_NOTICES.md
+  - from: build/tray.png
+    to: tray.png
+# Deep links: app-template://open/notes
+protocols:
+  - name: App Template
+    schemes:
+      - app-template
+# File association for Markdown files, off by default: once installed it makes this app a candidate
+# for opening every .md file on the machine. To turn it on, uncomment this block and add text/markdown
+# to linux.mimeTypes below.
+# fileAssociations:
+#   - ext: md
+#     name: Markdown document
+#     role: Editor
+linux:
+  target:
+    - target: deb
+      arch: x64
+  category: Utility
+  executableName: electron-app-template
+  icon: build/icons
+  maintainer: Alec Reimel <areimel@users.noreply.github.com>
+  mimeTypes:
+    - x-scheme-handler/app-template
+deb:
+  depends:
+    - libgtk-3-0
+    - libnotify4
+    - libnss3
+    - libxss1
+    - libxtst6
+    - xdg-utils
+    - libatspi2.0-0
+    - libuuid1
+    - libsecret-1-0
+# Windows and macOS targets are configured but untested; build each on its own platform.
+win:
+  target:
+    - target: nsis
+      arch: x64
+  icon: build/icon.png
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+mac:
+  target:
+    - target: dmg
+  category: public.app-category.developer-tools
+  icon: build/icon.png
+artifactName: electron-app-template_${version}_${arch}.${ext}

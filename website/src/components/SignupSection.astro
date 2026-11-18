@@ -1,0 +1,16 @@
+---
+import ContactForm from "./ContactForm.astro";
+import SectionHeading from "./SectionHeading.astro";
+import Card from "./Card.astro";
+import { signupSection } from "../config/forms";
+interface Props { id: string; }
+const { id } = Astro.props;
+---
+<section class="container section" id={id} aria-labelledby={`${id}-heading`}>
+  <div class="split">
+    <SectionHeading title={signupSection.heading} id={`${id}-heading`}>
+      <p class="muted">{signupSection.text}</p>
+    </SectionHeading>
+    <Card><ContactForm id={`${id}-form`} kind="signup" /></Card>
+  </div>
+</section>

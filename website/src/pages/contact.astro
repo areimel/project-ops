@@ -1,0 +1,30 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+import PageHeading from "../components/PageHeading.astro";
+import Card from "../components/Card.astro";
+import ContactForm from "../components/ContactForm.astro";
+import { contact } from "../config/pages/contact";
+import { product } from "../config/product";
+---
+<SiteLayout title={contact.title} description={contact.description}>
+  <PageHeading title={contact.heading} lede={contact.lede} />
+  <div class="container split contact-grid">
+    <Card as="section">
+      <h2>{contact.signup.heading}</h2>
+      <p class="muted">{contact.signup.text}</p>
+      <ContactForm id="contact-signup" kind="signup" />
+    </Card>
+    <section>
+      <h2>{contact.inquiry.heading}</h2>
+      <p class="muted">{contact.inquiry.text}</p>
+      <ContactForm id="contact-inquiry" kind="inquiry" />
+      <p class="issues-note muted">{contact.issues.before} <a href={product.issuesUrl}>{contact.issues.linkText}</a> {contact.issues.after}</p>
+    </section>
+  </div>
+</SiteLayout>
+<style>
+  .contact-grid { padding-bottom: var(--space-8); }
+  h2 { font-size: var(--step-2); margin: 0 0 var(--space-3); }
+  p.muted { margin: 0 0 var(--space-5); }
+  .issues-note { margin: var(--space-5) 0 0; padding-top: var(--space-4); border-top: var(--line-width) solid var(--line); font-size: var(--step--1); }
+</style>

@@ -1,0 +1,30 @@
+.system { overflow: auto; padding: var(--sp-5) var(--sp-5) var(--sp-6); }
+.system > * { max-width: 720px; margin-inline: auto; }
+.system-loading { display: grid; place-items: center; height: 100%; }
+
+.system-section + .system-section { margin-top: var(--sp-6); }
+.system-section h2 { font-size: var(--fs-xl); padding-bottom: var(--sp-2); border-bottom: var(--line-w) solid var(--text); }
+
+.system-table { margin: 0; }
+.system-row {
+  display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: var(--sp-4); align-items: center;
+  min-height: 36px; padding: var(--sp-1) 0; border-bottom: var(--line-w) solid var(--line);
+}
+.system-row dt { color: var(--text-muted); }
+.system-row dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.system-note { color: var(--text-muted); }
+.system-load { display: inline-flex; gap: var(--sp-3); }
+
+/* The text beside a bar has a fixed width, so a changing number never moves the bar. */
+.system-meter { display: flex; align-items: center; gap: var(--sp-3); }
+.system-bar {
+  flex: 1; min-width: 0; height: 10px; overflow: hidden;
+  border: var(--line-w) solid var(--control-border); border-radius: var(--r);
+}
+.system-bar-fill { height: 100%; background: var(--accent); }
+.system-meter-text { flex: none; width: 11rem; text-align: right; }
+
+@media (max-width: 640px) {
+  .system-row { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .system-meter-text { width: 9.5rem; }
+}

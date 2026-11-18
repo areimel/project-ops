@@ -1,0 +1,81 @@
+/* Things that float: panel, dropdown menu, dialog, toasts. The only place a shadow is allowed. */
+
+.panel {
+  background: var(--surface-raised); color: var(--text);
+  border: var(--line-w) solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-float);
+  z-index: var(--z-popover);
+}
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4); border-bottom: var(--line-w) solid var(--line);
+  font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-bold);
+}
+
+/* Dropdown */
+.dropdown { position: relative; display: inline-block; }
+.dropdown-btn { width: auto; padding: 0 var(--sp-2); }
+.dropdown-text { font-size: var(--fs-md); font-weight: var(--fw-medium); }
+.dropdown-menu {
+  position: absolute; top: calc(100% + var(--sp-1)); left: 0; min-width: max(100%, 160px);
+  margin: 0; padding: var(--sp-1); list-style: none;
+  background: var(--surface-raised); border: var(--line-w) solid var(--line); border-radius: var(--r);
+  box-shadow: var(--shadow-float); z-index: var(--z-popover);
+}
+.dropdown-menu.is-above { top: auto; bottom: calc(100% + var(--sp-1)); }
+.dropdown-item {
+  display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r); font-size: var(--fs-md); cursor: pointer; white-space: nowrap; user-select: none;
+}
+.dropdown-item:hover, .dropdown-item:focus-visible { background: var(--hover); outline: none; }
+.dropdown-item:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: -2px; }
+.dropdown-item.is-selected { background: var(--selected); color: var(--accent-text); font-weight: var(--fw-medium); }
+.dropdown-item-check { margin-left: auto; padding-left: var(--sp-4); }
+
+/* Dialog */
+.dialog-backdrop {
+  position: fixed; inset: 0; z-index: var(--z-dialog); display: grid; place-items: center; padding: var(--sp-4);
+  background: var(--scrim); animation: fade-in var(--dur) var(--ease);
+}
+.dialog {
+  display: flex; flex-direction: column; width: 480px; max-width: 100%; max-height: calc(100vh - 2 * var(--sp-5));
+  background: var(--surface-raised); color: var(--text);
+  border: var(--line-w) solid var(--control-border); border-radius: var(--r); box-shadow: var(--shadow-float);
+  animation: rise-in var(--dur) var(--ease);
+}
+.dialog:focus { outline: none; }
+.dialog-sm { width: 360px; }
+.dialog-lg { width: 680px; }
+.dialog-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-3) var(--sp-3) var(--sp-5); border-bottom: var(--line-w) solid var(--line);
+}
+.dialog-title { font-size: var(--fs-xl); }
+.dialog-body { padding: var(--sp-5); overflow: auto; min-height: 0; }
+.dialog-body > * + * { margin-top: var(--sp-3); }
+.dialog-foot {
+  display: flex; justify-content: flex-end; gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5); border-top: var(--line-w) solid var(--line);
+}
+
+.confirm-body { margin: 0; color: var(--text-muted); line-height: var(--lh-body); }
+
+/* Toasts: bottom right, above the title block. */
+.toast-host {
+  position: fixed; right: var(--sp-4); bottom: calc(var(--footer-h) + var(--sp-3)); z-index: var(--z-toast);
+  display: flex; flex-direction: column; align-items: flex-end; gap: var(--sp-2); pointer-events: none;
+}
+.toast {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4);
+  min-width: 240px; max-width: 420px; padding: var(--sp-3) var(--sp-4); pointer-events: auto;
+  background: var(--surface-raised); color: var(--text);
+  border: var(--line-w) solid var(--line); border-left: 3px solid var(--text-muted); border-radius: var(--r);
+  box-shadow: var(--shadow-float); font-size: var(--fs-md);
+  animation: rise-in var(--dur) var(--ease);
+}
+.toast-actions { display: inline-flex; align-items: center; gap: var(--sp-1); }
+.toast-success { border-left-color: var(--success); }
+.toast-error { border-left-color: var(--danger); }
+.toast-info { border-left-color: var(--accent-text); }
+
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes rise-in { from { opacity: 0; transform: translateY(6px); } }

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <defs>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M36 0H0V36" fill="none" stroke="#9DB4D3" stroke-opacity=".4" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1440" height="900" fill="#EEF2F6"/>
+  <rect width="1440" height="900" fill="url(#grid)"/>
+  <g fill="none" stroke="#5E7391" stroke-width="2">
+    <rect x="260" y="150" width="920" height="600" rx="2" fill="#FBFCFE"/>
+    <path d="M260 190H1180"/>
+    <path d="M330 190V750"/>
+    <rect x="284" y="164" width="12" height="12"/>
+    <rect x="304" y="164" width="12" height="12"/>
+    <rect x="324" y="164" width="12" height="12"/>
+    <rect x="282" y="210" width="26" height="26" rx="2"/>
+    <rect x="282" y="256" width="26" height="26" rx="2"/>
+    <rect x="282" y="302" width="26" height="26" rx="2"/>
+  </g>
+  <g stroke="#9DB4D3" stroke-width="2">
+    <path d="M360 240H1160M360 296H1160M360 352H1160M360 408H1160M360 464H1160M360 520H1160M360 576H1160M360 632H1160"/>
+  </g>
+  <g stroke="#5E7391" stroke-width="2" stroke-linecap="square">
+    <path d="M384 226H640M384 282H600M384 338H680M384 394H620M384 450H660M384 506H590M384 562H700M384 618H630"/>
+  </g>
+  <text x="720" y="820" text-anchor="middle" fill="#5E7391" font-family="Barlow, Arial, sans-serif" font-size="30">Screenshot placeholder</text>
+</svg>

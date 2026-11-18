@@ -1,0 +1,29 @@
+---
+import { navigation, product, url } from "../config/site";
+const strip = (p: string) => p.replace(/\/$/, "");
+const current = strip(Astro.url.pathname);
+import ThemeToggle from "./ThemeToggle.astro";
+---
+<header class="site-header">
+  <div class="container bar">
+    <a class="brand" href={url()}>{product.name}</a>
+    <nav aria-label="Main navigation">
+      {navigation.map((item) => <a href={url(item.path)} aria-current={current === strip(url(item.path)) ? "page" : undefined}>{item.label}</a>)}
+    </nav>
+    <ThemeToggle />
+  </div>
+</header>
+<style>
+  .site-header { border-bottom: var(--line-width) solid var(--line); background: var(--surface); }
+  .bar { display: flex; align-items: center; gap: var(--space-6); min-height: 64px; padding-block: var(--space-2); }
+  .brand { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); text-decoration: none; color: var(--text); white-space: nowrap; }
+  nav { display: flex; flex-wrap: wrap; gap: var(--space-5); margin-inline-end: auto; }
+  nav a { text-decoration: none; padding-block: var(--space-2); border-bottom: 2px solid transparent; color: var(--text); }
+  nav a:hover { border-bottom-color: var(--line); }
+  nav a[aria-current="page"] { border-bottom-color: var(--accent); font-weight: 600; }
+  @media (max-width: 760px) {
+    .bar { flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
+    .brand { flex: 1; }
+    nav { order: 3; width: 100%; gap: var(--space-4); margin: 0; }
+  }
+</style>

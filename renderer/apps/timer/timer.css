@@ -1,0 +1,21 @@
+/* Timer sheet. Colours, spacing and radii come from the theme tokens only. */
+.timer { overflow: auto; padding: var(--sp-6) var(--sp-5); }
+.timer-body { display: grid; gap: var(--sp-4); max-width: 520px; margin: 0 auto; }
+
+/* The one large element. Tabular figures keep every digit the same width, so the clock does not jitter. */
+.timer-clock {
+  font-family: var(--font-display); font-weight: var(--fw-medium); font-variant-numeric: tabular-nums;
+  font-size: var(--fs-display); line-height: 1; letter-spacing: 0; color: var(--text);
+}
+
+/* A dimension line: end ticks, a hairline, and the elapsed part drawn in the accent. */
+.timer-rule { position: relative; height: var(--sp-3); border-inline: var(--line-w) solid var(--control-border); }
+.timer-rule::before { content: ""; position: absolute; inset-inline: 0; top: 50%; border-top: var(--line-w) solid var(--control-border); }
+.timer-rule > span { position: absolute; inset-block: calc(50% - 1px) auto; height: 2px; left: 0; background: var(--accent-text); }
+
+.timer-status { margin: 0; font-size: var(--fs-lg); color: var(--text-muted); }
+.timer-actions { display: flex; gap: var(--sp-2); }
+
+.timer-setup { display: grid; gap: var(--sp-4); margin-top: var(--sp-4); padding-top: var(--sp-4); border-top: var(--line-w) solid var(--line); }
+.timer-length { display: flex; align-items: flex-end; gap: var(--sp-4); flex-wrap: wrap; }
+.timer-minutes { width: 96px; }

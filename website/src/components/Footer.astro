@@ -1,0 +1,26 @@
+---
+import { navigation, product, url } from "../config/site";
+import { footer } from "../config/content";
+import TitleBlock from "./TitleBlock.astro";
+interface Props { sheetTitle: string; sheet?: number; sheets?: number; }
+const { sheetTitle, sheet, sheets } = Astro.props;
+---
+<footer class="site-footer">
+  <div class="container inner">
+    <div class="info">
+      <nav aria-label={footer.navLabel}>
+        {navigation.map((item) => <a href={url(item.path)}>{item.label}</a>)}
+        <a href={product.repositoryUrl}>{footer.repositoryLabel}</a>
+      </nav>
+      <p class="credit"><a href={product.author.url}>{footer.authorCredit}</a>. {footer.licenseNote}</p>
+    </div>
+    <TitleBlock sheetTitle={sheetTitle} sheet={sheet} sheets={sheets} revision={footer.revision} />
+  </div>
+</footer>
+<style>
+  .site-footer { margin-top: var(--space-9); padding-block: var(--space-6); border-top: var(--line-width) solid var(--line); background: var(--surface); }
+  .inner { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--space-6); }
+  nav { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); }
+  .credit { color: var(--text-muted); margin: var(--space-3) 0 0; }
+  @media (max-width: 760px) { .inner { flex-direction: column; align-items: stretch; } }
+</style>

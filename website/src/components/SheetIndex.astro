@@ -1,0 +1,38 @@
+---
+import { demos } from "../config/content";
+interface Props { headingId: string; columns: { sheet: string; demo: string; shows: string }; }
+const { headingId, columns } = Astro.props;
+---
+<table class="sheet-index" aria-labelledby={headingId}>
+  <thead>
+    <tr><th scope="col">{columns.sheet}</th><th scope="col">{columns.demo}</th><th scope="col">{columns.shows}</th></tr>
+  </thead>
+  <tbody>
+    {demos.map((d) => (
+      <tr>
+        <th scope="row" class="num">{d.number}</th>
+        <td class="name">{d.name}</td>
+        <td class="shows">{d.skill}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+<style>
+  .sheet-index { width: 100%; border-collapse: collapse; border-top: 2px solid var(--text); border-bottom: 2px solid var(--text); background: var(--surface); }
+  thead th { padding: var(--space-2) var(--space-4); text-align: left; font-weight: 600; font-size: var(--step--1); color: var(--text-muted); border-bottom: var(--line-width) solid var(--text); }
+  tbody tr { border-top: var(--line-width) solid var(--line); }
+  tbody tr:first-child { border-top: 0; }
+  tbody tr:hover { background: var(--hover); }
+  td, tbody th { padding: var(--space-3) var(--space-4); text-align: left; vertical-align: baseline; }
+  .num { width: 5.5rem; font-family: var(--font-display); font-weight: 600; font-size: var(--step-2); line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .name { width: 11rem; font-family: var(--font-display); font-weight: 600; font-size: var(--step-1); }
+  .shows { color: var(--text-muted); }
+  thead th:first-child { width: 5.5rem; }
+  @media (max-width: 760px) {
+    .sheet-index, tbody { display: block; }
+    thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    tbody tr { display: grid; grid-template-columns: 3rem 1fr; column-gap: var(--space-3); padding: var(--space-3) var(--space-4); }
+    td, tbody th { padding: 0; width: auto; }
+    .shows { grid-column: 2; }
+  }
+</style>

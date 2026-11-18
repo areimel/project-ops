@@ -1,0 +1,29 @@
+---
+---
+<button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to dark theme"><span data-theme-label aria-hidden="true">Dark</span></button>
+<script>
+  import { themeStorageKey } from "../config/site";
+  const button = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+  const label = button?.querySelector<HTMLElement>("[data-theme-label]");
+  const effective = (): "light" | "dark" => {
+    const set = document.documentElement.dataset.theme;
+    if (set === "light" || set === "dark") return set;
+    return matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  };
+  const sync = () => {
+    const next = effective() === "dark" ? "light" : "dark";
+    button?.setAttribute("aria-label", `Switch to ${next} theme`);
+    if (label) label.textContent = next === "dark" ? "Dark" : "Light";
+  };
+  button?.addEventListener("click", () => {
+    const next = effective() === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem(themeStorageKey, next); } catch {}
+    sync();
+  });
+  sync();
+</script>
+<style>
+  .theme-toggle { min-height: 44px; min-width: 44px; padding: var(--space-1) var(--space-3); font: inherit; color: var(--text); background: transparent; border: var(--line-width) solid var(--line); border-radius: var(--radius); cursor: pointer; }
+  .theme-toggle:hover { background: var(--hover); border-color: var(--accent); }
+</style>

@@ -1,0 +1,24 @@
+---
+interface Props { title?: string; src: string; width: number; height: number; alt: string; caption?: string; loading?: "eager" | "lazy"; }
+const { title, src, width, height, alt, caption, loading = "lazy" } = Astro.props;
+---
+<figure class="window">
+  <div class="frame">
+    <div class="bar">
+      <span class="controls" aria-hidden="true"><i></i><i></i><i></i></span>
+      {title && <span class="title">{title}</span>}
+    </div>
+    <img src={src} width={width} height={height} alt={alt} loading={loading} decoding="async" />
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+<style>
+  .window { margin: 0; }
+  .frame { border: var(--line-width) solid var(--line); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+  .bar { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); border-bottom: var(--line-width) solid var(--line); background: var(--surface-raised); }
+  .controls { display: inline-flex; gap: var(--space-1); }
+  .controls i { width: 10px; height: 10px; border: var(--line-width) solid var(--line); border-radius: var(--radius); }
+  .title { font-size: var(--step--1); color: var(--text-muted); }
+  img { display: block; width: 100%; height: auto; }
+  figcaption { margin-top: var(--space-2); font-size: var(--step--1); color: var(--text-muted); }
+</style>

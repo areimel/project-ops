@@ -1,0 +1,33 @@
+---
+interface Props { command: string; label?: string; }
+const { command, label = "Terminal" } = Astro.props;
+---
+<div class="command-block" data-command-block>
+  <div class="heading"><span>{label}</span><button type="button" data-copy>Copy command</button></div>
+  <pre><code>{command}</code></pre>
+  <p class="copy-status" role="status" aria-live="polite" data-copy-status></p>
+</div>
+<script>
+  for (const block of document.querySelectorAll<HTMLElement>("[data-command-block]")) {
+    const button = block.querySelector<HTMLButtonElement>("[data-copy]")!;
+    const status = block.querySelector<HTMLElement>("[data-copy-status]")!;
+    const command = block.querySelector("code")!.textContent!;
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(command);
+        status.textContent = "Copied. Paste it into a terminal.";
+      } catch {
+        status.textContent = "Could not copy automatically. Select the command above to copy it.";
+      }
+    });
+  }
+</script>
+<style>
+  .command-block { border: var(--line-width) solid var(--line); border-radius: var(--radius); background: var(--surface-raised); margin-block: var(--space-5); }
+  .heading { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-2) var(--space-4); border-bottom: var(--line-width) solid var(--line); color: var(--text-muted); font-size: var(--step--1); }
+  button { min-height: 44px; padding: var(--space-1) var(--space-3); font: inherit; color: var(--text); background: transparent; border: var(--line-width) solid var(--line); border-radius: var(--radius); cursor: pointer; }
+  button:hover { background: var(--hover); border-color: var(--accent); }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; padding: var(--space-4); color: var(--text); font-family: var(--font-mono); font-size: var(--step--1); }
+  .copy-status { margin: 0; padding: 0 var(--space-4) var(--space-3); font-size: var(--step--1); color: var(--text-muted); }
+  .copy-status:empty { display: none; }
+</style>

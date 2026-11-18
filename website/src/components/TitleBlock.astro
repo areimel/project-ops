@@ -1,0 +1,24 @@
+---
+import { product } from "../config/site";
+interface Props { sheetTitle: string; sheet?: number; sheets?: number; revision?: string; }
+const { sheetTitle, sheet, sheets, revision } = Astro.props;
+const cells: { label: string; value: string; wide?: boolean }[] = [
+  { label: "Project", value: product.name, wide: true },
+  { label: "Drawing", value: sheetTitle, wide: true },
+  ...(sheet && sheets ? [{ label: "Sheet", value: `${sheet} of ${sheets}` }] : []),
+  { label: "Drawn by", value: product.author.name },
+  { label: "Licence", value: product.license },
+  ...(revision ? [{ label: "Revision", value: revision }] : []),
+];
+---
+<dl class="title-block">
+  {cells.map((c) => <div class:list={["cell", { wide: c.wide }]}><dt>{c.label}</dt><dd>{c.value}</dd></div>)}
+</dl>
+<style>
+  .title-block { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; width: 100%; max-width: 30rem; border: calc(var(--line-width) * 2) solid var(--text); border-radius: var(--radius); background: var(--surface); }
+  .cell { padding: var(--space-2) var(--space-3); border: 0 solid var(--line); border-width: 0 var(--line-width) var(--line-width) 0; min-width: 0; }
+  .wide { grid-column: 1 / -1; border-right-width: 0; }
+  .cell:nth-child(even):not(.wide) { border-right-width: 0; }
+  dt { font-size: var(--step--1); color: var(--text-muted); }
+  dd { margin: 0; font-family: var(--font-display); font-size: var(--step-1); font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
+</style>

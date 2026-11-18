@@ -1,0 +1,16 @@
+.tasks { display: flex; flex-direction: column; max-width: var(--content-max); margin: 0 auto; }
+.tasks-center { align-items: center; justify-content: center; }
+
+.tasks-add { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-4) var(--sp-4) var(--sp-3); }
+.tasks-add-title { flex: 1; min-width: 0; }
+.tasks-add-due { flex: none; }
+.tasks-add-due input { padding: 0 var(--sp-2); }
+
+.tasks-bar { display: flex; align-items: center; gap: var(--sp-3); padding: 0 var(--sp-4) var(--sp-3); }
+.tasks-clear { margin-left: auto; }
+
+/* The list scrolls, the add row and filter stay put. */
+.tasks-body { flex: 1; min-height: 0; overflow: auto; border-top: var(--line-w) solid var(--line); }
+
+.task-done { color: var(--text-muted); text-decoration: line-through; }
+.task-overdue { color: var(--danger); font-weight: var(--fw-medium); }

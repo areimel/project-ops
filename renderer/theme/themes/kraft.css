@@ -1,0 +1,31 @@
+/* Kraft: warm paper with a dark ink. */
+:root[data-theme="kraft"][data-mode="light"],
+[data-theme="kraft"][data-mode="light"] {
+  --bg: #efe6d6;
+  --surface: #faf5ec;
+  --surface-raised: #fffdf8;
+  --text: #3a2a1a;
+  --text-muted: #6e5a44;
+  --line: #c8b497;
+  --accent: #b5481f;
+  --accent-text: #b5481f;
+  --accent-ink: #ffffff;
+  --danger: #a3261a;
+  --danger-ink: #ffffff;
+  --success: #2e6b3a;
+}
+:root[data-theme="kraft"][data-mode="dark"],
+[data-theme="kraft"][data-mode="dark"] {
+  --bg: #2b2219;
+  --surface: #362b20;
+  --surface-raised: #413428;
+  --text: #f2e8d9;
+  --text-muted: #c9b79f;
+  --line: #6b5841;
+  --accent: #f0a35e;
+  --accent-text: #f0a35e;
+  --accent-ink: #2b2219;
+  --danger: #ff9a85;
+  --danger-ink: #2b2219;
+  --success: #9ed39a;
+}

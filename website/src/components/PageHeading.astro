@@ -1,0 +1,15 @@
+---
+interface Props { title: string; lede?: string; }
+const { title, lede } = Astro.props;
+---
+<header class="container page-heading">
+  <h1>{title}</h1>
+  {lede && <p class="lede">{lede}</p>}
+  {Astro.slots.has("default") && <div class="actions"><slot /></div>}
+</header>
+<style>
+  .page-heading { padding-block: var(--space-8) var(--space-6); }
+  h1 { font-size: var(--step-5); line-height: 1.05; margin: 0 0 var(--space-4); max-width: 20ch; }
+  .lede { max-width: var(--measure); margin: 0 0 var(--space-5); }
+  .actions { margin-top: var(--space-4); }
+</style>
