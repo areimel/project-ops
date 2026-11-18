@@ -1,8 +1,9 @@
 import { appIpc } from "./app"; import { dataIpc } from "./data"; import { settingsIpc } from "./settings";
+import { projectsIpc } from "./projects";
 import type { InvokeSpec, DropSpec, EventSpec } from "./define";
 
-export const IPC_PARTS = { app: appIpc, data: dataIpc, settings: settingsIpc } as const;
-export const IPC = { ...appIpc, ...dataIpc, ...settingsIpc } as const;
+export const IPC_PARTS = { app: appIpc, data: dataIpc, settings: settingsIpc, projects: projectsIpc } as const;
+export const IPC = { ...appIpc, ...dataIpc, ...settingsIpc, ...projectsIpc } as const;
 type Ipc = typeof IPC;
 type ChannelsOf<K> = { [C in keyof Ipc]: Ipc[C] extends K ? C : never }[keyof Ipc];
 export type InvokeChannel = ChannelsOf<InvokeSpec<any, any>>;
