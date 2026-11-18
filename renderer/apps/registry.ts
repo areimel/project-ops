@@ -1,4 +1,5 @@
+import { projects } from "./projects";
 import type { AppDefinition } from "./types";
 
-/** Sheet number = index + 1. Empty until the Project Ops app is added. */
-export const APPS: AppDefinition[] = [];
+/** The first app is the home screen. */
+export const APPS: AppDefinition[] = [projects];

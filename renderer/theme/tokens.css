@@ -45,7 +45,7 @@
   --dur-fast: 150ms; --dur: 150ms; --dur-glitch: 250ms; --ease: cubic-bezier(.2, .7, .2, 1);
 
   /* Shell sizes */
-  --titlebar-h: 44px; --rail-w: 56px; --footer-h: 44px; --content-max: 960px;
+  --titlebar-h: 44px; --footer-h: 44px; --content-max: 960px;
 }
 
 :root[data-mode="light"], [data-theme][data-mode="light"] { color-scheme: light; --glitch-b: var(--bg); }

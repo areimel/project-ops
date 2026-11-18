@@ -4,8 +4,8 @@ import { APPS } from "../renderer/apps/registry";
 import { activeCommands } from "../renderer/shell/commandTable";
 
 describe("app registry", () => {
-  it("has no apps yet", () => {
-    expect(APPS.map((a) => a.id)).toEqual([]);
+  it("has the projects app first", () => {
+    expect(APPS.map((a) => a.id)).toEqual(["projects"]);
   });
   it("has unique ids, a valid shape, a name and a summary", () => {
     expect(new Set(APPS.map((a) => a.id)).size).toBe(APPS.length);

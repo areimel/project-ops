@@ -14,14 +14,14 @@ interface State { error: Error | null; attempt: number; key: string }
 function Fallback({ error, onReload }: { error: Error; onReload(): void }) {
   const { navigate } = useShell();
   return (
-    <div className="app-root error-sheet">
+    <div className="app-root error-screen">
       <EmptyState
-        icon="warning" title="This sheet stopped working"
+        icon="warning" title="This screen stopped working"
         body={`Something went wrong while drawing it: ${error.message || "unknown error"}. Your saved data is not affected.`}
         action={(
-          <div className="error-sheet-actions">
-            <Button onClick={onReload}>Reload this sheet</Button>
-            <Button variant="quiet" onClick={() => navigate({ type: "home" })}>Back to index</Button>
+          <div className="error-screen-actions">
+            <Button onClick={onReload}>Reload this screen</Button>
+            <Button variant="quiet" onClick={() => navigate({ type: "home" })}>Back to projects</Button>
           </div>
         )}
       />
@@ -44,7 +44,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.error) {
       return <Fallback error={this.state.error} onReload={() => this.setState((s) => ({ error: null, attempt: s.attempt + 1 }))} />;
     }
-    // Changing the key remounts the sheet, so "Reload this sheet" starts it from scratch.
+    // Changing the key remounts the screen, so "Reload this screen" starts it from scratch.
     return <Fragment key={this.state.attempt}>{this.props.children}</Fragment>;
   }
 }

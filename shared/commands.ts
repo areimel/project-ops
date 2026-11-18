@@ -19,12 +19,13 @@ export const SHELL_COMMANDS: readonly CommandSpec[] = [
   { id: "shell.palette", label: "Command palette", group: "View", accelerator: "CmdOrCtrl+K" },
   { id: "shell.cycleMode", label: "Switch light or dark mode", group: "View", accelerator: "CmdOrCtrl+Shift+L" },
   { id: "shell.fullscreen", label: "Fullscreen", group: "View", accelerator: "F11" },
-  { id: "shell.home", label: "Go to home", group: "Go", accelerator: "CmdOrCtrl+Shift+H" },
+  { id: "shell.home", label: "Go to projects", group: "Go", accelerator: "CmdOrCtrl+Shift+H" },
   { id: "shell.shortcuts", label: "Keyboard shortcuts", group: "Help", keys: ["?"] },
 ];
 
-/** "go.<id>" commands, CmdOrCtrl+1..9 by registry order. Used by the renderer and by main's Go menu. */
+/** "go.<id>" commands, CmdOrCtrl+1..9 by registry order. None for a single app: shell.home already goes there. */
 export function goCommands(apps: readonly { id: string; name: string }[]): CommandSpec[] {
+  if (apps.length < 2) return [];
   return apps.slice(0, 9).map((a, i) => ({
     id: `go.${a.id}`, label: `Go to ${a.name}`, group: "Go", accelerator: `CmdOrCtrl+${i + 1}`,
   }));
