@@ -4,7 +4,7 @@ import { event, invoke } from "./define";
 
 export interface AppInfo { version: string; platform: string; electron: string; chrome: string; node: string; isPackaged: boolean }
 export interface DeepLink { view: "home" | "settings" | "app"; appId?: string; recordId?: string }
-// app-template://home | app-template://settings | app-template://open/<appId>[/<recordId>]
+// project-ops://home | project-ops://settings | project-ops://open/<appId>[/<recordId>]
 // appId matches ^[a-z][a-z0-9-]{0,31}$, recordId isRecordId; the renderer checks appId against its registry.
 
 export const appIpc = {

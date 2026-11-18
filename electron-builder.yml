@@ -1,6 +1,6 @@
 # Keeps its own copy of the identity values; tests/brand.test.ts fails when they drift from shared/brand.ts.
-appId: com.example.apptemplate
-productName: App Template
+appId: com.areimel.projectops
+productName: Project Ops
 copyright: Copyright © Alec Reimel. MIT licence.
 directories:
   output: release
@@ -14,28 +14,21 @@ extraResources:
     to: THIRD_PARTY_NOTICES.md
   - from: build/tray.png
     to: tray.png
-# Deep links: app-template://open/notes
+# Deep links: project-ops://open/notes
 protocols:
-  - name: App Template
+  - name: Project Ops
     schemes:
-      - app-template
-# File association for Markdown files, off by default: once installed it makes this app a candidate
-# for opening every .md file on the machine. To turn it on, uncomment this block and add text/markdown
-# to linux.mimeTypes below.
-# fileAssociations:
-#   - ext: md
-#     name: Markdown document
-#     role: Editor
+      - project-ops
 linux:
   target:
     - target: deb
       arch: x64
   category: Utility
-  executableName: electron-app-template
+  executableName: project-ops
   icon: build/icons
   maintainer: Alec Reimel <areimel@users.noreply.github.com>
   mimeTypes:
-    - x-scheme-handler/app-template
+    - x-scheme-handler/project-ops
 deb:
   depends:
     - libgtk-3-0
@@ -61,4 +54,4 @@ mac:
     - target: dmg
   category: public.app-category.developer-tools
   icon: build/icon.png
-artifactName: electron-app-template_${version}_${arch}.${ext}
+artifactName: project-ops_${version}_${arch}.${ext}

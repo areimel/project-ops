@@ -2,7 +2,7 @@ import { brand } from "../../shared/brand";
 import { isRecordId } from "../../shared/collections/base";
 import type { DeepLink } from "../../shared/ipc/app";
 
-// app-template://home | app-template://settings | app-template://open/<appId>[/<recordId>]
+// project-ops://home | project-ops://settings | project-ops://open/<appId>[/<recordId>]
 const APP_ID = /^[a-z][a-z0-9-]{0,31}$/;
 const MAX_URL = 200;
 const URL_SHAPE = /^([A-Za-z][A-Za-z0-9+.-]*):\/\/([A-Za-z]+)((?:\/[^/?#\s]+){0,3})\/?$/;

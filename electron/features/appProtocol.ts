@@ -8,7 +8,7 @@ export const APP_SCHEME_ENTRY: Electron.CustomScheme = { scheme: appScheme, priv
 
 export const appUrl = (path = "index.html"): string => `${APP_ORIGIN}/${path}`;
 
-/** After app ready: answers app-template-app://renderer/... from dist-renderer, confined to that folder. */
+/** After app ready: answers project-ops-app://renderer/... from dist-renderer, confined to that folder. */
 export function registerAppProtocol(): void {
   const dir = join(__dirname, "../dist-renderer");
   let root: string;
