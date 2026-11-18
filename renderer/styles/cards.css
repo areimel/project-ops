@@ -1,0 +1,36 @@
+/* Card and key/value rows. Type for the header strip and keys is the mono label in base.css (.label). */
+
+.card {
+  display: flex; flex-direction: column; min-width: 0;
+  border: var(--line-w) solid var(--line); border-radius: var(--r); background: var(--surface);
+  transition: border-color var(--dur-fast) var(--ease);
+}
+.card:hover { border-color: var(--control-border); }
+.card.is-selected, .card.is-selected:hover { border-color: var(--accent-text); }
+/* Muted dims the text only; the border and focus ring keep their colour. */
+.card.is-muted .card-body, .card.is-muted .card-header, .card.is-muted .kv-value { color: var(--text-muted); }
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--sp-4); }
+
+.card-header {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-4); border-bottom: var(--line-w) solid var(--line); color: var(--text-muted);
+}
+.card-header-start, .card-header-end { display: inline-flex; align-items: center; gap: var(--sp-2); min-width: 0; }
+.card-header-start { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-header-end { flex: none; }
+
+.card-body { flex: 1; min-width: 0; padding: var(--sp-4); }
+.card-footer {
+  display: flex; align-items: center; gap: var(--sp-1); flex-wrap: wrap;
+  padding: var(--sp-2) var(--sp-3); border-top: var(--line-w) solid var(--line);
+}
+
+/* Trait rows */
+.kv-list { display: block; margin: 0; padding: 0; }
+.kv-row {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-4);
+  padding: var(--sp-2) 0; border-top: var(--line-w) solid var(--line);
+}
+.kv-key { flex: none; color: var(--text-muted); }
+.kv-value { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; font-size: var(--fs-sm); }

@@ -5,13 +5,20 @@
 const PATHS = {
   // Apps
   notes: "M6 3h9l4 4v14H6z M15 3v4h4 M9 12h7 M9 16h7",
-  tasks: "M3.5 6l1.7 1.7L8 4.5 M11 6h10 M3.5 12l1.7 1.7L8 10.5 M11 12h10 M4 16.5h3.5V20H4z M11 18h10",
-  editor: "M8 7l-5 5 5 5 M16 7l5 5-5 5 M13.5 5l-3 14",
-  clipboard: "M8 5H5v16h14V5h-3 M8 3h8v4H8z M9 12h6 M9 16h4",
-  timer: "M12 21a8 8 0 1 0 0-16 8 8 0 0 0 0 16z M10 2h4 M12 2v3 M12 9v4.5l2.5 2",
-  system: "M7 7h10v10H7z M10 10h4v4h-4z M9 3v4 M15 3v4 M9 17v4 M15 17v4 M3 9h4 M3 15h4 M17 9h4 M17 15h4",
-  news: "M4 4h13v16H6a2 2 0 0 1-2-2z M17 8h3v10a2 2 0 0 1-2 2 M7 8h7 M7 12h7 M7 16h4",
-  player: "M3 5h18v14H3z M10 9v6l5-3z",
+  code: "M8 7l-5 5 5 5 M16 7l5 5-5 5 M13.5 5l-3 14",
+  terminal: "M3 5h18v14H3z M7 10l3 2-3 2 M12 15h5",
+
+  // Projects
+  link: "M9 15l6-6 M11 7l1.5-1.5a4 4 0 0 1 5.7 5.7L16.5 13 M13 17l-1.5 1.5a4 4 0 0 1-5.7-5.7L7.5 11",
+  globe: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M3 12h18 M12 3c3 3 3 15 0 18 M12 3c-3 3-3 15 0 18",
+  gitBranch: "M6 3v12 M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M18 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M18 9c0 6-12 3-12 6",
+  pencil: "M4 20l1-5L16 4l4 4L9 19z M14 6l4 4",
+  archive: "M3 4h18v4H3z M5 8v12h14V8 M10 12h4",
+  pinOff: "M8 3h8 M9 3v6l-3 4h12 M12 13v8 M4 4l16 16",
+  filter: "M3 5h18l-7 8v6l-4 2v-8z",
+  sort: "M7 4v16 M3 16l4 4 4-4 M17 20V4 M13 8l4-4 4 4",
+  eyeOff: "M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z M12 14.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z M4 4l16 16",
+  arrowUpRight: "M7 17L17 7 M8 7h9v9",
 
   // Shell
   home: "M3 11l9-8 9 8 M5 9.5V21h5v-6h4v6h5V9.5",
@@ -38,12 +45,6 @@ const PATHS = {
   info: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 11v6 M12 7.5h.01",
 
   // Player
-  play: "M7 4.5v15l12-7.5z",
-  pause: "M6 5h4v14H6z M14 5h4v14h-4z",
-  fullscreen: "M4 9V4h5 M15 4h5v5 M20 15v5h-5 M9 20H4v-5",
-  exitFullscreen: "M9 4v5H4 M20 9h-5V4 M15 20v-5h5 M4 15h5v5",
-  volume: "M4 9.5h4l5-4.5v14l-5-4.5H4z M16.5 9a4 4 0 0 1 0 6 M19 6.5a8 8 0 0 1 0 11",
-  mute: "M4 9.5h4l5-4.5v14l-5-4.5H4z M17 9.5l4 5 M21 9.5l-4 5",
 } as const;
 
 export type IconName = keyof typeof PATHS;

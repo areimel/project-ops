@@ -1,0 +1,58 @@
+/* Badge, status light, tag input. Type for .badge and .status is the mono label in base.css. */
+
+.badge {
+  display: inline-flex; align-items: center; gap: var(--sp-1); max-width: 100%; min-height: 22px; padding: 0 var(--sp-2);
+  border: var(--line-w) solid var(--line); border-radius: var(--r); background: none; color: var(--text); line-height: 1.4;
+  transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.badge-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.badge-count { color: var(--text-muted); }
+.badge-solid { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.badge-solid .badge-count { color: inherit; }
+.badge-quiet { border-color: transparent; color: var(--text-muted); }
+
+/* Button parts: bare, so the badge draws the box. */
+.badge-main, .badge-remove {
+  display: inline-flex; align-items: center; gap: var(--sp-1); min-width: 0; margin: 0; padding: 0;
+  border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit;
+}
+.badge-remove { margin-right: calc(-1 * var(--sp-1)); padding: var(--sp-1); color: var(--text-muted); }
+.badge-remove:hover { color: var(--text); }
+.badge:has(.badge-main):hover { border-color: var(--text); }
+.badge:has(.badge-main:focus-visible), .badge:has(.badge-remove:focus-visible) { outline: none; }
+.badge-main:focus-visible, .badge-remove:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
+
+/* Toggle states. */
+.badge.is-pressed, .badge.is-pressed:hover { background: var(--selected); border-color: var(--accent-text); color: var(--accent-text); }
+.badge-solid.is-pressed, .badge-solid.is-pressed:hover { background: var(--accent); color: var(--accent-ink); }
+.badge.is-excluded, .badge.is-excluded:hover { border-color: var(--danger); color: var(--danger); }
+.badge.is-excluded .badge-text { text-decoration: line-through; }
+
+/* Status light: a solid square and its label. */
+.status { display: inline-flex; align-items: center; gap: var(--sp-2); color: var(--text); white-space: nowrap; }
+.status::before { content: ""; flex: none; width: var(--bullet); height: var(--bullet); background: var(--accent); }
+.status-success::before { background: var(--success); }
+.status-muted { color: var(--text-muted); }
+.status-muted::before { background: var(--text-muted); }
+.status-danger::before { background: var(--danger); }
+
+/* Tag input: a text-field look around the badges and a bare input. */
+.tag-input-field, .combobox { position: relative; display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
+.tag-input {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1); min-height: var(--control-h); padding: 4px var(--sp-2);
+  border: var(--line-w) solid var(--control-border); border-radius: var(--r); background: var(--bg); cursor: text;
+  transition: border-color var(--dur-fast) var(--ease);
+}
+.tag-input:hover { border-color: var(--text); }
+.tag-input:focus-within { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
+.tag-input .badge:has(:focus-visible) { outline: none; }
+.tag-input-text {
+  flex: 1 1 96px; min-width: 0; height: 24px; padding: 0 var(--sp-1); border: 0; outline: none; background: none;
+  color: var(--text); font-family: var(--font-text); font-size: var(--fs-md);
+}
+.tag-input-text::placeholder { color: var(--text-muted); opacity: 1; }
+
+/* Suggestion list: the dropdown menu, with a highlighted row that follows the arrow keys. */
+.suggestion-list { top: 100%; right: 0; max-height: 240px; overflow-y: auto; }
+.suggestion-list .dropdown-item.is-active { background: var(--hover); box-shadow: inset 2px 0 0 var(--accent); }
+.tag-input-field > .suggestion-list { top: calc(100% + var(--sp-1)); }

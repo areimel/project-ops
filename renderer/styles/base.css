@@ -42,7 +42,7 @@ svg { display: block; flex: none; }
 /* The mono label, defined once: buttons, segmented options, field labels, list meta, key caps, kickers, `.label`.
    Upper case comes from CSS; the source copy stays in sentence case. Class selectors only, so a component rule
    can still set colour or size without a specificity fight. */
-.label, .kicker, .btn, .segmented > button, .field-label, .text-field-label, .list-row-meta, kbd {
+.label, .kicker, .badge, .status, .btn, .segmented > button, .field-label, .text-field-label, .list-row-meta, kbd {
   font-family: var(--label-font);
   font-size: var(--label-size);
   font-weight: var(--label-weight);
