@@ -65,6 +65,29 @@ describe("bundle", () => {
     expect(s.projects.list().map((r) => r.path)).toEqual(["/keep"]);
   });
 
+  it("a failed later write puts back the collections already replaced and rethrows", () => {
+    const s = stores();
+    s.projects.create({ path: "/keep" });
+    const before = s.projects.list();
+    const failing = { list: () => [], replaceAll: () => { throw new Error("disk full"); }, clear: () => undefined };
+    const bundle = healBundle(wrap({ projects: [{ path: "/new" }], "project-roots": [{ path: "/r" }] }));
+    expect(() => applyCollections(bundle!, { projects: s.projects, "project-roots": failing })).toThrow("disk full");
+    expect(s.projects.list()).toEqual(before);
+  });
+
+  it("a failed settings step puts every replaced collection back", () => {
+    const s = stores();
+    s.projects.create({ path: "/keep" });
+    const root = s["project-roots"].create({ path: "/r" });
+    const bundle = healBundle(wrap({ projects: [{ path: "/new" }], "project-roots": [] }));
+    expect(() => applyCollections(bundle!, s, () => { throw new Error("settings"); })).toThrow("settings");
+    expect(s.projects.list().map((r) => r.path)).toEqual(["/keep"]);
+    expect(s["project-roots"].list().map((r) => r.id)).toEqual([root.id]);
+    let ran = false;
+    expect(applyCollections(bundle!, s, () => { ran = true; })).toEqual({ projects: 1, "project-roots": 0 });
+    expect(ran).toBe(true);
+  });
+
   it("an empty list in the file empties that collection; reset clears all", () => {
     const s = stores();
     s.projects.create({ path: "/a" });

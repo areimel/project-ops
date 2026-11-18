@@ -35,17 +35,33 @@ export function exportCollections(targets: Record<string, BundleCollection>): Re
 }
 
 /**
- * Replaces only the collections the bundle contains; returns how many records each now holds (after healing).
- * Every target the file touches is read first, so one from a newer version (list() throws) refuses the whole
- * import before anything is replaced. Nothing is stat'ed or opened: paths are only data.
+ * Replaces only the collections the bundle contains, then runs `andThen` (the settings update); returns how many
+ * records each collection now holds (after healing). Every target the file touches is read first and its list kept,
+ * so one from a newer version (list() throws) refuses the whole import before anything is replaced. When a later
+ * write or `andThen` fails, the collections already replaced are put back from those lists and the error is
+ * rethrown, so a failed import leaves the data as it was (as far as the put-back writes succeed). Nothing is
+ * stat'ed or opened: paths are only data.
  */
-export function applyCollections(bundle: ImportBundle, targets: Record<string, BundleCollection>): Record<string, number> {
+export function applyCollections(
+  bundle: ImportBundle, targets: Record<string, BundleCollection>, andThen: () => void = () => undefined,
+): Record<string, number> {
   const todo = Object.entries(bundle.collections).filter((e): e is [string, unknown[]] => Array.isArray(e[1]) && Object.hasOwn(targets, e[0]));
-  for (const [name] of todo) targets[name].list();
+  const before = todo.map(([name]) => [name, targets[name].list()] as const);
+  const replaced: string[] = [];
   const counts: Record<string, number> = {};
-  for (const [name, items] of todo) {
-    targets[name].replaceAll(items);
-    counts[name] = targets[name].list().length;
+  try {
+    for (const [name, items] of todo) {
+      targets[name].replaceAll(items);
+      replaced.push(name);
+      counts[name] = targets[name].list().length;
+    }
+    andThen();
+  } catch (e) {
+    for (const [name, items] of before) {
+      if (!replaced.includes(name)) continue;
+      try { targets[name].replaceAll(items); } catch { /* the original error is the one to report */ }
+    }
+    throw e;
   }
   return counts;
 }

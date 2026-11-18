@@ -35,8 +35,9 @@ export async function importData(): Promise<{ imported: boolean; counts: Record<
   const bundle = healBundle(raw);
   if (!bundle) throw new Error(`That file is not an export from ${brand.name}.`);
   invalidateScan();   // a running scan must not write over what is imported
-  const counts = applyCollections(bundle, targets());   // throws (nothing replaced) when a collection is from a newer version
-  updateSettings(bundle.settings);
+  // All or nothing: a newer-version collection refuses before any write; a failed write (or settings update)
+  // puts back the collections already replaced, then throws.
+  const counts = applyCollections(bundle, targets(), () => updateSettings(bundle.settings));
   return { imported: true, counts };
 }
 
