@@ -12,8 +12,8 @@ export const brand = {
     issues: "https://github.com/areimel/project-ops/issues",
     source: "https://github.com/areimel/project-ops",
   },
-  defaultTheme: "blueprint",
-  defaultMode: "system",
+  defaultTheme: "kojima",
+  defaultMode: "dark",
 } as const;
 
 export type LinkKey = keyof typeof brand.links;

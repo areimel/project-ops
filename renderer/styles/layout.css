@@ -1,4 +1,4 @@
-/* Lists, toolbar, split pane, empty state, spinner. */
+/* Lists, toolbar, split pane, empty state, spinner. Hairline rules, no gaps between rows. */
 
 .list { margin: 0; padding: 0; list-style: none; }
 .list-row {
@@ -8,7 +8,7 @@
   transition: background-color var(--dur-fast) var(--ease);
 }
 .list-row:hover { background: var(--hover); }
-.list-row.is-selected { background: var(--selected); box-shadow: inset 3px 0 0 var(--accent-text); }
+.list-row.is-selected { background: var(--selected); box-shadow: inset 3px 0 0 var(--accent); }   /* a selection bar, not a shadow */
 .list-row-leading { display: flex; align-items: center; color: var(--text-muted); }
 .list-row-title {
   display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 2px;
@@ -19,7 +19,7 @@
 .list-row-text, .list-row-secondary { display: block; max-width: 100%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .list-row-secondary { font-size: var(--fs-sm); font-weight: var(--fw-regular); color: var(--text-muted); }
 .list-row-title.is-wrap .list-row-text { overflow: visible; white-space: normal; overflow-wrap: anywhere; }
-.list-row-meta { flex: none; font-size: var(--fs-sm); color: var(--text-muted); }
+.list-row-meta { flex: none; color: var(--text-muted); }
 .list-row-trailing { display: flex; align-items: center; flex: none; gap: var(--sp-1); }
 
 .toolbar {
@@ -38,15 +38,15 @@
 }
 .empty-state-icon {
   display: grid; place-items: center; width: 64px; height: 64px; margin-bottom: var(--sp-2);
-  border: var(--line-w) dashed var(--control-border); border-radius: var(--r); color: var(--text-muted);
+  border: var(--line-w) solid var(--line); border-radius: var(--r); color: var(--accent-text);
 }
-.empty-state-title { font-size: var(--fs-xl); }
+.empty-state-title { font-size: var(--fs-2xl); }
 .empty-state-body { color: var(--text-muted); }
 .empty-state-body + * { margin-top: var(--sp-2); }
 
 .spinner {
-  display: inline-block; width: 24px; height: 24px; border-radius: 50%;
-  border: 2px solid var(--line); border-top-color: var(--accent-text); animation: spin 0.9s linear infinite;
+  display: inline-block; width: 24px; height: 24px; border-radius: var(--r);   /* a turning square: the one looping motion */
+  border: 2px solid var(--line); border-top-color: var(--accent); animation: spin 0.9s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 .list-row[role="option"] { cursor: pointer; }

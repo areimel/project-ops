@@ -8,10 +8,7 @@ importers:
 
   .:
     dependencies:
-      '@fontsource/barlow':
-        specifier: ^5.3.0
-        version: 5.3.0
-      '@fontsource/barlow-condensed':
+      '@fontsource/dm-sans':
         specifier: ^5.3.0
         version: 5.3.0
       react:
@@ -266,11 +263,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@fontsource/barlow-condensed@5.3.0':
-    resolution: {integrity: sha512-RA7MmIx0v3eQ6Gcf74qLVLOwLB0GpPOzx+eU9iG/AmCnSJGcIWYeU8y6CEMGZ210MGwGg5CZhzLkkvyZdTTk1g==}
-
-  '@fontsource/barlow@5.3.0':
-    resolution: {integrity: sha512-tGR0y6QObRtKv71MOth44222+mdNFM/ZWFWDV1VLzNbG4oK9PNRlyJzmkck4vHAi9ibHBXgt4SlY51amFP55CA==}
+  '@fontsource/dm-sans@5.3.0':
+    resolution: {integrity: sha512-lYJtMXXO28q1z+yz+z8XKd0s4hXaa9QdkETzkyD760sidCv5heI86weYA0sx0Nc4pAMAQTUuyf4gO44cYKKS9g==}
 
   '@hapi/address@5.1.1':
     resolution: {integrity: sha512-A+po2d/dVoY7cYajycYI43ZbYMXukuopIsqCjh5QzsBCipDtdofHntljDlpccMjIfTy6UOkg+5KPriwYch2bXA==}
@@ -2043,9 +2037,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@fontsource/barlow-condensed@5.3.0': {}
-
-  '@fontsource/barlow@5.3.0': {}
+  '@fontsource/dm-sans@5.3.0': {}
 
   '@hapi/address@5.1.1':
     dependencies:

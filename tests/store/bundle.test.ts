@@ -14,7 +14,7 @@ describe("bundle", () => {
     n.create({ title: "Hello", body: "World", pinned: true });
     t.create({ title: "One", due: "2026-01-02" });
     t.create({ title: "Two", done: true });
-    const settings = { ...defaultSettings(), theme: "kraft" as const, accent: "#112233" };
+    const settings = { ...defaultSettings(), theme: "kojima" as const, accent: "#112233" };
 
     const json = JSON.stringify(buildBundle(settings, { notes: n.list(), tasks: t.list() }, new Date("2026-11-17T10:00:00Z")));
     const bundle = healBundle(JSON.parse(json), NAMES);

@@ -1,0 +1,31 @@
+/* Kojima: warm charcoal and ivory, safety orange as the only accent. Dark is the default. */
+:root[data-theme="kojima"][data-mode="light"],
+[data-theme="kojima"][data-mode="light"] {
+  --bg: #efebe0;
+  --surface: #f8f5ed;
+  --surface-raised: #e1dccf;
+  --text: #141310;
+  --text-muted: #625e53;
+  --line: #c4beaf;
+  --accent: #ff4d00;
+  --accent-text: #ad2f00;
+  --accent-ink: #141310;
+  --danger: #a3261a;
+  --danger-ink: #ffffff;
+  --success: #256331;
+}
+:root[data-theme="kojima"][data-mode="dark"],
+[data-theme="kojima"][data-mode="dark"] {
+  --bg: #141310;
+  --surface: #1c1b17;
+  --surface-raised: #27251f;
+  --text: #efebe0;
+  --text-muted: #aaa596;
+  --line: #3f3b31;
+  --accent: #ff4d00;
+  --accent-text: #ff4d00;
+  --accent-ink: #141310;
+  --danger: #ff8a7a;
+  --danger-ink: #141310;
+  --success: #8fd18a;
+}

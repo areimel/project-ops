@@ -22,9 +22,9 @@ export function AboutSection() {
       <h2 id="set-about">About</h2>
       <Field label={brand.name} hint={brand.tagline}>
         <dl className="about-facts">
-          <dt>Version</dt><dd>{info?.version ?? CREDITS.version}</dd>
-          <dt>Electron</dt><dd>{info?.electron ?? "Not available"}</dd>
-          <dt>Chrome</dt><dd>{info?.chrome ?? "Not available"}</dd>
+          <dt className="label">Version</dt><dd>{info?.version ?? CREDITS.version}</dd>
+          <dt className="label">Electron</dt><dd>{info?.electron ?? "Not available"}</dd>
+          <dt className="label">Chrome</dt><dd>{info?.chrome ?? "Not available"}</dd>
         </dl>
       </Field>
       <Field label="Links">

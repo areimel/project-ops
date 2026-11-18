@@ -13,7 +13,7 @@ export function ShortcutHelp({ commands, onClose }: { commands: readonly Command
       <div className="help-grid">
         {groups.map((g) => (
           <section key={g.name} className="help-group">
-            <h3>{g.name}</h3>
+            <h3 className="kicker">{g.name}</h3>
             <ul>
               {g.rows.map((r) => (
                 <li key={r.id}>

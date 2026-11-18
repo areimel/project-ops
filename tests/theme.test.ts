@@ -55,7 +55,8 @@ describe.each(THEMES.map((t) => t.id))("%s", (theme) => {
 
 describe("theme helpers", () => {
   it("knows the theme ids", () => {
-    expect(isThemeId("kraft")).toBe(true);
+    expect(isThemeId("kojima")).toBe(true);
+    expect(isThemeId("kraft")).toBe(false);
     expect(isThemeId("neon")).toBe(false);
   });
   it("resolves the mode", () => {

@@ -6,13 +6,13 @@ What ships inside the app, with the licence names and copyright lines taken from
 
 This project began as a copy of babu-video-player, MIT licensed, Copyright Babu Studios. The copyright line is kept in `LICENSE`.
 
-## Barlow and Barlow Condensed
+## DM Sans
 
-The interface typefaces are Barlow (text) and Barlow Condensed (headings), distributed through `@fontsource/barlow` and `@fontsource/barlow-condensed` and bundled with the app.
+The interface typeface is DM Sans (text and headings), distributed through `@fontsource/dm-sans` and bundled with the app.
 
-> Copyright 2017 The Barlow Project Authors (https://github.com/jpt/barlow)
+> Copyright 2014 The DM Sans Project Authors (https://github.com/googlefonts/dm-fonts)
 
-Licensed under the SIL Open Font License, Version 1.1 (https://openfontlicense.org). The full licence text ships with the packages as `node_modules/@fontsource/barlow/LICENSE` and `node_modules/@fontsource/barlow-condensed/LICENSE`.
+Licensed under the SIL Open Font License, Version 1.1 (https://openfontlicense.org). The full licence text ships with the package as `node_modules/@fontsource/dm-sans/LICENSE`.
 
 ## Electron and Chromium
 

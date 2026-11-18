@@ -1,20 +1,20 @@
-/* Text inputs, labelled rows, checkbox. */
+/* Text inputs, labelled rows, checkbox. Field labels use the mono label in base.css. */
 
 .text-field { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
-.text-field-label, .field-label { font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--text); }
+.text-field-label, .field-label { color: var(--text-muted); }
 
 .text-field input, .text-area {
   width: 100%; min-width: 0; padding: 0 var(--sp-3);
   border: var(--line-w) solid var(--control-border); border-radius: var(--r);
-  background: var(--surface-raised); color: var(--text);
-  font-size: var(--fs-md); line-height: var(--lh-body);
-  transition: border-color var(--dur-fast) var(--ease);
+  background: var(--bg); color: var(--text);
+  font-family: var(--font-text); font-size: var(--fs-md); line-height: var(--lh-body);
+  transition: border-color var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease);
 }
 .text-field input { height: var(--control-h); }
+.text-field input:hover:not(:disabled):not(:focus), .text-area:hover:not(:disabled):not(:focus) { border-color: var(--text); }
 .text-field input::placeholder, .text-area::placeholder { color: var(--text-muted); opacity: 1; }
-.text-field input:focus-visible, .text-area:focus-visible { outline-offset: 0; border-color: var(--focus); }
-.text-field input:disabled, .text-area:disabled { opacity: 0.55; }
-.text-field input[aria-invalid="true"], .text-area[aria-invalid="true"] { border-color: var(--danger); }
+.text-field input:disabled, .text-area:disabled { opacity: 0.55; cursor: not-allowed; }
+.text-field input[aria-invalid="true"], .text-area[aria-invalid="true"] { border-color: var(--danger); outline-color: var(--danger); }
 .text-field input[type="search"]::-webkit-search-cancel-button { appearance: none; }
 .text-field input[type="number"] { -moz-appearance: textfield; }
 

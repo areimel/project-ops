@@ -4,7 +4,7 @@ import { isThemeId, type ThemeId } from "./theme";
 
 export type ModeSetting = "system" | "light" | "dark";
 export interface Settings {
-  theme: ThemeId;            // from shared/theme.ts
+  theme: ThemeId;            // from shared/theme.ts; an unknown (old) id heals to the default
   mode: ModeSetting;
   accent: string | null;     // ^#[0-9a-f]{6}$ override of --accent, null = theme accent
   closeToTray: boolean;      // default false
@@ -16,7 +16,7 @@ const HEX = /^#[0-9a-fA-F]{6}$/;
 
 export function defaultSettings(): Settings {     // theme/mode from brand
   return {
-    theme: isThemeId(brand.defaultTheme) ? brand.defaultTheme : "blueprint",
+    theme: isThemeId(brand.defaultTheme) ? brand.defaultTheme : "kojima",
     mode: brand.defaultMode,
     accent: null, closeToTray: false,
   };
