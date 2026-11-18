@@ -1,5 +1,6 @@
 import { brand } from "../../shared/brand";
 import { isObject } from "../../shared/collections/heal";
+import { projectSpec, rootSpec } from "../../shared/projects";
 import { healSettingsPatch, type Settings } from "../../shared/settings";
 
 export const BUNDLE_VERSION = 1;
@@ -16,8 +17,43 @@ export interface ImportBundle {
   settings: Partial<Settings>; collections: Partial<Record<string, unknown[]>>;
 }
 
-/** Names of the collections an export carries and an import accepts. Empty until a collection is added. */
-export const COLLECTION_NAMES: readonly string[] = [];
+/** Names of the collections an export carries and an import accepts. */
+export const COLLECTION_NAMES: readonly string[] = [projectSpec.name, rootSpec.name];
+
+/** The part of a Collection the bundle code needs, so tests can pass in-memory ones. */
+export interface BundleCollection {
+  list(): unknown[];
+  replaceAll(items: unknown): void;
+  clear(): void;
+}
+
+/** Full stored records of every collection (paths and tombstones included: it is the owner's own backup). */
+export function exportCollections(targets: Record<string, BundleCollection>): Record<string, unknown[]> {
+  const out: Record<string, unknown[]> = {};
+  for (const [name, c] of Object.entries(targets)) out[name] = c.list();
+  return out;
+}
+
+/**
+ * Replaces only the collections the bundle contains; returns how many records each now holds (after healing).
+ * Every target the file touches is read first, so one from a newer version (list() throws) refuses the whole
+ * import before anything is replaced. Nothing is stat'ed or opened: paths are only data.
+ */
+export function applyCollections(bundle: ImportBundle, targets: Record<string, BundleCollection>): Record<string, number> {
+  const todo = Object.entries(bundle.collections).filter((e): e is [string, unknown[]] => Array.isArray(e[1]) && Object.hasOwn(targets, e[0]));
+  for (const [name] of todo) targets[name].list();
+  const counts: Record<string, number> = {};
+  for (const [name, items] of todo) {
+    targets[name].replaceAll(items);
+    counts[name] = targets[name].list().length;
+  }
+  return counts;
+}
+
+/** Reset: every collection emptied (also a damaged or newer file). */
+export function clearCollections(targets: Record<string, BundleCollection>): void {
+  for (const c of Object.values(targets)) c.clear();
+}
 
 export function buildBundle(settings: Settings, collections: Record<string, unknown[]>, now: Date = new Date()): Bundle {
   return { format: brand.packageName, version: BUNDLE_VERSION, exportedAt: now.toISOString(), settings, collections };

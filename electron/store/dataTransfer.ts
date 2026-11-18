@@ -3,8 +3,13 @@ import { readFile, stat, writeFile } from "node:fs/promises";
 import { brand } from "../../shared/brand";
 import { pickOpenFile, pickSaveFile } from "../features/files";
 import { getWindow } from "../window";
-import { buildBundle, healBundle } from "./bundle";
+import { invalidateScan } from "../features/projectsScanRun";
+import { applyCollections, buildBundle, clearCollections, exportCollections, healBundle, type BundleCollection } from "./bundle";
+import { projectsStore, rootsStore } from "./projects";
+import { projectSpec, rootSpec } from "../../shared/projects";
 import { getSettings, resetSettings, updateSettings } from "./settings";
+
+const targets = (): Record<string, BundleCollection> => ({ [projectSpec.name]: projectsStore(), [rootSpec.name]: rootsStore() });
 
 const MAX_IMPORT_BYTES = 50 * 1024 * 1024;
 const FILTERS = [{ name: "JSON", extensions: ["json"] }];
@@ -15,11 +20,11 @@ export async function exportData(): Promise<{ saved: boolean }> {
     defaultName: `${brand.packageName}-data-${new Date().toISOString().slice(0, 10)}.json`,
   });
   if (!filePath || !getWindow()) return { saved: false };
-  await writeFile(filePath, JSON.stringify(buildBundle(getSettings(), {}), null, 2));
+  await writeFile(filePath, JSON.stringify(buildBundle(getSettings(), exportCollections(targets())), null, 2));
   return { saved: true };
 }
 
-/** Applies only the settings the file contains (collections will be replaced here once there are any). */
+/** Replaces only the settings and collections the file contains. The page is updated by the stores' own change pushes. */
 export async function importData(): Promise<{ imported: boolean; counts: Record<string, number> }> {
   const path = await pickOpenFile({ title: "Import data", filters: FILTERS });
   if (!path || !getWindow()) return { imported: false, counts: {} };
@@ -29,14 +34,17 @@ export async function importData(): Promise<{ imported: boolean; counts: Record<
   if (!getWindow()) return { imported: false, counts: {} };
   const bundle = healBundle(raw);
   if (!bundle) throw new Error(`That file is not an export from ${brand.name}.`);
-  const counts: Record<string, number> = {};
+  invalidateScan();   // a running scan must not write over what is imported
+  const counts = applyCollections(bundle, targets());   // throws (nothing replaced) when a collection is from a newer version
   updateSettings(bundle.settings);
   return { imported: true, counts };
 }
 
 /**
- * Data reset: the settings are deleted; the change is pushed to the renderer by the listener. The window position and the log files are kept on purpose.
+ * Data reset: both project collections are cleared and the settings deleted; a running scan is dropped first; the change is pushed to the renderer by the listener. The window position and the log files are kept on purpose.
  */
 export function resetData(): void {
+  invalidateScan();
+  clearCollections(targets());
   resetSettings();
 }
