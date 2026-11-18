@@ -9,6 +9,7 @@ export interface ProjectFilters {
   query: string;
   category: string | null; // null = all; UNCATEGORISED = empty category
   tags: string[]; // a project must have all of them
+  excludeTags: string[]; // a project must have none of them
   statuses: ProjectStatus[]; // empty = all
   stack: string[]; // a project must have at least one of them
 }
@@ -29,6 +30,8 @@ export interface Facet {
   label: string;
   count: number;
   selected: boolean;
+  /** Tags only: the value is in `excludeTags` ("must not have"). */
+  excluded?: boolean;
 }
 
 export interface Facets {
@@ -40,7 +43,7 @@ export interface Facets {
 }
 
 export function defaultFilters(): ProjectFilters {
-  return { query: "", category: null, tags: [], statuses: ["active", "paused"], stack: [] };
+  return { query: "", category: null, tags: [], excludeTags: [], statuses: ["active", "paused"], stack: [] };
 }
 
 export const clearFilters = defaultFilters;
@@ -51,7 +54,7 @@ const sameSet = (a: readonly string[], b: readonly string[]) =>
 export function isFiltered(f: ProjectFilters): boolean {
   const d = defaultFilters();
   return (
-    f.query.trim() !== "" || f.category !== null || f.tags.length > 0 || f.stack.length > 0 ||
+    f.query.trim() !== "" || f.category !== null || f.tags.length > 0 || f.excludeTags.length > 0 || f.stack.length > 0 ||
     !sameSet(f.statuses, d.statuses)
   );
 }
@@ -90,6 +93,10 @@ function passes(p: ProjectView, f: ProjectFilters, skip?: Group): boolean {
   if (skip !== "tags" && f.tags.length > 0) {
     const have = p.tags.map(fold);
     if (!f.tags.every((t) => have.includes(fold(t)))) return false;
+  }
+  if (skip !== "tags" && f.excludeTags.length > 0) {
+    const have = p.tags.map(fold);
+    if (f.excludeTags.some((t) => have.includes(fold(t)))) return false;
   }
   if (skip !== "statuses" && f.statuses.length > 0 && !f.statuses.includes(p.status)) return false;
   if (skip !== "stack" && f.stack.length > 0) {
@@ -176,7 +183,10 @@ export function facets(projects: readonly ProjectView[], filters: ProjectFilters
     (p) => (categoryKey(p) === UNCATEGORISED ? [{ value: UNCATEGORISED, label: "Uncategorised" }] : [{ value: p.category.trim(), label: p.category.trim() }]),
     catSelected,
   ).map((f) => (f.value === UNCATEGORISED ? { ...f, label: "Uncategorised" } : f));
-  const tags = buildFacet(projects, filters, "tags", (p) => p.tags.map((t) => ({ value: t, label: t })), filters.tags);
+  const excluded = new Set(filters.excludeTags.map(fold));
+  const tags = buildFacet(
+    projects, filters, "tags", (p) => p.tags.map((t) => ({ value: t, label: t })), [...filters.tags, ...filters.excludeTags],
+  ).map((t) => (excluded.has(fold(t.value)) ? { ...t, selected: false, excluded: true } : t));
   const stack = buildFacet(projects, filters, "stack", (p) => p.stack.map((s) => ({ value: s, label: s })), filters.stack);
   const statuses: Facet[] = PROJECT_STATUSES.map((s) => ({
     value: s,

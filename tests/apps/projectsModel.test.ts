@@ -22,14 +22,14 @@ const names = (ps: ProjectView[]) => ps.map((p) => p.name);
 
 describe("defaults", () => {
   it("hides archived and is not 'filtered'", () => {
-    expect(defaultFilters()).toEqual({ query: "", category: null, tags: [], statuses: ["active", "paused"], stack: [] });
+    expect(defaultFilters()).toEqual({ query: "", category: null, tags: [], excludeTags: [], statuses: ["active", "paused"], stack: [] });
     expect(isFiltered(defaultFilters())).toBe(false);
     expect(isFiltered(f({ statuses: ["paused", "active"] }))).toBe(false);
     expect(clearFilters()).toEqual(defaultFilters());
     expect(SORT_OPTIONS.map((o) => o.value)).toEqual(["name", "lastCommit", "added", "updated"]);
   });
   it("detects any change", () => {
-    for (const o of [{ query: "x" }, { category: "Work" }, { tags: ["a"] }, { stack: ["node"] }, { statuses: [] }, { statuses: ["archived" as const] }]) {
+    for (const o of [{ query: "x" }, { category: "Work" }, { tags: ["a"] }, { excludeTags: ["a"] }, { stack: ["node"] }, { statuses: [] }, { statuses: ["archived" as const] }]) {
       expect(isFiltered(f(o))).toBe(true);
     }
   });
@@ -70,11 +70,16 @@ describe("filters", () => {
     expect(names(filterProjects(all, f({ tags: ["cli"] })))).toEqual(["A", "B"]);
     expect(names(filterProjects(all, f({ tags: ["CLI", "tui"] })))).toEqual(["A"]);
   });
-  it("Work + terminal app + CLI finds CLI projects, including ones also tagged TUI (exclusion is not supported)", () => {
+  it("Work + terminal app + CLI but not TUI", () => {
     const x = project({ name: "X", category: "Work", tags: ["terminal app", "CLI"] });
     const y = project({ name: "Y", category: "Work", tags: ["terminal app", "CLI", "TUI"] });
     const z = project({ name: "Z", category: "Home", tags: ["terminal app", "CLI"] });
     expect(names(filterProjects([x, y, z], f({ category: "Work", tags: ["terminal app", "cli"] })))).toEqual(["X", "Y"]);
+    expect(names(filterProjects([x, y, z], f({ category: "Work", tags: ["terminal app", "cli"], excludeTags: ["tui"] })))).toEqual(["X"]);
+  });
+  it("excluded tags drop any project carrying one, case-insensitively", () => {
+    expect(names(filterProjects(all, f({ excludeTags: ["TUI"] })))).toEqual(["B", "C"]);
+    expect(names(filterProjects(all, f({ excludeTags: ["tui", "web"] })))).toEqual(["B"]);
   });
   it("stack matches any selected id", () => {
     expect(names(filterProjects(all, f({ stack: ["rust", "react"] })))).toEqual(["A", "C"]);
@@ -141,6 +146,16 @@ describe("facets", () => {
     const r2 = facets(ps, f({ category: "Nowhere", stack: ["go"] }));
     expect(get(r2.categories, "Nowhere")).toMatchObject({ count: 0, selected: true });
     expect(get(r2.stack, "go")).toMatchObject({ count: 0, selected: true });
+  });
+  it("marks excluded tags and counts them as if included, while other groups apply the exclusion", () => {
+    const r = facets(ps, f({ excludeTags: ["tui"] }));
+    expect(r.total).toBe(2);
+    expect(get(r.tags, "TUI")).toMatchObject({ count: 1, selected: false, excluded: true });
+    expect(get(r.tags, "CLI")).toMatchObject({ count: 2, selected: false });
+    expect(r.tags.find((t) => t.value === "CLI")?.excluded).toBeUndefined();
+    expect(get(r.stack, "rust")).toBeUndefined(); // A (rust) carries TUI
+    const zero = facets(ps, f({ excludeTags: ["gone"] }));
+    expect(get(zero.tags, "gone")).toMatchObject({ count: 0, excluded: true });
   });
   it("respects the query in every group", () => {
     const r = facets(ps, f({ query: "web" }));
