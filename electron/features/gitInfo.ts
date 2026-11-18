@@ -7,9 +7,14 @@
 // repo: the branch and origin URL come from .git/HEAD and .git/config, and the last-commit time and dirty flag
 // stay null. git itself is resolved to an absolute file once (never a bare name
 // searched in the project folder).
+//
+// Every git call is pinned to the folder that was checked: `--git-dir=<path>/.git --work-tree=<path>`, so git never
+// searches parent folders or treats the folder as a bare repository (GIT_CEILING_DIRECTORIES and
+// safe.bareRepository=explicit back that up). Before git runs, `.git` must also look like a repository on disk
+// (HEAD a regular file, objects/ and refs/ folders); otherwise git, given that --git-dir, would refuse it anyway.
 import { execFile, type ChildProcess } from "node:child_process";
 import { lstat } from "node:fs/promises";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { log } from "./logger";
 import {
   type GitInfo, configKeys, disallowedKeys, isPlainConfigText, parseCommitTime, parseHeadFile, parseOriginUrl,
@@ -42,7 +47,22 @@ const SAFE_ARGS = [
   "-c", "core.fsmonitor=false", "-c", "core.untrackedCache=false",
   "-c", "core.hooksPath=/dev/null", "-c", "log.showSignature=false", "-c", "core.attributesFile=/dev/null",
   "-c", "diff.ignoreSubmodules=all", "-c", "status.submoduleSummary=false", "-c", "submodule.recurse=false",
+  "-c", "safe.bareRepository=explicit",
 ];
+
+/**
+ * The environment for git: the app's own minus every inherited GIT_* variable (GIT_DIR, GIT_WORK_TREE,
+ * GIT_CONFIG_COUNT ... would redirect or reconfigure git), plus fixed values. The ceiling is the project's parent
+ * folder, so even a discovery could not climb above it.
+ */
+function gitEnv(path: string): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = {};
+  for (const [key, value] of Object.entries(process.env)) if (!/^GIT_/i.test(key)) env[key] = value;
+  return {
+    ...env, GIT_TERMINAL_PROMPT: "0", GIT_OPTIONAL_LOCKS: "0", GIT_CONFIG_NOSYSTEM: "1", GIT_ATTR_NOSYSTEM: "1",
+    GIT_CEILING_DIRECTORIES: dirname(path),
+  };
+}
 
 /** stdout, or null on any failure (no git, not a repo, timeout, too much output, non-zero exit). */
 function git(path: string, args: string[]): Promise<string | null> {
@@ -51,10 +71,10 @@ function git(path: string, args: string[]): Promise<string | null> {
   return new Promise((resolve) => {
     try {
       const child = execFile(
-        bin, [...SAFE_ARGS, "-C", path, ...args],
+        bin, [...SAFE_ARGS, `--git-dir=${join(path, ".git")}`, `--work-tree=${path}`, ...args],
         {
-          timeout: TIMEOUT_MS, maxBuffer: MAX_BUFFER, windowsHide: true, encoding: "utf8", shell: false,
-          env: { ...process.env, GIT_TERMINAL_PROMPT: "0", GIT_OPTIONAL_LOCKS: "0", GIT_CONFIG_NOSYSTEM: "1", GIT_ATTR_NOSYSTEM: "1" },
+          cwd: path, timeout: TIMEOUT_MS, maxBuffer: MAX_BUFFER, windowsHide: true, encoding: "utf8", shell: false,
+          env: gitEnv(path),
         },
         (err, stdout) => { running.delete(child); resolve(err ? null : stdout); },
       );
@@ -82,12 +102,8 @@ export async function mapLimit<T, R>(items: readonly T[], limit: number, fn: (it
   return out;
 }
 
-/**
- * The risky path: facts from disk only, no git process. A `.git` that is a file (a worktree or submodule pointer to
- * another folder) gives no info rather than following the pointer.
- */
-async function readFromDisk(dotGit: string, isDir: boolean): Promise<GitInfo> {
-  if (!isDir) return NONE;
+/** The risky path: facts from disk only (a `.git` folder's HEAD and config), no git process. */
+async function readFromDisk(dotGit: string): Promise<GitInfo> {
   const head = await readSmallFile(join(dotGit, "HEAD"), GIT_FILE_MAX);
   const config = await readSmallFile(join(dotGit, "config"), GIT_FILE_MAX);
   const origin = config === null ? null : parseOriginUrl(config);
@@ -100,6 +116,8 @@ async function readFromDisk(dotGit: string, isDir: boolean): Promise<GitInfo> {
 }
 
 const exists = (path: string): Promise<boolean> => lstat(path).then(() => true, () => false);
+const isKind = (path: string, kind: "file" | "dir"): Promise<boolean> =>
+  lstat(path).then((s) => (kind === "file" ? s.isFile() : s.isDirectory()), () => false);
 
 /**
  * Decided from disk, before any git process: a real `.git` folder whose config is entirely plain data (see
@@ -107,6 +125,11 @@ const exists = (path: string): Promise<boolean> => lstat(path).then(() => true, 
  * not plain and gets no git command at all.
  */
 async function plainRepo(path: string, dotGit: string): Promise<{ plain: boolean; reason: string }> {
+  // What git itself requires of a git dir (is_git_directory), checked without following links.
+  if (!(await isKind(join(dotGit, "HEAD"), "file"))) return { plain: false, reason: ".git/HEAD is not a regular file" };
+  for (const name of ["objects", "refs"]) {
+    if (!(await isKind(join(dotGit, name), "dir"))) return { plain: false, reason: `.git/${name} is not a folder` };
+  }
   const config = await readSmallFile(join(dotGit, "config"), GIT_FILE_MAX);
   if (config === null) return { plain: false, reason: ".git/config is missing, unreadable or too large" };
   for (const name of ["config.worktree", "commondir", "modules"]) {
@@ -121,23 +144,19 @@ async function plainRepo(path: string, dotGit: string): Promise<{ plain: boolean
   return { plain: true, reason: "" };
 }
 
-/** Skips git when the folder has no `.git` entry. Sequential calls, so one repo uses one process at a time. */
+/**
+ * Skips git when the folder has no `.git` folder. A `.git` that is a file (a worktree or submodule `gitdir:` pointer
+ * to another folder) or a symlink gives no info rather than being followed. Sequential calls, so one repo uses one
+ * process at a time.
+ */
 export async function readGitInfo(path: string): Promise<GitInfo> {
   if (!gitBinary()) return NONE;
   const dotGit = join(path, ".git");
-  let isDir: boolean;
-  try {
-    const st = await lstat(dotGit);
-    if (!st.isDirectory() && !st.isFile()) return NONE;
-    isDir = st.isDirectory();
-  } catch {
-    return NONE;
-  }
-  if (!isDir) return NONE;   // a `gitdir:` pointer (worktree, submodule): not followed, no git
+  if (!(await isKind(dotGit, "dir"))) return NONE;
   const { plain, reason } = await plainRepo(path, dotGit);
   if (!plain) {
     log.warn("git", `not running git in a project folder: ${reason}`);
-    return readFromDisk(dotGit, isDir);
+    return readFromDisk(dotGit);
   }
   const status = await git(path, ["status", "--porcelain=v2", "--branch", "--ignore-submodules=all"]);
   const commit = await git(path, ["log", "-1", "--format=%ct", "--no-show-signature"]);

@@ -117,6 +117,12 @@ describe("isPlainConfigText and isPlainRepoConfig", () => {
       + "[lfs]\n\trepositoryformatversion = 0\n[lfs \"https://h.example/r.git/info/lfs\"]\n\taccess = basic\n";
     expect(isPlainConfigText(text)).toBe(true);
   });
+  it("accepts the gh CLI's base-branch key and core.hooksPath (overridden by -c on every call)", () => {
+    const text = `${FRESH_CLONE}[branch "fix"]\n\tgithub-pr-base-branch = main\n\tgithub-pr-owner-number = "u#r#1"\n`
+      + "[core]\n\thooksPath = .githooks\n";
+    expect(isPlainConfigText(text)).toBe(true);
+    expect(isPlainConfigText(`${FRESH_CLONE}[core]\n\thooksPath\n`)).toBe(true);
+  });
   it.each([
     ["filter", "[filter \"lfs\"]\n\tclean = git-lfs clean -- %f\n"],
     ["fsmonitor", "[core]\n\tfsmonitor = ./x.sh\n"],

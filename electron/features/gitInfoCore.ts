@@ -129,10 +129,15 @@ export function configKeys(text: string): string[] | null {
 }
 
 // Plain data keys: [section, keys without a subsection, keys with a subsection].
+//
+// core.hooksPath names a folder of programs, yet it is allowed: every git call passes `-c core.hooksPath=/dev/null`,
+// and a command-line `-c` (the "command" scope) wins over the repository's own config, so the repo's value is never
+// used; besides, the only commands run (status, log -1, config --get) run no hooks at all.
+// branch.<name>.github-pr-base-branch is written by the gh CLI: plain data.
 const ALLOWED: Record<string, { plain?: readonly string[]; sub?: readonly string[] }> = {
-  core: { plain: ["repositoryformatversion", "filemode", "bare", "logallrefupdates", "ignorecase", "precomposeunicode", "symlinks", "autocrlf", "eol", "safecrlf"] },
+  core: { plain: ["repositoryformatversion", "filemode", "bare", "logallrefupdates", "ignorecase", "precomposeunicode", "symlinks", "autocrlf", "eol", "safecrlf", "hookspath"] },
   remote: { sub: ["url", "fetch", "pushurl", "tagopt", "prune", "gh-resolved"] },
-  branch: { sub: ["remote", "merge", "rebase", "description", "pushremote", "vscode-merge-base", "github-pr-owner-number"] },
+  branch: { sub: ["remote", "merge", "rebase", "description", "pushremote", "vscode-merge-base", "github-pr-owner-number", "github-pr-base-branch"] },
   user: { plain: ["name", "email"] },
   pull: { plain: ["rebase", "ff"] },
   push: { plain: ["default", "autosetupremote"] },
