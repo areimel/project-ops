@@ -1,63 +1,100 @@
 import { describe, expect, it } from "vitest";
-import { buildBundle, healBundle } from "../../electron/store/bundle";
+import { applyCollections, buildBundle, clearCollections, exportCollections, healBundle } from "../../electron/store/bundle";
 import { createCollection } from "../../electron/store/collectionCore";
 import { brand } from "../../shared/brand";
-import { tasks } from "../../shared/collections/tasks";
-import { notes } from "../../shared/collections/notes";
+import { projectSpec, rootSpec } from "../../shared/projects";
 import { defaultSettings } from "../../shared/settings";
 
-describe("bundle", () => {
-  it("round-trips through JSON into fresh collections", () => {
-    const n = createCollection(notes);
-    const t = createCollection(tasks);
-    n.create({ title: "Hello", body: "World", pinned: true });
-    t.create({ title: "One", due: "2026-01-02" });
-    t.create({ title: "Two", done: true });
-    const settings = { ...defaultSettings(), theme: "kraft" as const, accent: "#112233" };
+const stores = () => ({ projects: createCollection(projectSpec), "project-roots": createCollection(rootSpec) });
+const wrap = (collections: unknown, extra: object = {}) => ({ format: brand.packageName, version: 1, collections, ...extra });
 
-    const json = JSON.stringify(buildBundle(settings, { notes: n.list(), tasks: t.list(), snippets: [] }, new Date("2026-11-17T10:00:00Z")));
+describe("bundle", () => {
+  it("round-trips projects and roots through JSON into fresh collections", () => {
+    const a = stores();
+    const root = a["project-roots"].create({ path: "/home/x/code" });
+    const p = a.projects.create({ path: "/home/x/code/app", rootId: root.id, favorite: true });
+    const hidden = a.projects.create({ path: "/home/x/code/old", rootId: root.id });
+    a.projects.update(hidden.id, { hidden: true });
+    const settings = { ...defaultSettings(), mode: "dark" as const };
+
+    const json = JSON.stringify(buildBundle(settings, exportCollections(a), new Date("2026-11-17T10:00:00Z")));
     const bundle = healBundle(JSON.parse(json));
-    expect(bundle).not.toBeNull();
-    expect(bundle?.format).toBe(brand.packageName);
     expect(bundle?.exportedAt).toBe("2026-11-17T10:00:00.000Z");
     expect(bundle?.settings).toEqual(settings);
+    expect(Object.keys(bundle?.collections ?? {}).sort()).toEqual(["project-roots", "projects"]);
 
-    const n2 = createCollection(notes);
-    const t2 = createCollection(tasks);
-    n2.replaceAll(bundle?.collections.notes);
-    t2.replaceAll(bundle?.collections.tasks);
-    expect(n2.list()).toEqual(n.list());
-    expect(t2.list()).toEqual(t.list());
+    const b = stores();
+    const counts = applyCollections(bundle!, b);
+    expect(counts).toEqual({ projects: 2, "project-roots": 1 });
+    expect(b.projects.list()).toEqual(a.projects.list());
+    expect(b["project-roots"].list()).toEqual(a["project-roots"].list());
+    expect(b.projects.get(p.id)?.path).toBe("/home/x/code/app");
   });
 
-  it("rejects what is not a bundle of this app", () => {
-    const ok = buildBundle(defaultSettings(), { notes: [], tasks: [], snippets: [] });
-    expect(healBundle(ok)).not.toBeNull();
-    for (const raw of [undefined, null, 5, "x", [], {}, { ...ok, format: "other-app" }, { ...ok, version: 2 }, { ...ok, version: "1" }, { ...ok, version: 0 }]) {
+  it("a partial file replaces only the collections it contains", () => {
+    const a = stores();
+    a.projects.create({ path: "/a" });
+    const root = a["project-roots"].create({ path: "/r" });
+    const bundle = healBundle(wrap({ projects: [{ path: "/b" }, { path: "/c" }] }));
+    expect(Object.keys(bundle?.collections ?? {})).toEqual(["projects"]);
+    expect(applyCollections(bundle!, a)).toEqual({ projects: 2 });
+    expect(a.projects.list().map((r) => r.path)).toEqual(["/b", "/c"]);
+    expect(a["project-roots"].list().map((r) => r.id)).toEqual([root.id]);
+  });
+
+  it("garbage records are dropped and counted after healing", () => {
+    const bundle = healBundle(wrap({ projects: [{ path: "/ok" }, 5, null, "x", {}, { path: "" }], "project-roots": "no" }));
+    const s = stores();
+    expect(applyCollections(bundle!, s)).toEqual({ projects: 1 });
+    expect(s.projects.list().map((r) => r.path)).toEqual(["/ok"]);
+  });
+
+  it("ignores unknown collections and refuses other formats", () => {
+    expect(healBundle(wrap({ notes: [1], evil: [1], constructor: [1] }))?.collections).toEqual({});
+    for (const raw of [undefined, null, 5, [], {}, wrap({}, { format: "other-app" }), wrap({}, { version: 2 }), wrap({}, { version: "1" })]) {
       expect(healBundle(raw), JSON.stringify(raw)).toBeNull();
     }
   });
 
-  it("ignores unknown collections; a malformed body gives no collections and no settings", () => {
-    const b = healBundle({ format: brand.packageName, version: 1, collections: { notes: "no", evil: [1], constructor: [1] }, settings: 7 });
-    expect(b?.collections).toEqual({});
-    expect(b?.settings).toEqual({});
-    expect(b?.exportedAt).toBe("");
+  it("a newer-version collection refuses the whole import before anything is replaced", () => {
+    const s = stores();
+    s.projects.create({ path: "/keep" });
+    const newer = createCollection(rootSpec, { read: () => ({ version: 99, items: [] }) });
+    const bundle = healBundle(wrap({ projects: [{ path: "/new" }], "project-roots": [{ path: "/r" }] }));
+    expect(() => applyCollections(bundle!, { projects: s.projects, "project-roots": newer })).toThrow(/newer version/);
+    expect(s.projects.list().map((r) => r.path)).toEqual(["/keep"]);
   });
 
-  it("returns only the collections and settings the file contains, so a partial import leaves the rest alone", () => {
-    const b = healBundle({ format: brand.packageName, version: 1, collections: { tasks: [{ title: "x" }] }, settings: { mode: "dark", theme: "nope" } });
-    expect(Object.keys(b?.collections ?? {})).toEqual(["tasks"]);
-    expect(b?.settings).toEqual({ mode: "dark" });
-    const empty = healBundle({ format: brand.packageName, version: 1, collections: { notes: [] } });
-    expect(empty?.collections).toEqual({ notes: [] });     // an empty list is present: it replaces
-    expect(empty?.settings).toEqual({});
+  it("a failed later write puts back the collections already replaced and rethrows", () => {
+    const s = stores();
+    s.projects.create({ path: "/keep" });
+    const before = s.projects.list();
+    const failing = { list: () => [], replaceAll: () => { throw new Error("disk full"); }, clear: () => undefined };
+    const bundle = healBundle(wrap({ projects: [{ path: "/new" }], "project-roots": [{ path: "/r" }] }));
+    expect(() => applyCollections(bundle!, { projects: s.projects, "project-roots": failing })).toThrow("disk full");
+    expect(s.projects.list()).toEqual(before);
   });
 
-  it("items inside a bundle are healed on import, not trusted", () => {
-    const b = healBundle({ format: brand.packageName, version: 1, collections: { tasks: [{ title: "ok" }, { title: "" }, "x", { title: "y", done: "no" }] } });
-    const t = createCollection(tasks);
-    t.replaceAll(b?.collections.tasks);
-    expect(t.list().map((r) => r.title)).toEqual(["ok", "y"]);
+  it("a failed settings step puts every replaced collection back", () => {
+    const s = stores();
+    s.projects.create({ path: "/keep" });
+    const root = s["project-roots"].create({ path: "/r" });
+    const bundle = healBundle(wrap({ projects: [{ path: "/new" }], "project-roots": [] }));
+    expect(() => applyCollections(bundle!, s, () => { throw new Error("settings"); })).toThrow("settings");
+    expect(s.projects.list().map((r) => r.path)).toEqual(["/keep"]);
+    expect(s["project-roots"].list().map((r) => r.id)).toEqual([root.id]);
+    let ran = false;
+    expect(applyCollections(bundle!, s, () => { ran = true; })).toEqual({ projects: 1, "project-roots": 0 });
+    expect(ran).toBe(true);
+  });
+
+  it("an empty list in the file empties that collection; reset clears all", () => {
+    const s = stores();
+    s.projects.create({ path: "/a" });
+    s["project-roots"].create({ path: "/r" });
+    expect(applyCollections(healBundle(wrap({ projects: [] }))!, s)).toEqual({ projects: 0 });
+    expect(s["project-roots"].list()).toHaveLength(1);
+    clearCollections(s);
+    expect(s["project-roots"].list()).toEqual([]);
   });
 });

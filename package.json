@@ -1,8 +1,8 @@
 {
-  "name": "electron-app-template",
-  "productName": "App Template",
+  "name": "project-ops",
+  "productName": "Project Ops",
   "version": "0.1.0",
-  "description": "A starter for desktop apps, one sheet per skill",
+  "description": "Find, filter and open your coding projects.",
   "main": "dist-electron/main.js",
   "license": "MIT",
   "private": true,
@@ -17,14 +17,11 @@
     "dist:mac": "pnpm build && electron-builder --mac dmg"
   },
   "dependencies": {
-    "@fontsource/barlow": "^5.3.0",
-    "@fontsource/barlow-condensed": "^5.3.0",
-    "markdown-it": "^15.0.3",
+    "@fontsource/dm-sans": "^5.3.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
-    "@types/markdown-it": "^14.2.0",
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
@@ -41,8 +38,8 @@
   "homepage": "https://example.com/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/areimel/electron-app-template.git"
+    "url": "https://github.com/areimel/project-ops.git"
   },
   "packageManager": "pnpm@11.22.0",
-  "desktopName": "electron-app-template.desktop"
+  "desktopName": "project-ops.desktop"
 }

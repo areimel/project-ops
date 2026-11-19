@@ -3,7 +3,7 @@ import { writeFileSync } from "node:fs";
 import { brand } from "../shared/brand";
 
 const P = brand.envPrefix;
-const KEY_GAP_MS = 400;   // a key for a sheet that is still lazy-loading would be lost without a pause
+const KEY_GAP_MS = 400;   // a key for a screen that is still lazy-loading would be lost without a pause
 
 /**
  * Development aid for checking rendering without a person at the screen:

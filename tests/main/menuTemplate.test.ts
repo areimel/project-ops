@@ -92,6 +92,10 @@ describe("buildTemplate", () => {
     expect(send).toHaveBeenCalledWith("go.notes");
     expect(go.find((i) => i.label === "Go to Tasks")?.accelerator).toBe("CmdOrCtrl+2");
   });
+  it("has no Go entries or trailing separator for a single app", () => {
+    const go = sub(build({ apps: [apps[0]], app: null }).tpl, "Go");
+    expect(go.map((i) => i.label)).toEqual(["Go to projects"]);
+  });
   it("skips commands with menu: false and keeps shell accelerators", () => {
     const { tpl } = build(ctx);
     expect(sub(tpl, "Notes").map((i) => i.label)).toEqual(["New note"]);

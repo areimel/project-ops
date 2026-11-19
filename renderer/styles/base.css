@@ -14,24 +14,49 @@ body {
 }
 #root { overflow: hidden; }
 
-h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); font-weight: var(--fw-bold); line-height: var(--lh-tight); }
+h1, h2, h3, h4 {
+  margin: 0; font-family: var(--font-display); font-weight: var(--fw-heavy);
+  line-height: var(--lh-tight); letter-spacing: var(--track-heading); text-wrap: balance;
+}
 h1 { font-size: var(--fs-3xl); }
 h2 { font-size: var(--fs-2xl); }
 h3 { font-size: var(--fs-xl); }
 h4 { font-size: var(--fs-lg); }
 p { margin: 0; }
-a { color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: var(--line-w); }
+a {
+  color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: var(--line-w);
+  transition: color var(--dur-fast) var(--ease);
+}
 a:hover { text-decoration-thickness: 2px; }
 button, input, textarea, select { font: inherit; color: inherit; }
 button { cursor: pointer; user-select: none; }
-button:disabled { cursor: default; }
+button:disabled { cursor: not-allowed; }
 svg { display: block; flex: none; }
-::selection { background: color-mix(in srgb, var(--accent) 32%, transparent); }
+::selection { background: var(--accent); color: var(--accent-ink); }
 
 /* Thin scrollbars that stay on the sheet's colours. */
 * { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
 
 :focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
+
+/* The mono label, defined once: buttons, segmented options, field labels, list meta, key caps, kickers, `.label`.
+   Upper case comes from CSS; the source copy stays in sentence case. Class selectors only, so a component rule
+   can still set colour or size without a specificity fight. */
+.label, .kicker, .badge, .status, .btn, .segmented > button, .field-label, .text-field-label, .list-row-meta, kbd {
+  font-family: var(--label-font);
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-track);
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+/* Kicker: a muted mono label led by a solid accent square. */
+.kicker { display: flex; align-items: center; gap: var(--sp-3); color: var(--text-muted); }
+.kicker::before, .bullet {
+  content: ""; display: inline-block; flex: none;
+  width: var(--bullet); height: var(--bullet); background: var(--accent);
+}
 
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;

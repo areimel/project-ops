@@ -3,7 +3,7 @@
 A command is declared once as a `CommandSpec`. From that one entry the app generates: the keyboard shortcut, the native menu item, the tooltip hint, the command palette entry and the `?` shortcut help.
 
 ```ts
-{ id: "notes.pin", label: "Pin or unpin note", group: "Notes", keys: ["p"] }
+{ id: "projects.pin", label: "Pin or unpin project", group: "Projects", keys: ["p"] }
 ```
 
 | Field | Meaning |
@@ -19,13 +19,13 @@ Use `keys` for single-letter actions and `accelerator` for chords. A command tha
 
 ## An app command
 
-1. Add the entry to the app's `commands` in `renderer/apps/<id>/index.ts` (or a `commands.ts` next to it, as the Editor and Player do). The id must start with `<id>.`.
+1. Add the entry to the app's `commands` in `renderer/apps/<id>/index.ts`. The id must start with `<id>.`.
 2. Register the handler while the app is mounted, in the app component:
    ```tsx
-   useCommandHandlers({ "notes.pin": togglePin });
+   useCommandHandlers({ "projects.pin": togglePin });
    ```
    A command with no handler does nothing and is left out of the palette.
-3. Use `useHint()` for the tooltip text: `title={hint("notes.pin")}`. Never write the key into a label by hand.
+3. Use `useHint()` for the tooltip text: `title={hint("projects.pin")}`. Never write the key into a label by hand.
 4. Run `pnpm test`. `tests/registry.test.ts` fails on duplicate ids, duplicate `keys` or duplicate accelerators across the shell commands plus that app's commands, and on more than 30 commands per app.
 
 ## A shell command (works everywhere)
@@ -34,7 +34,7 @@ Use `keys` for single-letter actions and `accelerator` for chords. A command tha
 2. Add its handler in `renderer/shell/useShellCommands.ts` (the `handlers` object).
 3. It appears in the native menu automatically (`electron/menuTemplate.ts` builds the File, View, Go and Help menus from the table).
 
-`go.<id>` commands (`Ctrl/Cmd+1..9`) come from the registry order; do not declare them by hand.
+`go.<id>` commands (`Ctrl/Cmd+1..9`) come from the registry order and exist only with two or more apps; do not declare them by hand. `shell.home` goes to the first app.
 
 ## Checklist
 

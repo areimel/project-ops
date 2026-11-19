@@ -16,7 +16,10 @@ describe("activeCommands", () => {
     const ids = activeCommands(notes, apps).map((c) => c.id);
     expect(ids).toEqual([...SHELL_COMMANDS.map((c) => c.id), "go.notes", "go.tasks", "notes.new", "notes.pin"]);
   });
-  it("has no app commands on home or settings", () => {
+  it("has no go commands for a single app", () => {
+    expect(activeCommands(notes, [notes]).some((c) => c.id.startsWith("go."))).toBe(false);
+  });
+  it("has no app commands on settings", () => {
     expect(activeCommands(null, apps).some((c) => c.id.startsWith("notes."))).toBe(false);
   });
   it("has unique ids", () => {
@@ -32,7 +35,7 @@ describe("menuContext", () => {
     expect(ctx.app?.name).toBe("Notes");
     expect(ctx.app?.commands).toHaveLength(2);
   });
-  it("has no app on home", () => { expect(menuContext(null, apps).app).toBeNull(); });
+  it("has no app on settings", () => { expect(menuContext(null, apps).app).toBeNull(); });
   it("stays within the limits main accepts", () => {
     const many = Array.from({ length: 40 }, (_, i) => ({ id: `big.c${i}`, label: "x", group: "Big" }));
     expect(menuContext(app("big", many), apps).app?.commands).toHaveLength(30);

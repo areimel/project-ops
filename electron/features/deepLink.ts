@@ -38,6 +38,6 @@ export function registerDeepLinks(onLink: (l: DeepLink) => void): void {
     const link = parseDeepLink(url);
     if (link) onLink(link);
   });
-  const { link } = argvTargets(process.argv, process.cwd());
+  const { link } = argvTargets(process.argv);
   if (link) onLink(link);
 }

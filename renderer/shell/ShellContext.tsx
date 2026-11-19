@@ -5,16 +5,14 @@ import type { HandlerRegistry } from "./handlerRegistry";
 import { useLatest } from "../hooks/useLatest";
 
 export type SaveState = "saved" | "saving" | "unsaved" | "error";
-export interface TitleInfo { count?: string; saveState?: SaveState }      // count: "12 notes"
+export interface TitleInfo { count?: string; saveState?: SaveState }      // count: "12 projects"
 export interface ConfirmOptions { title: string; body?: string; confirmLabel: string; cancelLabel?: string; danger?: boolean }
 export interface ShellApi {
   route: Route;
-  /** `index` is 0-based (registry position); the title block prints index + 1. */
-  sheet: { index: number; total: number } | null;     // null on home and settings
   navigate(action: RouterAction): void;
   toast(kind: ToastKind, message: string, action?: ToastAction): void;
   confirm(o: ConfirmOptions): Promise<boolean>;
-  /** Tooltip text for a command id of the active sheet or the shell ("Pin note (Ctrl+P)"), from the command table. */
+  /** Tooltip text for a command id of the active app or the shell ("Pin note (Ctrl+P)"), from the command table. */
   hint(id: string): string;
 }
 
@@ -67,7 +65,7 @@ export function useCommandHandlers(handlers: Record<string, () => void>): void {
   }, [registry, ids, latest]);
 }
 
-/** While `message` is set, leaving the sheet or closing the window asks first. Also tells main (window:set-guard). */
+/** While `message` is set, leaving the screen or closing the window asks first. Also tells main (window:set-guard). */
 export function useNavigationGuard(message: string | null): void {
   const { setGuard } = need(useContext(InternalsContext));
   useEffect(() => {

@@ -1,8 +1,0 @@
-/* News sheet. Rows are plain ListRows; these rules add the offline notice. */
-.news { display: flex; flex-direction: column; min-height: 0; }
-.news-body { flex: 1; min-height: 0; overflow-y: auto; }
-.news-loading { display: grid; justify-items: center; gap: var(--sp-3); padding: var(--sp-7) var(--sp-5); color: var(--text-muted); }
-.news-notice {
-  margin: 0; padding: var(--sp-2) var(--sp-3); border-bottom: var(--line-w) solid var(--line);
-  box-shadow: inset 3px 0 0 var(--accent-text); background: var(--hover); font-size: var(--fs-sm);
-}

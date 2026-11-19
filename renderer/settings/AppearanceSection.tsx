@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { resolveMode, type ThemeId } from "../../shared/theme";
+import { resolveMode } from "../../shared/theme";
 import type { ModeSetting, Settings } from "../../shared/settings";
 import { Icon } from "../components/common/Icon";
 import { Button } from "../components/common/Button";
@@ -8,7 +8,6 @@ import { Segmented } from "../components/common/Segmented";
 import { TextField } from "../components/common/TextField";
 import { useSettings } from "../hooks/useSettings";
 import { useSystemDark } from "../theme/useTheme";
-import { ThemePicker } from "./ThemePicker";
 import { accentIsHardToRead, normalizeHex } from "./themeTokens";
 
 const MODES: { value: ModeSetting; label: string }[] = [
@@ -47,20 +46,17 @@ export function AppearanceSection() {
   return (
     <section className="settings-section" aria-labelledby="set-appearance">
       <h2 id="set-appearance">Appearance</h2>
-      <Field label="Theme" hint="Applies as soon as you pick it.">
-        <ThemePicker value={settings.theme} mode={mode} onChange={(id: ThemeId) => save({ theme: id })} />
-      </Field>
       <Field label="Mode" hint="System follows your operating system.">
         <Segmented<ModeSetting> label="Mode" options={MODES} value={settings.mode} onChange={(m) => save({ mode: m })} />
       </Field>
-      <Field label="Accent" hint="Replaces the theme's accent colour.">
+      <Field label="Accent" hint="Replaces the orange accent.">
         <div className="accent-control">
           <div className="accent-row">
             <input type="color" className="accent-swatch" aria-label="Accent colour" value={shown}
               onChange={(e) => save({ accent: e.target.value })} />
             <TextField label="Accent hex colour" hideLabel className="accent-hex" value={draft} maxLength={7} spellCheck={false}
               invalid={invalid} onChange={onHex} onBlur={onBlur} />
-            <Button variant="quiet" disabled={settings.accent === null} onClick={() => save({ accent: null })}>Use theme accent</Button>
+            <Button variant="quiet" disabled={settings.accent === null} onClick={() => save({ accent: null })}>Use default accent</Button>
           </div>
           {invalid && <p className="settings-note is-error" role="alert">Enter a hex colour such as #3366cc.</p>}
           {!invalid && settings.accent && accentIsHardToRead(settings.accent, themed.surface) && (

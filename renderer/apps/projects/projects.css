@@ -1,0 +1,171 @@
+/* Projects: the filter rail, the toolbar, the card grid and the edit form. Tokens only. */
+
+.projects { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 0; }
+.projects.projects-center { display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; overflow: auto; }
+.projects-empty-actions { display: flex; justify-content: center; gap: var(--sp-2); }
+
+/* ---- Rail ---- */
+.projects-rail {
+  display: flex; flex-direction: column; min-height: 0; overflow-y: auto;
+  border-right: var(--line-w) solid var(--line); background: var(--bg);
+}
+.projects-rail-toggle { display: none; }
+.projects-rail-groups { display: flex; flex-direction: column; flex: 1; }
+.projects-rail-group { padding: var(--sp-4) var(--sp-4) var(--sp-5); border-bottom: var(--line-w) solid var(--line); }
+.projects-rail-title { margin-bottom: var(--sp-3); }
+
+.projects-cats { margin: 0 calc(-1 * var(--sp-2)); padding: 0; list-style: none; }
+.projects-cat {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  width: 100%; min-height: 30px; padding: 0 var(--sp-2);
+  border: 0; background: none; color: var(--text); text-align: left; font-size: var(--fs-md);
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.projects-cat:hover { background: var(--hover); }
+.projects-cat:focus-visible { outline-offset: -2px; }
+/* Chosen category: a 2px accent bar and full-strength text; no fill, so the default ("All") stays quiet. */
+.projects-cat { color: var(--text-muted); }
+.projects-cat:hover { color: var(--text); }
+.projects-cat.is-selected { color: var(--text); font-weight: var(--fw-medium); box-shadow: inset 2px 0 0 var(--accent); }
+.projects-cat.is-check { justify-content: flex-start; }
+.projects-cat.is-check .projects-cat-count { margin-left: auto; }
+.projects-check { flex: none; width: 10px; height: 10px; border: var(--line-w) solid var(--control-border); }
+.projects-cat.is-check.is-selected { box-shadow: none; }
+.projects-cat.is-selected .projects-check { border-color: var(--accent); background: var(--accent); }
+.projects-cat-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.projects-cat-count { flex: none; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--text-muted); }
+
+.projects-chips { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
+.projects-more { margin-top: var(--sp-3); font-size: var(--fs-sm); }
+
+.projects-rail-foot {
+  position: sticky; bottom: 0; margin-top: auto; padding: var(--sp-3) var(--sp-4);
+  border-top: var(--line-w) solid var(--line); background: var(--bg);
+}
+.projects-rail-foot .btn { width: 100%; }
+
+/* ---- Main column ---- */
+.projects-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.projects-toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3);
+  padding: var(--sp-3) var(--sp-5); border-bottom: var(--line-w) solid var(--line);
+}
+.projects-search { flex: 1 1 200px; max-width: 340px; }
+.projects-search input { padding-left: var(--sp-3); }
+.projects-sort .dropdown-text { font-family: var(--label-font); font-size: var(--label-size); font-weight: var(--label-weight); letter-spacing: var(--label-track); text-transform: uppercase; }
+.projects-sort .dropdown-btn { padding: 0 var(--sp-3); }
+.projects-count { color: var(--text-muted); white-space: nowrap; }
+.projects-toolbar-end { display: flex; gap: var(--sp-2); margin-left: auto; }
+.projects-toolbar .spinner { width: 12px; height: 12px; }
+.projects-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: var(--sp-5); }
+.projects-scroll > .empty-state { margin-top: var(--sp-6); }
+
+/* Active filters: removable chips under the toolbar. */
+.projects-active {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1) var(--sp-2);
+  padding: var(--sp-2) var(--sp-5); border-bottom: var(--line-w) solid var(--line);
+}
+.projects-active-clear { margin-left: var(--sp-1); font-size: var(--fs-sm); }
+
+/* Tags are the owner's words: the text face in sentence case, not the mono label. */
+.badge.projects-tag { font-family: var(--font-text); font-size: var(--fs-sm); font-weight: var(--fw-regular); letter-spacing: 0; text-transform: none; }
+.badge.projects-tag .badge-count { font-family: var(--font-mono); font-size: var(--fs-xs); }
+
+/* Pinned and other projects, when the result has both. */
+.projects-group { margin-bottom: var(--sp-3); }
+.projects-grid + .projects-group { margin-top: var(--sp-6); }
+
+/* ---- Grid: separate cards with a gap, each with its own full border ---- */
+.projects-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(296px, 1fr)); gap: var(--sp-4);
+  margin: 0; padding: 0; list-style: none;
+}
+.projects-card { position: relative; content-visibility: auto; contain-intrinsic-size: auto 360px; }
+
+.projects-card .card-header { min-height: 37px; }
+.projects-card .card-header-end { white-space: nowrap; }
+.projects-card-cat {
+  flex: 0 1 auto; min-width: 0; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  margin: 0; padding: 0; border: 0; background: none; color: inherit;
+  font: inherit; letter-spacing: inherit; text-transform: inherit;
+  transition: color var(--dur-fast) var(--ease);
+}
+.projects-card-cat:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+
+.projects-card-body { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4) var(--sp-4) 0; }
+.projects-card-name {
+  display: flex; align-items: baseline; gap: var(--sp-2); color: inherit;
+  font-size: var(--fs-xl); line-height: 1.2; text-wrap: pretty;
+}
+.projects-card-name-text {
+  min-width: 0; overflow: hidden; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+}
+.projects-card-pin { flex: none; align-self: center; color: var(--accent-text); }
+.card.is-muted .projects-card-pin { color: inherit; }
+.projects-card-desc {
+  margin-top: calc(-1 * var(--sp-1)); color: var(--text-muted); font-size: var(--fs-md); line-height: 1.55;
+  overflow: hidden; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;
+}
+.projects-card-chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1); }
+.projects-card-more { padding: 0 var(--sp-1); color: var(--text-muted); }
+
+/* Trait rows sit at the bottom of the body so rows line up across a grid row. */
+.projects-card-traits { margin-top: auto; }
+.projects-card-traits .kv-row { padding: 5px 0; }
+/* One rule above the block; the rows inside it separate by space alone. */
+.projects-card-traits .kv-row + .kv-row { border-top: 0; }
+.projects-card-traits .kv-row:first-child { padding-top: var(--sp-2); }
+/* Folder row: the front is cut with an ellipsis first, so the folder name at the end stays readable. */
+.projects-path { display: flex; justify-content: flex-end; min-width: 0; }
+.projects-path-head { flex: 0 1000 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.projects-path-tail { flex: 0 1 auto; min-width: 4ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.projects-rail-hint { margin: 0; color: var(--text-muted); font-size: var(--fs-sm); line-height: 1.5; }
+.projects-none { color: var(--text-muted); }
+.projects-dirty { margin-left: var(--sp-2); vertical-align: 1px; }
+.projects-link {
+  display: inline-flex; align-items: center; gap: 2px; padding: 0; border: 0; background: none; color: var(--text);
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: var(--line-w); text-decoration-color: var(--line);
+  transition: color var(--dur-fast) var(--ease), text-decoration-color var(--dur-fast) var(--ease);
+}
+.projects-link + .projects-link { margin-left: var(--sp-3); }
+.projects-link:hover { color: var(--accent-text); text-decoration-color: currentColor; }
+.card.is-muted .projects-link { color: var(--text-muted); }
+
+.projects-card-foot { gap: 0; padding: var(--sp-2); }
+.projects-card-open { margin-right: var(--sp-2); padding: 0 var(--sp-3); }
+.projects-card-foot .icon-btn { color: var(--text-muted); }
+.projects-card-foot .icon-btn:hover:not(:disabled) { color: var(--text); }
+.projects-card-foot .icon-btn[aria-pressed="true"] { background: none; color: var(--accent-text); }
+.projects-card-foot-end { display: flex; margin-left: auto; }
+
+/* ---- Edit form ---- */
+.projects-form { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+.projects-form > .text-area-wrap, .projects-form-wide { grid-column: 1 / -1; }
+.projects-form .field { align-content: start; }
+.projects-form .field-control { min-height: var(--control-h); }
+.projects-form-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-3); }
+.projects-form-error { margin-top: var(--sp-1); color: var(--danger); font-size: var(--fs-sm); }
+.projects-form-folder {
+  display: flex; align-items: baseline; gap: var(--sp-4); padding-top: var(--sp-3);
+  border-top: var(--line-w) solid var(--line); color: var(--text-muted);
+}
+.projects-form-folder-path { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); font-size: var(--fs-sm); }
+.projects-dialog-remove { margin-right: auto; }
+
+/* ---- Narrow windows: the rail folds into a bar above the grid ---- */
+@media (max-width: 860px) {
+  .projects { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .projects-rail { max-height: 50vh; border-right: 0; border-bottom: var(--line-w) solid var(--line); }
+  .projects-rail-toggle {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+    min-height: 40px; padding: 0 var(--sp-5); border: 0; background: none; color: var(--text-muted);
+  }
+  .projects-rail-toggle:hover { color: var(--text); }
+  .projects-rail-toggle:focus-visible { outline-offset: -2px; }
+  .projects-rail:not(.is-open) .projects-rail-groups { display: none; }
+  .projects-rail.is-open .projects-rail-toggle { border-bottom: var(--line-w) solid var(--line); }
+  .projects-rail-group { padding: var(--sp-3) var(--sp-5); }
+  .projects-toolbar, .projects-active, .projects-scroll { padding-left: var(--sp-4); padding-right: var(--sp-4); }
+  .projects-form, .projects-form-links { grid-template-columns: minmax(0, 1fr); }
+}

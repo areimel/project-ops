@@ -104,7 +104,8 @@ export function buildTemplate(env: MenuEnv): MenuItemConstructorOptions[] {
     ...fromGroup("View"),
     ...(env.dev ? [sep, { role: "reload" as const }, { role: "forceReload" as const }, { role: "toggleDevTools" as const }] : []),
   ];
-  const go = [...fromGroup("Go"), ...(env.context.apps.length ? [sep] : []), ...items(goCommands(env.context.apps))];
+  const goApps = items(goCommands(env.context.apps));
+  const go = [...fromGroup("Go"), ...(goApps.length ? [sep] : []), ...goApps];
   const helpItems = fromGroup("Help");
   const help: MenuItemConstructorOptions[] = [
     ...helpItems, ...(helpItems.length ? [sep] : []),

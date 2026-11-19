@@ -1,9 +1,8 @@
-import { isAbsolute, resolve } from "node:path";
 import { brand } from "../../shared/brand";
 import { isRecordId } from "../../shared/collections/base";
 import type { DeepLink } from "../../shared/ipc/app";
 
-// app-template://home | app-template://settings | app-template://open/<appId>[/<recordId>]
+// project-ops://home | project-ops://settings | project-ops://open/<appId>[/<recordId>]
 const APP_ID = /^[a-z][a-z0-9-]{0,31}$/;
 const MAX_URL = 200;
 const URL_SHAPE = /^([A-Za-z][A-Za-z0-9+.-]*):\/\/([A-Za-z]+)((?:\/[^/?#\s]+){0,3})\/?$/;
@@ -23,24 +22,14 @@ export function parseDeepLink(url: string): DeepLink | null {
   return isRecordId(recordId) ? { view: "app", appId, recordId } : null;
 }
 
-const TEXT_FILE = /\.(md|markdown|txt)$/i;
-/** Anything shaped like a URL (`scheme:` followed by `//`, or our own scheme) is never a file path. */
-const URL_LIKE = /^[A-Za-z][A-Za-z0-9+.-]*:(\/\/|[^\\/])/;
-
-/** What a launch or second-instance command line asks for: the first deep link and the first text file. */
-export function argvTargets(argv: readonly string[], cwd: string): { link: DeepLink | null; file: string | null } {
-  let link: DeepLink | null = null;
-  let file: string | null = null;
+/** What a launch or second-instance command line asks for: the first deep link. Every other argument is ignored. */
+export function argvTargets(argv: readonly string[]): { link: DeepLink | null } {
   for (const arg of argv.slice(1)) {
     if (typeof arg !== "string") continue;
     if (arg === "--") break;
     if (arg.startsWith("-")) continue;
-    // A Windows drive path (`C:\notes.md`) is a file; every other `scheme:` argument is a URL and stops here.
-    if (URL_LIKE.test(arg) && !isAbsolute(arg)) {
-      if (!link) link = parseDeepLink(arg);
-      continue;
-    }
-    if (!file && TEXT_FILE.test(arg)) file = isAbsolute(arg) ? arg : resolve(cwd, arg);
+    const link = parseDeepLink(arg);
+    if (link) return { link };
   }
-  return { link, file };
+  return { link: null };
 }

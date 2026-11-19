@@ -42,6 +42,10 @@ describe("helpers", () => {
     expect(go.map((c) => c.id)).toEqual(["go.notes", "go.tasks"]);
     expect(go[1].accelerator).toBe("CmdOrCtrl+2");
   });
+  it("goCommands is empty for a single app", () => {
+    expect(goCommands([{ id: "projects", name: "Projects" }])).toEqual([]);
+    expect(goCommands([])).toEqual([]);
+  });
   it("goCommands covers at most the nine accelerators CmdOrCtrl+1..9", () => {
     const go = goCommands(Array.from({ length: 12 }, (_, i) => ({ id: `a${i}`, name: `A${i}` })));
     expect(go).toHaveLength(9);
