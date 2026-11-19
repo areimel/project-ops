@@ -47,6 +47,15 @@ describe("collection CRUD", () => {
     expect(c.get(t.id)).toEqual(u);
   });
 
+  it("update with keepUpdatedAt changes the fields but not updatedAt", () => {
+    const c = createCollection(tasks, memory().io);
+    const t = c.create({ title: "a" });
+    const u = c.update(t.id, { done: true }, { keepUpdatedAt: true });
+    expect(u.done).toBe(true);
+    expect(u.updatedAt).toBe(t.updatedAt);
+    expect(c.get(t.id)).toEqual(u);
+  });
+
   it("update refuses unknown ids, non-object patches and patches that make the record unusable", () => {
     const c = createCollection(tasks, memory().io);
     const t = c.create({ title: "a" });
