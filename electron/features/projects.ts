@@ -61,7 +61,7 @@ function pushRoots(): void {
   emit("projects:roots-changed", views);
 }
 
-/** Subscribes the page pushes to both stores, once. Call after app ready. */
+/** Subscribes the page pushes to the projects and roots stores, once. Call after app ready. */
 export function initProjects(): void {
   if (initialised) return;
   initialised = true;
