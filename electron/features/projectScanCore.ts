@@ -161,6 +161,7 @@ export function mergeScan(
       name: null, description: null, category: f.categoryHint.slice(0, PROJECT_LIMITS.category),
       tags: [], status: "active", pinned: false,
       links: { repo: null, site: null, docs: null },
+      lastOpenedAt: null,
       scan: { ...emptyScan(), ...f.scan, scannedAt: now },
     });
     added++;

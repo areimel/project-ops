@@ -49,7 +49,7 @@ describe("project heal", () => {
   it("fills defaults and drops unknown keys", () => {
     expect(healProject({ path: PATH, id: "x", extra: 1 })).toEqual({
       path: PATH, origin: "manual", rootId: null, missing: false, hidden: false, name: null, description: null,
-      category: "", tags: [], status: "active", pinned: false, links: { repo: null, site: null, docs: null },
+      category: "", tags: [], status: "active", pinned: false, links: { repo: null, site: null, docs: null }, lastOpenedAt: null,
       scan: { name: null, description: null, repoUrl: null, branch: null, lastCommitAt: null, dirty: null, stack: [], scannedAt: null },
     });
   });
@@ -108,6 +108,12 @@ describe("healProjectPatch", () => {
       scan: { name: "x" }, id: "0123456789abcdef", createdAt: 1, other: 1, pinned: true,
     });
     expect(p).toEqual({ pinned: true });
+  });
+
+  it("the page cannot set lastOpenedAt; a stored one heals as a timestamp", () => {
+    expect(healProjectPatch({ lastOpenedAt: 5, pinned: true })).toEqual({ pinned: true });
+    expect(healProject({ path: PATH, lastOpenedAt: 1234 })?.lastOpenedAt).toBe(1234);
+    expect(healProject({ path: PATH, lastOpenedAt: "soon" })?.lastOpenedAt).toBeNull();
   });
 
   it("keeps valid user fields, drops invalid ones", () => {

@@ -3,6 +3,7 @@ import { applyCollections, buildBundle, clearCollections, exportCollections, hea
 import { createCollection } from "../../electron/store/collectionCore";
 import { brand } from "../../shared/brand";
 import { projectSpec, rootSpec } from "../../shared/projects";
+import { resourceLinkSpec } from "../../shared/resources/links";
 import { defaultSettings } from "../../shared/settings";
 
 const stores = () => ({ projects: createCollection(projectSpec), "project-roots": createCollection(rootSpec) });
@@ -40,6 +41,15 @@ describe("bundle", () => {
     expect(applyCollections(bundle!, a)).toEqual({ projects: 2 });
     expect(a.projects.list().map((r) => r.path)).toEqual(["/b", "/c"]);
     expect(a["project-roots"].list().map((r) => r.id)).toEqual([root.id]);
+  });
+
+  it("carries resource links, healed on import", () => {
+    const s = { ...stores(), "resource-links": createCollection(resourceLinkSpec) };
+    const bundle = healBundle(wrap({ "resource-links": [
+      { name: "Netlify", url: "https://app.netlify.com", group: "Hosting" }, { name: "Bad", url: "http://x.test" }, { url: "https://x.test" },
+    ] }));
+    expect(applyCollections(bundle!, s)).toEqual({ "resource-links": 1 });
+    expect(s["resource-links"].list()[0]).toMatchObject({ name: "Netlify", url: "https://app.netlify.com/", group: "Hosting" });
   });
 
   it("garbage records are dropped and counted after healing", () => {

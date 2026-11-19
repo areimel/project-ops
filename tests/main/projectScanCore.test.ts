@@ -82,7 +82,7 @@ describe("categoryHint", () => {
 const rec = (over: Partial<ProjectFields> & { path: string }, id = "0123456789abcdef"): ProjectRecord => ({
   id, createdAt: 10, updatedAt: 20,
   origin: "scan", rootId: "r1", missing: false, hidden: false, name: null, description: null, category: "",
-  tags: [], status: "active", pinned: false, links: { repo: null, site: null, docs: null }, scan: emptyScan(),
+  tags: [], status: "active", pinned: false, links: { repo: null, site: null, docs: null }, lastOpenedAt: null, scan: emptyScan(),
   ...over,
 });
 const found = (path: string, over: Partial<FoundProject> = {}): FoundProject => ({

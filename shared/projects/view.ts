@@ -25,6 +25,7 @@ export interface ProjectView {
   dirty: boolean | null;
   stack: string[];
   scannedAt: number | null;
+  lastOpenedAt: number | null;   // when it was last opened from the app (editor, terminal or folder)
   /** The user's own stored values, for the edit form (null = not overridden). */
   overrides: { name: string | null; description: string | null; links: ProjectLinks };
   /** What the scan found, for placeholders and "Use detected". */
@@ -59,6 +60,7 @@ export function toProjectView(record: ProjectRecord, displayPath: (abs: string) 
     dirty: scan.dirty,
     stack: scan.stack.slice(),
     scannedAt: scan.scannedAt,
+    lastOpenedAt: record.lastOpenedAt,
     overrides: { name: record.name, description: record.description, links: { ...record.links } },
     detected: { name: detectedName, description: scan.description, repo: scan.repoUrl },
   };

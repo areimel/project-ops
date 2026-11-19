@@ -6,7 +6,8 @@ export interface Collection<F> {
   list(): (RecordBase & F)[];
   get(id: string): (RecordBase & F) | undefined;
   create(input: unknown): RecordBase & F;
-  update(id: string, patch: unknown): RecordBase & F;           // throws "Not found" for an unknown id
+  /** Throws "Not found" for an unknown id. `keepUpdatedAt` is for bookkeeping writes that are not an edit. */
+  update(id: string, patch: unknown, opts?: { keepUpdatedAt?: boolean }): RecordBase & F;
   remove(id: string): Removed<RecordBase & F>;
   restore(record: unknown, index: number): RecordBase & F;      // keeps id if valid and unused, else new id
   reorder(ids: string[]): void;                                 // must be a permutation of current ids
@@ -120,14 +121,14 @@ export function createCollection<F>(spec: CollectionSpec<F>, io: CollectionIo = 
       commit([...items, rec]);
       return rec;
     },
-    update(id, patch) {
+    update(id, patch, opts) {
       open();
       const i = indexOf(id);
       if (i < 0) throw new Error("Not found");
       if (!isObject(patch)) unusable();
-      const { id: _id, createdAt, updatedAt: _u, ...current } = items[i] as RecordBase & Record<string, unknown>;
+      const { id: _id, createdAt, updatedAt, ...current } = items[i] as RecordBase & Record<string, unknown>;
       const fields = spec.heal({ ...current, ...(patch as Record<string, unknown>) }) ?? unusable();
-      const rec = { ...fields, id, createdAt, updatedAt: now() } as R;
+      const rec = { ...fields, id, createdAt, updatedAt: opts?.keepUpdatedAt ? updatedAt : now() } as R;
       commit(items.map((r, j) => (j === i ? rec : r)));
       return rec;
     },

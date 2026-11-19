@@ -7,7 +7,7 @@ const view = (o: Partial<ProjectView> = {}): ProjectView => ({
   id: "0123456789abcdef", createdAt: 1, updatedAt: 1, name: "Detected", description: "Found text", category: "Work",
   tags: ["CLI"], status: "active", pinned: false, missing: false, origin: "scan",
   links: { repo: "https://github.com/a/b", site: null, docs: null }, folder: "~/code/b", branch: "main", lastCommitAt: 1,
-  dirty: false, stack: [], scannedAt: 1, overrides: { name: null, description: null, links: none },
+  dirty: false, stack: [], scannedAt: 1, lastOpenedAt: null, overrides: { name: null, description: null, links: none },
   detected: { name: "Detected", description: "Found text", repo: "https://github.com/a/b" }, ...o,
 });
 

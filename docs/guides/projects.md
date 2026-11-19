@@ -29,7 +29,7 @@ Example: a `notes` text the owner types.
 1. `shared/projects/record.ts`: add the field to `ProjectFields`, a limit to `PROJECT_LIMITS`, and its line in `healProject` (use the helpers in `shared/collections/heal.ts`). A field with a default needs no `version` bump: an old file heals to the default. A change of meaning does need a bump and a migration in `healProject`.
 2. `shared/projects/patch.ts`: if the owner edits it, add it to `ProjectPatch` and `healProjectPatch` (an invalid value drops the key).
 3. `shared/projects/view.ts`: add it to `ProjectView` and `toProjectView`. If the edit form must tell "set by you" from "detected", follow `overrides` and `detected`.
-4. Records are built by hand in two places that need the new field: `newManualProject` in `electron/features/projectsCore.ts` and the new-record literal in `mergeScan` in `electron/features/projectScanCore.ts`.
+4. (A field only main writes, like `lastOpenedAt`, skips the patch step: `healProjectPatch` must keep ignoring it.) Records are built by hand in two places that need the new field: `newManualProject` in `electron/features/projectsCore.ts` and the new-record literal in `mergeScan` in `electron/features/projectScanCore.ts`.
 5. Page: show it in `renderer/apps/projects/ProjectCard.tsx`, edit it in `ProjectDialog.tsx` and `projectDraft.ts` (`ProjectDraft`, `draftFromView`, `draftPatch`), filter or search it in `projectsModel.ts` (`matchesQuery`, `passes`, facets, `ProjectFilters`; stored filters are healed in `filterState.ts`, so a new filter needs a line in `healViewState`).
 6. Export and import need nothing: the bundle holds whole records and heals them.
 7. Tests: `tests/projects/heal.test.ts` (defaults, limits, patch), then the page-side tests above.

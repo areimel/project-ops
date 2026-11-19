@@ -50,6 +50,7 @@ export function newManualProject(path: string, detected: DetectedScan | null, gi
     path, origin: "manual", rootId: null, missing: false, hidden: false,
     name: null, description: null, category: "", tags: [], status: "active", pinned: false,
     links: { repo: null, site: null, docs: null },
+    lastOpenedAt: null,
     scan: scanFacts(emptyScan(), detected, git, now),
   };
 }

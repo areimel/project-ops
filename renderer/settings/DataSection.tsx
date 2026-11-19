@@ -24,7 +24,7 @@ export function DataSection() {
   const importData = () => run(async () => {
     const ok = await confirm({
       title: "Import data", confirmLabel: "Choose file",
-      body: "Importing replaces the projects, scan folders and settings with what the file contains. Anything the file does not contain stays as it is. Export first if you want a copy of what you have now.",
+      body: "Importing replaces the projects, scan folders, resource links and settings with what the file contains. Anything the file does not contain stays as it is. Export first if you want a copy of what you have now.",
     });
     if (!ok) return;
     const r = await window.app.invoke("data:import");
@@ -39,7 +39,7 @@ export function DataSection() {
   const reset = () => run(async () => {
     const ok = await confirm({
       title: "Reset all data", confirmLabel: "Reset all data", danger: true,
-      body: "This permanently deletes your projects, scan folders and settings. The folders of your projects on disk are not touched, and the window size and position and the log files are kept. It cannot be undone. Export your data first if you may want it back.",
+      body: "This permanently deletes your projects, scan folders, resource links and settings. The folders of your projects on disk are not touched, and the window size and position and the log files are kept. It cannot be undone. Export your data first if you may want it back.",
     });
     if (!ok) return;
     await window.app.invoke("data:reset");
@@ -56,7 +56,7 @@ export function DataSection() {
       <Field label="Data folder" hint="Where this app keeps its files on this computer.">
         <Button variant="quiet" icon="external" disabled={busy} onClick={showFolder}>Show data folder</Button>
       </Field>
-      <Field label="Reset" hint="Deletes your projects, scan folders and settings. Folders on disk are not touched.">
+      <Field label="Reset" hint="Deletes your projects, scan folders, resource links and settings. Folders on disk are not touched.">
         <Button variant="danger" icon="trash" disabled={busy} onClick={reset}>Reset all data</Button>
       </Field>
     </section>

@@ -1,6 +1,7 @@
 import { brand } from "../../shared/brand";
 import { isObject } from "../../shared/collections/heal";
 import { projectSpec, rootSpec } from "../../shared/projects";
+import { resourceLinkSpec } from "../../shared/resources/links";
 import { healSettingsPatch, type Settings } from "../../shared/settings";
 
 export const BUNDLE_VERSION = 1;
@@ -18,7 +19,7 @@ export interface ImportBundle {
 }
 
 /** Names of the collections an export carries and an import accepts. */
-export const COLLECTION_NAMES: readonly string[] = [projectSpec.name, rootSpec.name];
+export const COLLECTION_NAMES: readonly string[] = [projectSpec.name, rootSpec.name, resourceLinkSpec.name];
 
 /** The part of a Collection the bundle code needs, so tests can pass in-memory ones. */
 export interface BundleCollection {

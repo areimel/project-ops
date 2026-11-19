@@ -7,9 +7,13 @@ import { invalidateScan } from "../features/projectsScanRun";
 import { applyCollections, buildBundle, clearCollections, exportCollections, healBundle, type BundleCollection } from "./bundle";
 import { projectsStore, rootsStore } from "./projects";
 import { projectSpec, rootSpec } from "../../shared/projects";
+import { resourceLinkSpec } from "../../shared/resources/links";
+import { resourceLinksStore } from "./resources";
 import { getSettings, resetSettings, updateSettings } from "./settings";
 
-const targets = (): Record<string, BundleCollection> => ({ [projectSpec.name]: projectsStore(), [rootSpec.name]: rootsStore() });
+const targets = (): Record<string, BundleCollection> => ({
+  [projectSpec.name]: projectsStore(), [rootSpec.name]: rootsStore(), [resourceLinkSpec.name]: resourceLinksStore(),
+});
 
 const MAX_IMPORT_BYTES = 50 * 1024 * 1024;
 const FILTERS = [{ name: "JSON", extensions: ["json"] }];
@@ -42,7 +46,7 @@ export async function importData(): Promise<{ imported: boolean; counts: Record<
 }
 
 /**
- * Data reset: both project collections are cleared and the settings deleted; a running scan is dropped first; the change is pushed to the renderer by the listener. The window position and the log files are kept on purpose.
+ * Data reset: every collection (projects, scan folders, resource links) is cleared and the settings deleted; a running scan is dropped first; the change is pushed to the renderer by the listener. The window position and the log files are kept on purpose.
  */
 export function resetData(): void {
   invalidateScan();

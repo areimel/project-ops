@@ -6,6 +6,7 @@ import { argvTargets } from "./features/deepLinkParse";
 import { log } from "./features/logger";
 import { APP_SCHEME_ENTRY, applyDevCsp, registerAppProtocol } from "./features/appProtocol";
 import { initProjects, shutdownProjects } from "./features/projects";
+import { initResources } from "./features/resources";
 import { createTray, hasTray } from "./features/tray";
 import { registerIpc } from "./ipc/index";
 import { buildMenu } from "./menu";
@@ -61,6 +62,7 @@ if (!app.requestSingleInstanceLock()) {
     if (dev) applyDevCsp(dev); else registerAppProtocol();
     registerIpc();
     initProjects();        // pushes only; no scan at startup (scans run when a root is added and on demand)
+    initResources();
     openMainWindow();
     applySettingsToNative();
     const win = getWindow();

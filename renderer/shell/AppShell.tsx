@@ -75,6 +75,7 @@ export function AppShell() {
           name={name} mode={mode} hintOf={hintOf} paletteKey={keyFor(commands, "shell.palette")} onPalette={togglePalette}
           onCycleMode={() => registry.run("shell.cycleMode")} onSettings={() => navigate({ type: route.view === "settings" ? "home" : "settings" })}
           onHome={() => navigate({ type: "home" })} inSettings={route.view === "settings"}
+          apps={APPS} activeApp={app?.id ?? null} onOpenApp={(id) => navigate({ type: "open", appId: id })}
         />
         <main className="shell-content" id="content">{content}</main>
         <footer className="shell-footer">

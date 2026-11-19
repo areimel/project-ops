@@ -1,6 +1,6 @@
 # Add another app (a new screen)
 
-Project Ops has one app, `projects`, and it is the home screen. The registry can still hold more. An app is a folder in `renderer/apps/` plus one registry entry; the title bar, the command palette, the native menu and the shortcut help are generated from it. With two or more apps the Go menu and `Ctrl/Cmd+1..9` shortcuts (`goCommands` in `shared/commands.ts`) appear as well. There is no home index and no rail: the first app in `APPS` is where the wordmark and `project-ops://home` go, and the only way to reach the second is the palette, the Go menu, its shortcut or a deep link (`project-ops://open/<id>`). Adding a second app therefore also means deciding how a person gets between the two; the shell has no navigation UI for that today.
+Project Ops has two apps: `dashboard`, the home screen, and `projects`, the grid. An app is a folder in `renderer/apps/` plus one registry entry; the title bar, the command palette, the native menu and the shortcut help are generated from it. Every app gets a button in the title bar's switch, a Go menu entry and a `Ctrl/Cmd+1..9` shortcut (`goCommands` in `shared/commands.ts`), in registry order. There is no home index and no rail: the first app in `APPS` is where the wordmark and `project-ops://home` go. The title bar has room for a few names only, so a fourth or fifth app means rethinking that switch.
 
 The example id is `habits`. It must match `^[a-z][a-z0-9-]{0,31}$` and is also the prefix of command ids (`habits.new`) and CSS classes (`.habits-`).
 
@@ -15,7 +15,7 @@ The example id is `habits`. It must match `^[a-z][a-z0-9-]{0,31}$` and is also t
 | `tests/apps/habitsModel.test.ts` | tests for the model |
 | `renderer/components/common/Icon.tsx` | one path in `PATHS` for the app icon |
 | `renderer/apps/registry.ts` | one import and one array entry |
-| `tests/registry.test.ts` | the first test expects `["projects"]` exactly; update it |
+| `tests/registry.test.ts` | the first test expects `["dashboard", "projects"]` exactly; update it |
 
 ## Steps
 

@@ -19,7 +19,7 @@ export const SHELL_COMMANDS: readonly CommandSpec[] = [
   { id: "shell.palette", label: "Command palette", group: "View", accelerator: "CmdOrCtrl+K" },
   { id: "shell.cycleMode", label: "Switch light or dark mode", group: "View", accelerator: "CmdOrCtrl+Shift+L" },
   { id: "shell.fullscreen", label: "Fullscreen", group: "View", accelerator: "F11" },
-  { id: "shell.home", label: "Go to projects", group: "Go", accelerator: "CmdOrCtrl+Shift+H" },
+  { id: "shell.home", label: "Go home", group: "Go", accelerator: "CmdOrCtrl+Shift+H" },
   { id: "shell.shortcuts", label: "Keyboard shortcuts", group: "Help", keys: ["?"] },
 ];
 

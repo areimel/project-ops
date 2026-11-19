@@ -21,7 +21,7 @@ function Fallback({ error, onReload }: { error: Error; onReload(): void }) {
         action={(
           <div className="error-screen-actions">
             <Button onClick={onReload}>Reload this screen</Button>
-            <Button variant="quiet" onClick={() => navigate({ type: "home" })}>Back to projects</Button>
+            <Button variant="quiet" onClick={() => navigate({ type: "home" })}>Go home</Button>
           </div>
         )}
       />

@@ -9,5 +9,8 @@
 - Git runs only in repositories with a plain config, pinned to that folder; other repositories show branch and remote read from the .git folder
 - Removing a project keeps it out of later scans, with Undo; a folder that disappears is marked missing
 - Export, import and reset cover projects, scan folders and settings; exports contain folder paths from this computer
-- One theme, Kojima, in light and dark with an accent colour override; the app opens straight on the projects screen
+- Dashboard home screen: pinned projects and the projects you opened most recently as compact tiles, each one click from your editor, terminal or file manager
+- Resource links on the dashboard: keep https links to hosting, domains and other tools under group headings; they are part of export, import and reset
+- A Dashboard / Projects switch in the title bar
+- One theme, Kojima, in light and dark with an accent colour override; the app opens on the dashboard
 - Deep link project-ops://open/projects/<id> scrolls to a project
