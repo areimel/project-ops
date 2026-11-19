@@ -7,11 +7,13 @@ import { useLatest } from "../../hooks/useLatest";
 import { useProjects, useRoots, useScanState } from "../../hooks/useProjects";
 import { useCommandHandlers, useShell, useTitleInfo } from "../../shell/ShellContext";
 import { projectCount, scanMessage } from "../../utils/projectText";
+import { ActiveFilters } from "./ActiveFilters";
 import { FilterRail } from "./FilterRail";
 import { categoryValue, includeTag, revealFilters } from "./filterState";
 import { ProjectCard, type CardActions } from "./ProjectCard";
 import { ProjectDialog } from "./ProjectDialog";
-import { allCategories, allTags } from "./projectsModel";
+import { allCategories, allTags, pinnedSplit } from "./projectsModel";
+import type { ProjectView } from "../../../shared/projects/view";
 import { ProjectsToolbar } from "./ProjectsToolbar";
 import { useProjectFilters } from "./useProjectFilters";
 import "./projects.css";
@@ -97,6 +99,12 @@ export default function ProjectsApp() {
   const editingProject = editing ? projects.find((p) => p.id === editing) ?? null : null;
   const categories = useMemo(() => allCategories(projects), [projects]);
   const tags = useMemo(() => allTags(projects), [projects]);
+  const split = pinnedSplit(view.results);
+  const grid = (list: readonly ProjectView[], label: string) => (
+    <ul className="projects-grid" aria-label={label}>
+      {list.map((p) => <ProjectCard key={p.id} project={p} selected={p.id === selected} now={now} actions={actions} />)}
+    </ul>
+  );
 
   if (status === "loading") {
     return <div className="app-root projects projects-center"><Spinner label="Loading projects" /></div>;
@@ -129,17 +137,17 @@ export default function ProjectsApp() {
         <ProjectsToolbar query={view.filters.query} onQuery={(q) => view.setFilters((f) => ({ ...f, query: q }))} searchRef={searchRef}
           sort={view.sort} onSort={view.setSort} shown={view.results.length} total={projects.length}
           scanning={scanning} onAddFolder={addFolder} onRescan={rescan} />
+        <ActiveFilters filters={view.filters} onChange={view.setFilters} onClear={view.clear} />
         <div className="projects-scroll">
           {view.results.length === 0 ? (
             <EmptyState icon="filter" title="No projects match" body="Nothing fits the search and filters you have set."
               action={<Button variant="quiet" icon="close" onClick={view.clear}>Clear filters</Button>} />
-          ) : (
-            <ul className="projects-grid" aria-label="Projects">
-              {view.results.map((p, i) => (
-                <ProjectCard key={p.id} project={p} index={i} selected={p.id === selected} now={now} actions={actions} />
-              ))}
-            </ul>
-          )}
+          ) : split > 0 ? (<>
+            <h2 className="kicker projects-group">Pinned</h2>
+            {grid(view.results.slice(0, split), "Pinned projects")}
+            <h2 className="kicker projects-group">Other projects</h2>
+            {grid(view.results.slice(split), "Other projects")}
+          </>) : grid(view.results, "Projects")}
         </div>
       </div>
       {editingProject && (

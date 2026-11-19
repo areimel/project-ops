@@ -136,6 +136,15 @@ export function sortProjects(projects: readonly ProjectView[], key: SortKey): Pr
   });
 }
 
+/**
+ * Where the unpinned cards start in a sorted result, when the result has both pinned and unpinned cards
+ * (the grid then splits into two labelled groups); 0 when there is nothing to split.
+ */
+export function pinnedSplit(sorted: readonly ProjectView[]): number {
+  const i = sorted.findIndex((p) => !p.pinned);
+  return i > 0 ? i : 0;
+}
+
 // ---- facets ----
 
 interface Entry { value: string; label: string }
@@ -182,7 +191,7 @@ function buildFacet(
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
 }
 
-const STATUS_LABELS: Record<ProjectStatus, string> = { active: "Active", paused: "Paused", archived: "Archived" };
+export const STATUS_LABELS: Record<ProjectStatus, string> = { active: "Active", paused: "Paused", archived: "Archived" };
 
 export function facets(projects: readonly ProjectView[], filters: ProjectFilters): Facets {
   const catSelected = filters.category === null ? [] : [filters.category];

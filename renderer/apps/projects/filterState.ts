@@ -1,9 +1,11 @@
-// Filter state beyond the filter test itself: the tag toggle cycle, the rail's tag list, revealing a
-// deep-linked project, and healing what localStorage gives back. Pure: no React, no DOM.
+// Filter state beyond the filter test itself: the tag toggle cycle, the rail's tag list, the toolbar's
+// active-filter chips, revealing a deep-linked project, and healing what localStorage gives back. Pure: no React, no DOM.
 import { PROJECT_LIMITS, PROJECT_STATUSES, type ProjectStatus } from "../../../shared/projects/record";
 import type { ProjectView } from "../../../shared/projects/view";
+import { stackLabel } from "./cardModel";
 import {
-  DEFAULT_SORT, SORT_OPTIONS, UNCATEGORISED, defaultFilters, filterProjects, fold, type Facet, type ProjectFilters, type SortKey,
+  DEFAULT_SORT, SORT_OPTIONS, STATUS_LABELS, UNCATEGORISED, defaultFilters, filterProjects, fold,
+  type Facet, type ProjectFilters, type SortKey,
 } from "./projectsModel";
 
 export type TagState = "off" | "include" | "exclude";
@@ -45,6 +47,36 @@ export function visibleTags(tags: readonly Facet[], limit: number, showAll: bool
   if (showAll || tags.length <= limit) return { shown: tags.slice(), hidden: 0 };
   const shown = tags.filter((t, i) => i < limit || t.selected || t.excluded);
   return { shown, hidden: tags.length - shown.length };
+}
+
+export interface ActiveFilter {
+  key: string;
+  label: string;
+  /** The filters with this one taken off. */
+  remove(f: ProjectFilters): ProjectFilters;
+}
+
+/**
+ * One removable chip per filter that differs from the defaults (search has its own field, so it is left out):
+ * category, each included and excluded tag, the status set, each stack.
+ */
+export function activeFilters(f: ProjectFilters): ActiveFilter[] {
+  const out: ActiveFilter[] = [];
+  const without = (l: readonly string[], v: string) => l.filter((x) => fold(x) !== fold(v));
+  if (f.category !== null) {
+    out.push({ key: "category", label: f.category === UNCATEGORISED ? "Uncategorised" : f.category, remove: (g) => ({ ...g, category: null }) });
+  }
+  for (const t of f.tags) out.push({ key: `tag:${fold(t)}`, label: `Tag: ${t}`, remove: (g) => ({ ...g, tags: without(g.tags, t) }) });
+  for (const t of f.excludeTags) {
+    out.push({ key: `not:${fold(t)}`, label: `Not: ${t}`, remove: (g) => ({ ...g, excludeTags: without(g.excludeTags, t) }) });
+  }
+  const d = defaultFilters().statuses;
+  if (f.statuses.length !== d.length || !f.statuses.every((s) => d.includes(s))) {
+    const names = PROJECT_STATUSES.filter((s) => f.statuses.includes(s)).map((s) => STATUS_LABELS[s]);
+    out.push({ key: "status", label: `Status: ${names.length ? names.join(", ") : "all"}`, remove: (g) => ({ ...g, statuses: defaultFilters().statuses }) });
+  }
+  for (const s of f.stack) out.push({ key: `stack:${fold(s)}`, label: `Stack: ${stackLabel(s)}`, remove: (g) => ({ ...g, stack: without(g.stack, s) }) });
+  return out;
 }
 
 /** Filters to use so `project` is in the result: unchanged when it already is, else defaults widened to its status. */

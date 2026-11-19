@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
-  capList, cardCategory, cardMuted, cardNumber, cardStatus, gitInfo, splitFolder, stackLabel,
+  capList, cardCategory, cardMuted, cardStatus, gitInfo, splitFolder, stackLabel, traitRows,
 } from "../../renderer/apps/projects/cardModel";
 import {
-  VIEW_STATE_KEY, categoryValue, cycleTag, healViewState, includeTag, revealFilters, tagState, visibleTags,
+  VIEW_STATE_KEY, activeFilters, categoryValue, cycleTag, healViewState, includeTag, revealFilters, tagState, visibleTags,
 } from "../../renderer/apps/projects/filterState";
-import { UNCATEGORISED, defaultFilters, type Facet, type ProjectFilters } from "../../renderer/apps/projects/projectsModel";
+import { UNCATEGORISED, defaultFilters, pinnedSplit, type Facet, type ProjectFilters } from "../../renderer/apps/projects/projectsModel";
 import type { ProjectView } from "../../shared/projects/view";
 
 let n = 0;
@@ -103,8 +103,11 @@ describe("healViewState", () => {
 });
 
 describe("card model", () => {
-  it("numbers from 01", () => {
-    expect([cardNumber(0), cardNumber(8), cardNumber(98), cardNumber(99)]).toEqual(["01", "09", "99", "100"]);
+  it("trait rows leave out what is empty", () => {
+    expect(traitRows(project())).toEqual(["git", "folder"]);
+    expect(traitRows(project({ branch: "main", stack: ["rust"], links: { repo: "https://x.test/", site: null, docs: null } })))
+      .toEqual(["branch", "lastCommit", "stack", "folder", "links"]);
+    expect(traitRows(project({ branch: null, lastCommitAt: 5 }))).toEqual(["branch", "lastCommit", "folder"]);
   });
   it("names the category or the bucket", () => {
     expect(cardCategory({ category: "" })).toBe("Uncategorised");
@@ -137,5 +140,35 @@ describe("card model", () => {
     expect(splitFolder("C:\\Users\\me\\app")).toEqual({ head: "C:\\Users\\me\\", tail: "app" });
     expect(splitFolder("app")).toEqual({ head: "", tail: "app" });
     expect(splitFolder("~/code/")).toEqual({ head: "", tail: "~/code/" });
+  });
+});
+
+describe("activeFilters", () => {
+  it("is empty for the defaults and ignores the search text", () => {
+    expect(activeFilters(f({ query: "cli" }))).toEqual([]);
+  });
+  it("lists each filter in rail order with a label", () => {
+    const chips = activeFilters(f({ category: UNCATEGORISED, tags: ["cli"], excludeTags: ["tui"], statuses: [], stack: ["rust"] }));
+    expect(chips.map((c) => c.label)).toEqual(["Uncategorised", "Tag: cli", "Not: tui", "Status: all", "Stack: Rust"]);
+    expect(activeFilters(f({ statuses: ["archived", "active"] })).map((c) => c.label)).toEqual(["Status: Active, Archived"]);
+  });
+  it("removing a chip takes off only that filter", () => {
+    const on = f({ category: "Work", tags: ["cli", "web"], excludeTags: ["tui"], statuses: ["archived"], stack: ["rust"] });
+    const [cat, cli, , not, status, stack] = activeFilters(on);
+    expect(cat.remove(on).category).toBeNull();
+    expect(cli.remove(on).tags).toEqual(["web"]);
+    expect(not.remove(on).excludeTags).toEqual([]);
+    expect(status.remove(on).statuses).toEqual(defaultFilters().statuses);
+    expect(stack.remove(on).stack).toEqual([]);
+    expect(activeFilters(activeFilters(on).reduce((g, c) => c.remove(g), on))).toEqual([]);
+  });
+});
+
+describe("pinnedSplit", () => {
+  it("splits only when both groups exist", () => {
+    expect(pinnedSplit([])).toBe(0);
+    expect(pinnedSplit([project(), project()])).toBe(0);
+    expect(pinnedSplit([project({ pinned: true }), project({ pinned: true })])).toBe(0);
+    expect(pinnedSplit([project({ pinned: true }), project({ pinned: true }), project()])).toBe(2);
   });
 });

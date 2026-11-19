@@ -90,7 +90,7 @@ export function FilterRail({ facets, filters, filtered, onChange, onClear }: Pro
           <Group title="Tags">
             <div className="projects-chips">
               {tags.shown.map((t) => (
-                <Badge key={t.value} count={t.count} pressed={t.selected} excluded={t.excluded} title={tagTitle(t)}
+                <Badge key={t.value} className="projects-tag" count={t.count} pressed={t.selected} excluded={t.excluded} title={tagTitle(t)}
                   onClick={() => onChange((f) => cycleTag(f, t.value))}>{t.label}</Badge>
               ))}
             </div>

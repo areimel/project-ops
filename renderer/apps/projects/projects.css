@@ -1,4 +1,4 @@
-/* Projects: the filter rail, the toolbar, the hairline card grid and the edit form. Tokens only. */
+/* Projects: the filter rail, the toolbar, the card grid and the edit form. Tokens only. */
 
 .projects { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 0; }
 .projects.projects-center { display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; overflow: auto; }
@@ -60,21 +60,29 @@
 .projects-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: var(--sp-5); }
 .projects-scroll > .empty-state { margin-top: var(--sp-6); }
 
-/* ---- Grid: hairline cells that share their borders (each overlaps its neighbour by 1px), no gaps ---- */
+/* Active filters: removable chips under the toolbar. */
+.projects-active {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1) var(--sp-2);
+  padding: var(--sp-2) var(--sp-5); border-bottom: var(--line-w) solid var(--line);
+}
+.projects-active-clear { margin-left: var(--sp-1); font-size: var(--fs-sm); }
+
+/* Tags are the owner's words: the text face in sentence case, not the mono label. */
+.badge.projects-tag { font-family: var(--font-text); font-size: var(--fs-sm); font-weight: var(--fw-regular); letter-spacing: 0; text-transform: none; }
+.badge.projects-tag .badge-count { font-family: var(--font-mono); font-size: var(--fs-xs); }
+
+/* Pinned and other projects, when the result has both. */
+.projects-group { margin-bottom: var(--sp-3); }
+.projects-grid + .projects-group { margin-top: var(--sp-6); }
+
+/* ---- Grid: separate cards with a gap, each with its own full border ---- */
 .projects-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(296px, 1fr));
-  margin: 0; padding: 0 var(--line-w) var(--line-w) 0; list-style: none;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(296px, 1fr)); gap: var(--sp-4);
+  margin: 0; padding: 0; list-style: none;
 }
-.projects-card {
-  position: relative; margin: 0 calc(-1 * var(--line-w)) calc(-1 * var(--line-w)) 0;
-  content-visibility: auto; contain-intrinsic-size: auto 360px;
-}
-.projects-card:hover, .projects-card:focus-within { z-index: 1; }
-.projects-card.is-selected { z-index: 2; }
+.projects-card { position: relative; content-visibility: auto; contain-intrinsic-size: auto 360px; }
 
 .projects-card .card-header { min-height: 37px; }
-.projects-card-num { flex: none; color: var(--text); }
-.projects-card .card-header-start > [aria-hidden] { flex: none; }
 .projects-card .card-header-end { white-space: nowrap; }
 .projects-card-cat {
   flex: 0 1 auto; min-width: 0; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -96,7 +104,7 @@
 .projects-card-pin { flex: none; align-self: center; color: var(--accent-text); }
 .card.is-muted .projects-card-pin { color: inherit; }
 .projects-card-desc {
-  margin-top: calc(-1 * var(--sp-1)); color: var(--text-muted); font-size: var(--fs-sm); line-height: 1.5;
+  margin-top: calc(-1 * var(--sp-1)); color: var(--text-muted); font-size: var(--fs-md); line-height: 1.55;
   overflow: hidden; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;
 }
 .projects-card-chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1); }
@@ -104,7 +112,10 @@
 
 /* Trait rows sit at the bottom of the body so rows line up across a grid row. */
 .projects-card-traits { margin-top: auto; }
-.projects-card-traits .kv-row { padding: 6px 0; }
+.projects-card-traits .kv-row { padding: 5px 0; }
+/* One rule above the block; the rows inside it separate by space alone. */
+.projects-card-traits .kv-row + .kv-row { border-top: 0; }
+.projects-card-traits .kv-row:first-child { padding-top: var(--sp-2); }
 /* Folder row: the front is cut with an ellipsis first, so the folder name at the end stays readable. */
 .projects-path { display: flex; justify-content: flex-end; min-width: 0; }
 .projects-path-head { flex: 0 1000 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -121,7 +132,8 @@
 .projects-link:hover { color: var(--accent-text); text-decoration-color: currentColor; }
 .card.is-muted .projects-link { color: var(--text-muted); }
 
-.projects-card-foot { gap: 0; padding: var(--sp-1) var(--sp-2); }
+.projects-card-foot { gap: 0; padding: var(--sp-2); }
+.projects-card-open { margin-right: var(--sp-2); padding: 0 var(--sp-3); }
 .projects-card-foot .icon-btn { color: var(--text-muted); }
 .projects-card-foot .icon-btn:hover:not(:disabled) { color: var(--text); }
 .projects-card-foot .icon-btn[aria-pressed="true"] { background: none; color: var(--accent-text); }
@@ -154,6 +166,6 @@
   .projects-rail:not(.is-open) .projects-rail-groups { display: none; }
   .projects-rail.is-open .projects-rail-toggle { border-bottom: var(--line-w) solid var(--line); }
   .projects-rail-group { padding: var(--sp-3) var(--sp-5); }
-  .projects-toolbar, .projects-scroll { padding-left: var(--sp-4); padding-right: var(--sp-4); }
+  .projects-toolbar, .projects-active, .projects-scroll { padding-left: var(--sp-4); padding-right: var(--sp-4); }
   .projects-form, .projects-form-links { grid-template-columns: minmax(0, 1fr); }
 }

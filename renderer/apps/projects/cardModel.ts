@@ -1,12 +1,7 @@
-// What a project card shows, decided once: numbering, status light, tag cap, stack labels, git rows, folder split.
+// What a project card shows, decided once: status light, tag cap, stack labels, trait rows, folder split.
 // Pure: no React, no DOM.
 import type { StatusTone } from "../../components/common/StatusDot";
 import type { ProjectView } from "../../../shared/projects/view";
-
-/** "01".."99", then "100": the card's position in the current result, counting from 1. */
-export function cardNumber(index: number): string {
-  return String(index + 1).padStart(2, "0");
-}
 
 export function cardCategory(p: Pick<ProjectView, "category">): string {
   return p.category.trim() === "" ? "Uncategorised" : p.category.trim();
@@ -43,6 +38,20 @@ export type GitInfo = "none" | "unread" | "read";
 export function gitInfo(p: Pick<ProjectView, "branch" | "lastCommitAt">): GitInfo {
   if (p.lastCommitAt !== null) return "read";
   return p.branch === null ? "none" : "unread";
+}
+
+export type TraitRow = "branch" | "lastCommit" | "git" | "stack" | "folder" | "links";
+
+/**
+ * The trait rows a card shows, top to bottom. Empty rows are left out: no stack, no links, and for a folder
+ * that is not a repository one "Git: none" row in place of the branch and last-commit rows.
+ */
+export function traitRows(p: Pick<ProjectView, "branch" | "lastCommitAt" | "stack" | "links">): TraitRow[] {
+  const rows: TraitRow[] = gitInfo(p) === "none" ? ["git"] : ["branch", "lastCommit"];
+  if (p.stack.length > 0) rows.push("stack");
+  rows.push("folder");
+  if (Object.values(p.links).some((l) => l !== null)) rows.push("links");
+  return rows;
 }
 
 export const GIT_UNREAD_NOTE = "Git details are not read for repositories with custom git configuration.";

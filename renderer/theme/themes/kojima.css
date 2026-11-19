@@ -17,7 +17,7 @@
 :root[data-theme="kojima"][data-mode="dark"],
 [data-theme="kojima"][data-mode="dark"] {
   --bg: #141310;
-  --surface: #1c1b17;
+  --surface: #201f1a;
   --surface-raised: #27251f;
   --text: #efebe0;
   --text-muted: #aaa596;
