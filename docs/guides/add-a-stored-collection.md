@@ -1,6 +1,6 @@
 # Add a main-only stored collection
 
-A collection is a list of records saved as `<name>.json` in the app's data folder, with the store, healing, atomic writes and change listeners already written. The two that exist, `projects` and `project-roots`, are **main-only**: no channel lets the page read or write a collection by name. The page gets path-free views through dedicated `projects:*` channels. A new collection follows the same pattern.
+A collection is a list of records saved as `<name>.json` in the app's data folder, with the store, healing, atomic writes and change listeners already written. The three that exist, `projects`, `project-roots` and `resource-links`, are **main-only**: no channel lets the page read or write a collection by name. The page gets views through dedicated `projects:*` and `resources:*` channels (`resource-links` is the smallest complete example: `shared/resources/links.ts`, `electron/store/resources.ts`, `electron/features/resources.ts`, `electron/ipc/resources.ts`, `renderer/hooks/useResourceLinks.ts`). A new collection follows the same pattern.
 
 Example name: `groups`. Names are lowercase letters, digits and hyphens (file name `^[a-z0-9-]+\.json$`).
 

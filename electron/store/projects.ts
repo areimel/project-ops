@@ -1,4 +1,4 @@
-// The two main-only project collections. Neither is in COLLECTIONS, so no generic channel can name them; the
+// The two main-only project collections (resource links are in resources.ts). Neither is in COLLECTIONS, so no generic channel can name them; the
 // page reaches them only through the projects:* handlers, which send path-free views.
 import { projectSpec, rootSpec } from "../../shared/projects";
 import { openCollection, type Collection } from "./collection";

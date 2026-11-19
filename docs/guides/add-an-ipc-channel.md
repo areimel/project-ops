@@ -4,7 +4,7 @@
 
 Flow: `shared/ipc/<part>.ts` (declaration) -> `electron/preload.ts` (the bridge, already generic) -> `electron/ipc/<part>.ts` (handler, validates every argument). The page calls `window.app.invoke("part:verb", ...args)`.
 
-Channel names are `<part>:<verb-kebab>`: letters only, hyphens between words (`projects:open-link`, `projects:roots-add`). The prefix must be the part file's name (`tests/ipc.test.ts`). Parts today: `app` (also `menu:`, `window:`, `log:`, `links:`), `data`, `settings`, `projects`.
+Channel names are `<part>:<verb-kebab>`: letters only, hyphens between words (`projects:open-link`, `projects:roots-add`). The prefix must be the part file's name (`tests/ipc.test.ts`). Parts today: `app` (also `menu:`, `window:`, `log:`, `links:`), `data`, `settings`, `projects`, `resources`.
 
 | Kind | Declaration | Direction |
 | --- | --- | --- |
