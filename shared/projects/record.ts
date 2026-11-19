@@ -57,6 +57,7 @@ export interface ProjectFields {
   status: ProjectStatus;
   pinned: boolean;
   links: ProjectLinks;           // user values; the view falls back to scan.repoUrl for repo
+  lastOpenedAt: number | null;   // ms; set by main when projects:open succeeds, never by the page
   scan: ProjectScan;
 }
 
@@ -145,6 +146,7 @@ export function healProject(raw: unknown): ProjectFields | null {
     status: oneOf(raw.status, PROJECT_STATUSES, "active"),
     pinned: bool(raw.pinned, false),
     links: healLinks(raw.links),
+    lastOpenedAt: timestamp(raw.lastOpenedAt),
     scan: healScan(raw.scan),
   };
 }

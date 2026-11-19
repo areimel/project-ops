@@ -21,6 +21,7 @@ import { homeDir } from "./home";
 import { installedLaunchers, launch, openFolder } from "./launch";
 import { resolveLauncher } from "./launchCore";
 import { openExternalHttps } from "./links";
+import { log } from "./logger";
 import { inspectFolder } from "./projectScan";
 import { afterRootRemoved, newManualProject, scanFacts, toRootViews } from "./projectsCore";
 import { invalidateScan, scanInBackground } from "./projectsScanRun";
@@ -147,14 +148,32 @@ export function removeRoot(id: string): void {
 
 export async function open(id: string, target: OpenTarget): Promise<void> {
   const { path } = record(id);
-  if (target === "folder") return openFolder(path);
-  const chosen = resolveLauncher(target, getSettings()[target], installedFor(target, installedLaunchers()));
-  if (!chosen) {
-    throw new Error(target === "editor"
-      ? "No code editor was found. Install one, then choose it in Settings."
-      : "No terminal was found. Install one, then choose it in Settings.");
+  if (target === "folder") {
+    await openFolder(path);
+  } else {
+    const chosen = resolveLauncher(target, getSettings()[target], installedFor(target, installedLaunchers()));
+    if (!chosen) {
+      throw new Error(target === "editor"
+        ? "No code editor was found. Install one, then choose it in Settings."
+        : "No terminal was found. Install one, then choose it in Settings.");
+    }
+    await launch(target, chosen, path);
   }
-  await launch(target, chosen, path);
+  markOpened(id, path);
+}
+
+/**
+ * Records when a project was last opened (the dashboard's "Recent"). Not an edit, so updatedAt is kept. The open
+ * already happened, so a record replaced meanwhile is skipped and a failed write is logged, not thrown.
+ */
+function markOpened(id: string, path: string): void {
+  try {
+    const projects = projectsStore();
+    if (projects.get(id)?.path !== path) return;
+    projects.update(id, { lastOpenedAt: Date.now() }, { keepUpdatedAt: true });
+  } catch (e) {
+    log.warn("projects", "could not record the open time", e);
+  }
 }
 
 /** The URL is looked up in the record (the user's link, or the detected remote for repo), https only. */
