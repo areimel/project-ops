@@ -18,7 +18,7 @@ import { ProjectsToolbar } from "./ProjectsToolbar";
 import { useProjectFilters } from "./useProjectFilters";
 import "./projects.css";
 
-/** The home screen: every project as a card, with a filter rail and a toolbar. */
+/** Every project as a card, with a filter rail and a toolbar. */
 export default function ProjectsApp() {
   const api = useProjects();
   const { projects, status } = api;

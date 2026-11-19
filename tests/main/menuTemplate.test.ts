@@ -94,7 +94,7 @@ describe("buildTemplate", () => {
   });
   it("has no Go entries or trailing separator for a single app", () => {
     const go = sub(build({ apps: [apps[0]], app: null }).tpl, "Go");
-    expect(go.map((i) => i.label)).toEqual(["Go to projects"]);
+    expect(go.map((i) => i.label)).toEqual(["Go home"]);
   });
   it("skips commands with menu: false and keeps shell accelerators", () => {
     const { tpl } = build(ctx);
