@@ -1,0 +1,31 @@
+/* Mosaic: a seamless hairline grid of cells. The grid background shows through the gaps as the lines. */
+.mosaic {
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--line-w);
+  background: var(--line);
+  border: var(--line-w) solid var(--line);
+}
+.mosaic-cell {
+  grid-column: span var(--span, 12);
+  grid-row: span var(--row-span, 1);
+  background: var(--surface);
+  padding: var(--sp-4);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.mosaic-cell-accent { background: var(--surface-raised); }
+.mosaic-cell-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+.mosaic-cell-end { display: flex; align-items: center; gap: var(--sp-2); color: var(--text-muted); }
+
+@container (max-width: 720px) {
+  .mosaic { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .mosaic-cell { grid-column: span min(var(--span, 12), 6); }
+}
+@container (max-width: 480px) {
+  .mosaic { grid-template-columns: minmax(0, 1fr); }
+  .mosaic-cell { grid-column: 1 / -1; }
+}

@@ -1,0 +1,39 @@
+/* graphics */
+.projects-dossier-hazard {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  height: calc(var(--hazard-w) * 2.4);
+  background: repeating-linear-gradient(45deg, var(--accent) 0 var(--hazard-w), var(--accent-ink) var(--hazard-w) calc(var(--hazard-w) * 2));
+}
+.projects-dossier-hazard-plate {
+  padding: 0 var(--sp-3); background: var(--bg); color: var(--text);
+  font-family: var(--label-font); font-size: var(--label-size); font-weight: var(--label-weight);
+  letter-spacing: var(--label-track); text-transform: uppercase; line-height: 1.8;
+  border: var(--line-w) solid var(--line);
+}
+
+.projects-dossier-barcode { display: block; color: var(--text); }
+
+.projects-dossier-reg { --reg: 12px; position: absolute; width: var(--reg); height: var(--reg); border: 0 solid var(--text-muted); pointer-events: none; }
+.projects-dossier-reg-tl { top: var(--sp-2); left: var(--sp-2); border-top-width: var(--line-w); border-left-width: var(--line-w); }
+.projects-dossier-reg-tr { top: var(--sp-2); right: var(--sp-2); border-top-width: var(--line-w); border-right-width: var(--line-w); }
+.projects-dossier-reg-bl { bottom: var(--sp-2); left: var(--sp-2); border-bottom-width: var(--line-w); border-left-width: var(--line-w); }
+.projects-dossier-reg-br { bottom: var(--sp-2); right: var(--sp-2); border-bottom-width: var(--line-w); border-right-width: var(--line-w); }
+
+.projects-dossier-stamp {
+  --stamp: var(--accent); display: inline-block; padding: 3px; color: var(--stamp);
+  outline: var(--focus-w) solid var(--stamp); outline-offset: 0;
+}
+.projects-dossier-stamp-accent { --stamp: var(--accent-text, var(--accent)); }
+.projects-dossier-stamp-danger { --stamp: var(--danger); }
+.projects-dossier-stamp-muted { --stamp: var(--text-muted); }
+.projects-dossier-stamp-success { --stamp: var(--text); }
+.projects-dossier-stamp-inner {
+  display: block; padding: var(--sp-1) var(--sp-3); border: var(--line-w) solid var(--stamp);
+  font-family: var(--label-font); font-size: var(--fs-md); font-weight: var(--fw-medium);
+  letter-spacing: 0.18em; text-transform: uppercase; line-height: 1.4; white-space: nowrap;
+}
+
+.projects-dossier-dotgrid {
+  display: inline-block; width: 18px; height: 18px; color: var(--text-muted);
+  background: radial-gradient(circle, currentColor 1.5px, transparent 2px) 0 0 / 6px 6px;
+}
