@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { ProjectView } from "../../../../shared/projects/view";
 import { Badge } from "../../../components/common/Badge";
 import { Button } from "../../../components/common/Button";
@@ -21,6 +22,10 @@ export interface DossierProps {
 
 /** One project as a technical file: identity, status, site, git, stack, notes, links, timeline and location. */
 export function ProjectDossier({ project: p, now, actions: a, onBack }: DossierProps) {
+  // Opening a project moves focus to its name, so keyboard and screen-reader users land on the page they opened.
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const id = p?.id;
+  useEffect(() => { headingRef.current?.focus({ preventScroll: true }); }, [id]);
   if (!p) {
     return (
       <div className="projects-dossier">
@@ -50,7 +55,7 @@ export function ProjectDossier({ project: p, now, actions: a, onBack }: DossierP
           <MosaicCell as="div" span={6} className="projects-dossier-identity">
             <RegMarks />
             <span className="kicker">{cardCategory(p)}</span>
-            <h1 className="projects-dossier-name">{p.name}</h1>
+            <h1 className="projects-dossier-name" tabIndex={-1} ref={headingRef}>{p.name}</h1>
             {p.description && <p className="projects-dossier-desc">{p.description}</p>}
             {(p.tags.length > 0 || p.pinned) && (
               <div className="projects-dossier-chips">

@@ -53,13 +53,16 @@ export default function ProjectsApp() {
     setSelected(pendingFocus);
     setPendingFocus(null);
   }, [pendingFocus, projects, status]);
+  // The grid is unmounted while a dossier shows, so coming back always scrolls (and focuses) the card again.
   useEffect(() => {
+    if (profile) { scrolledTo.current = null; return; }
     if (!selected || scrolledTo.current === selected) return;
     const el = document.querySelector(`[data-project-id="${selected}"]`);
     if (!el) return;
     scrolledTo.current = selected;
     el.scrollIntoView({ block: "center" });
-  }, [selected, view.results]);
+    el.querySelector<HTMLElement>(".projects-card-name-text")?.focus({ preventScroll: true });
+  }, [selected, view.results, profile]);
 
   // ---- actions ----
   const actions = useProjectActions({ api, view, attempt, setEditing, setProfile });

@@ -57,6 +57,7 @@
   margin: 0; font-size: var(--fs-display); font-weight: var(--fw-heavy); line-height: 1.05;
   letter-spacing: -0.01em; overflow-wrap: anywhere; text-wrap: balance;
 }
+.projects-dossier-name:focus { outline: none; }
 .projects-dossier-desc { margin: 0; max-width: 70ch; color: var(--text-muted); font-size: var(--fs-lg); line-height: 1.5; }
 .projects-dossier-chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
 .projects-dossier-pin { display: inline-flex; align-items: center; gap: var(--sp-1); color: var(--accent-text); font-family: var(--label-font); font-size: var(--label-size); letter-spacing: var(--label-track); text-transform: uppercase; }
