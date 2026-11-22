@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  allCategories, allTags, clearFilters, defaultFilters, facets, filterProjects, isFiltered, matchesQuery,
+  allCategories, allHosting, allServices, allTags, clearFilters, defaultFilters, facets, filterProjects, isFiltered, matchesQuery,
   relativeTime, SORT_OPTIONS, sortProjects, toggle, UNCATEGORISED, type ProjectFilters,
 } from "../../renderer/apps/projects/projectsModel";
 import type { ProjectView } from "../../shared/projects/view";
@@ -53,6 +53,18 @@ describe("query", () => {
   it("is part of filtering", () => {
     const other = project({ name: "Other" });
     expect(filterProjects([p, other], f({ query: "terminal" }))).toEqual([p]);
+  });
+  it("matches the site's client, hosting and services, but not its notes", () => {
+    const s = project({
+      name: "Shop",
+      site: { client: "Acme Bakery", hosting: "Netlify", launchDate: null, services: ["SEO audit", "Email"], notes: "call Tuesdays about the wholesale page" },
+    });
+    expect(matchesQuery(s, "acme")).toBe(true);
+    expect(matchesQuery(s, "netlify")).toBe(true);
+    expect(matchesQuery(s, "seo")).toBe(true);
+    expect(matchesQuery(s, "EMAIL netlify")).toBe(true);
+    expect(matchesQuery(s, "wholesale")).toBe(false);
+    expect(matchesQuery(s, "tuesdays")).toBe(false);
   });
 });
 
@@ -192,6 +204,18 @@ describe("autocomplete lists", () => {
     const ps = [project({ category: "work", tags: ["b", "A"] }), project({ category: "Work", tags: ["a", "C"] }), project({ category: "" })];
     expect(allTags(ps)).toEqual(["A", "b", "C"]);
     expect(allCategories(ps)).toEqual(["work"]);
+  });
+  it("lists hosting and services distinct, trimmed and without empties", () => {
+    const site = (hosting: string, services: string[]) => ({ client: "", hosting, launchDate: null, services, notes: "" });
+    const ps = [
+      project({ site: site(" Netlify ", ["SEO", "Email"]) }),
+      project({ site: site("netlify", ["email", ""]) }),
+      project({ site: site("", ["Analytics"]) }),
+    ];
+    expect(allHosting(ps)).toEqual(["Netlify"]);
+    expect(allServices(ps)).toEqual(["Analytics", "Email", "SEO"]);
+    expect(allHosting([])).toEqual([]);
+    expect(allServices([project()])).toEqual([]);
   });
 });
 

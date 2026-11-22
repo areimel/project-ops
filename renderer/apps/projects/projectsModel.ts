@@ -73,11 +73,19 @@ export function toggle<T extends string>(list: readonly T[], value: T): T[] {
   return list.some((x) => fold(x) === key) ? list.filter((x) => fold(x) !== key) : [...list, value];
 }
 
+/**
+ * True when every word of the query appears (case and accent insensitive) in one of the searched fields:
+ * name, description, category, tags, stack, branch, folder, and the site's client, hosting and services.
+ * The site's notes are not searched.
+ */
 export function matchesQuery(p: ProjectView, query: string): boolean {
   const words = fold(query).split(/\s+/).filter(Boolean);
   if (words.length === 0) return true;
   const hay = fold(
-    [p.name, p.description ?? "", p.category, ...p.tags, ...p.stack, p.branch ?? "", p.folder].join("\n"),
+    [
+      p.name, p.description ?? "", p.category, ...p.tags, ...p.stack, p.branch ?? "", p.folder,
+      p.site.client, p.site.hosting, ...p.site.services,
+    ].join("\n"),
   );
   return words.every((w) => hay.includes(w));
 }
@@ -233,6 +241,8 @@ function distinct(values: Iterable<string>): string[] {
 
 export const allTags = (projects: readonly ProjectView[]): string[] => distinct(projects.flatMap((p) => p.tags));
 export const allCategories = (projects: readonly ProjectView[]): string[] => distinct(projects.map((p) => p.category));
+export const allHosting = (projects: readonly ProjectView[]): string[] => distinct(projects.map((p) => p.site.hosting));
+export const allServices = (projects: readonly ProjectView[]): string[] => distinct(projects.flatMap((p) => p.site.services));
 
 const DAY = 86_400_000;
 

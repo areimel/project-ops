@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { draftFromView, draftInvalid, draftPatch, linkProblem } from "../../renderer/apps/projects/projectDraft";
+import { draftFromView, dateProblem, draftInvalid, draftPatch, linkProblem } from "../../renderer/apps/projects/projectDraft";
 import type { ProjectView } from "../../shared/projects/view";
 
 const none = { repo: null, site: null, docs: null };
@@ -18,6 +18,7 @@ describe("draftFromView", () => {
     expect(d).toEqual({
       name: "Mine", description: "", category: "Work", tags: ["CLI"], status: "active", pinned: false,
       links: { repo: "", site: "https://x.dev/", docs: "" },
+      site: { client: "", hosting: "", launchDate: "", services: [], notes: "" },
     });
   });
 });
@@ -60,5 +61,34 @@ describe("link checks", () => {
     const d = draftFromView(view());
     expect(draftInvalid(d)).toBe(false);
     expect(draftInvalid({ ...d, links: { ...d.links, docs: "ftp://x" } })).toBe(true);
+  });
+});
+
+describe("site details", () => {
+  const withSite = view({ site: { client: "Acme", hosting: "Netlify", launchDate: "2026-01-02", services: ["SEO"], notes: "hi" } });
+  it("fills the draft from the view", () => {
+    expect(draftFromView(withSite).site).toEqual({ client: "Acme", hosting: "Netlify", launchDate: "2026-01-02", services: ["SEO"], notes: "hi" });
+  });
+  it("sends no site key when unchanged", () => {
+    expect(draftPatch(withSite, draftFromView(withSite))).toBeNull();
+  });
+  it("sends only changed keys, normalised", () => {
+    const d = draftFromView(withSite);
+    expect(draftPatch(withSite, { ...d, site: { ...d.site, client: "  Beta   Co " } })).toEqual({ site: { client: "Beta Co" } });
+    expect(draftPatch(withSite, { ...d, site: { ...d.site, services: ["SEO", "Care"] } })).toEqual({ site: { services: ["SEO", "Care"] } });
+    expect(draftPatch(withSite, { ...d, site: { ...d.site, notes: "a\r\nb" } })).toEqual({ site: { notes: "a\nb" } });
+  });
+  it("clears the launch date with null", () => {
+    const d = draftFromView(withSite);
+    expect(draftPatch(withSite, { ...d, site: { ...d.site, launchDate: "" } })).toEqual({ site: { launchDate: null } });
+  });
+  it("flags an invalid date and leaves it out of the patch", () => {
+    const d = draftFromView(withSite);
+    const bad = { ...d, site: { ...d.site, launchDate: "2026-02-31" } };
+    expect(dateProblem("2026-02-31")).toBe("Use a full date.");
+    expect(dateProblem("")).toBeNull();
+    expect(dateProblem("2026-02-03")).toBeNull();
+    expect(draftInvalid(bad)).toBe(true);
+    expect(draftPatch(withSite, bad)).toBeNull();
   });
 });

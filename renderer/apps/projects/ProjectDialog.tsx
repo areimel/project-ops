@@ -11,6 +11,7 @@ import { Switch } from "../../components/common/Switch";
 import { TagInput } from "../../components/common/TagInput";
 import { TextArea } from "../../components/common/TextArea";
 import { TextField } from "../../components/common/TextField";
+import { SiteFields } from "./SiteFields";
 import { draftFromView, draftInvalid, draftPatch, linkProblem, type ProjectDraft } from "./projectDraft";
 
 const STATUS_OPTIONS: { value: ProjectStatus; label: string }[] = [
@@ -22,6 +23,9 @@ interface Props {
   project: ProjectView;
   categories: string[];
   tags: string[];
+  /** Hosting and service names used elsewhere, offered as suggestions. */
+  hosting?: string[];
+  services?: string[];
   /** Resolves true when saved; the dialog then closes. */
   onSave(patch: ProjectPatch): Promise<boolean>;
   onRemove(): void;
@@ -29,7 +33,7 @@ interface Props {
 }
 
 /** Edit what the user owns. Empty name, description or link means "use what was detected". */
-export function ProjectDialog({ project: p, categories, tags, onSave, onRemove, onClose }: Props) {
+export function ProjectDialog({ project: p, categories, tags, hosting = [], services = [], onSave, onRemove, onClose }: Props) {
   const [draft, setDraft] = useState<ProjectDraft>(() => draftFromView(p));
   const [saving, setSaving] = useState(false);
   const baseId = useId();
@@ -84,6 +88,9 @@ export function ProjectDialog({ project: p, categories, tags, onSave, onRemove, 
             );
           })}
         </div>
+
+        <SiteFields site={draft.site} onChange={(v) => set("site", v)}
+          hostingSuggestions={hosting} serviceSuggestions={services} />
 
         <p className="projects-form-folder projects-form-wide">
           <span className="label">Folder</span>
