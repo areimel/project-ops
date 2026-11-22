@@ -18,6 +18,8 @@ export interface CardActions {
   copyPath(id: string): void;
   togglePin(id: string): void;
   edit(id: string): void;
+  show(id: string): void;
+  refresh(id: string): void;
   filterTag(tag: string): void;
   filterCategory(category: string): void;
 }
@@ -52,7 +54,7 @@ function ProjectCardImpl({ project: p, selected, now, actions: a }: Props) {
       <CardBody className="projects-card-body">
         <h3 className="projects-card-name" title={p.name}>
           {p.pinned && <span className="projects-card-pin" title="Pinned"><Icon name="pin" size={14} /><span className="visually-hidden">Pinned: </span></span>}
-          <span className="projects-card-name-text">{p.name}</span>
+          <button type="button" className="projects-card-name-text" title="Open project page" onClick={() => a.show(p.id)}>{p.name}</button>
         </h3>
         {p.description && <p className="projects-card-desc" title={p.description}>{p.description}</p>}
         {p.tags.length > 0 && (

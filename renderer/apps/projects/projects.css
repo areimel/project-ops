@@ -100,7 +100,9 @@
 .projects-card-name-text {
   min-width: 0; overflow: hidden; overflow-wrap: anywhere;
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; letter-spacing: inherit;
 }
+.projects-card-name-text:hover { text-decoration: underline; text-underline-offset: 3px; }
 .projects-card-pin { flex: none; align-self: center; color: var(--accent-text); }
 .card.is-muted .projects-card-pin { color: inherit; }
 .projects-card-desc {

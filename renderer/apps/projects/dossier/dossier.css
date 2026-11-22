@@ -30,10 +30,61 @@
 .projects-dossier-stamp-inner {
   display: block; padding: var(--sp-1) var(--sp-3); border: var(--line-w) solid var(--stamp);
   font-family: var(--label-font); font-size: var(--fs-md); font-weight: var(--fw-medium);
-  letter-spacing: 0.18em; text-transform: uppercase; line-height: 1.4; white-space: nowrap;
+  letter-spacing: 0.18em; text-transform: uppercase; line-height: 1.4; overflow-wrap: anywhere;
 }
 
 .projects-dossier-dotgrid {
   display: inline-block; width: 18px; height: 18px; color: var(--text-muted);
   background: radial-gradient(circle, currentColor 1.5px, transparent 2px) 0 0 / 6px 6px;
+}
+
+/* ---- page ---- */
+.projects.projects-dossier-root { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+.projects-dossier { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.projects-dossier-bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-2) var(--sp-3);
+  padding: var(--sp-3) var(--sp-5); border-bottom: var(--line-w) solid var(--line);
+}
+.projects-dossier-bar-end { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
+.projects-dossier-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: var(--sp-5); }
+.projects-dossier-scroll > .empty-state { margin-top: var(--sp-6); }
+.projects-dossier-mosaic { max-width: 1200px; margin: 0 auto; }
+.projects-dossier-plate { padding: 0; }
+.projects-dossier-status { align-items: flex-start; }
+.projects-dossier-status .projects-dossier-stamp { margin: auto 0; max-width: 100%; }
+.projects-dossier-identity { position: relative; padding: var(--sp-6) var(--sp-6) var(--sp-5); gap: var(--sp-3); }
+.projects-dossier-name {
+  margin: 0; font-size: var(--fs-display); font-weight: var(--fw-heavy); line-height: 1.05;
+  letter-spacing: -0.01em; overflow-wrap: anywhere; text-wrap: balance;
+}
+.projects-dossier-desc { margin: 0; max-width: 70ch; color: var(--text-muted); font-size: var(--fs-lg); line-height: 1.5; }
+.projects-dossier-chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
+.projects-dossier-pin { display: inline-flex; align-items: center; gap: var(--sp-1); color: var(--accent-text); font-family: var(--label-font); font-size: var(--label-size); letter-spacing: var(--label-track); text-transform: uppercase; }
+.projects-dossier-serial { font-family: var(--font-mono); font-size: var(--fs-sm); letter-spacing: 0.06em; word-break: break-all; }
+.projects-dossier-origin { color: var(--text-muted); font-size: var(--fs-sm); }
+.projects-dossier-muted { margin: 0; color: var(--text-muted); font-size: var(--fs-sm); }
+.projects-dossier-sub { color: var(--text-muted); }
+.projects-dossier-group { display: flex; flex-direction: column; gap: var(--sp-2); }
+.projects-dossier-notes { margin: 0; max-width: 75ch; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; }
+.projects-dossier-links { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); }
+.projects-dossier-links .projects-link + .projects-link { margin-left: 0; }
+
+/* Each event draws its own segment of the rule, so a wrapped second row keeps its line. */
+.projects-dossier-timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; row-gap: var(--sp-5); }
+.projects-dossier-event {
+  position: relative; display: flex; flex-direction: column; gap: 2px; flex: 1 0 144px; max-width: 220px;
+  padding: var(--sp-4) var(--sp-5) 0 0; border-top: var(--line-w) solid var(--text-muted); font-size: var(--fs-sm);
+}
+.projects-dossier-event:last-child { flex-grow: 100; max-width: none; }
+.projects-dossier-event-mark { position: absolute; top: -4px; left: 0; width: 8px; height: 8px; background: var(--accent); }
+.projects-dossier-event-date { font-family: var(--font-mono); }
+
+.projects-dossier-location { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+.projects-dossier-path { min-width: 0; font-family: var(--font-mono); font-size: var(--fs-sm); overflow-wrap: anywhere; }
+.projects-dossier-path-head { color: var(--text-muted); }
+.projects-dossier-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
+
+@media (max-width: 700px) {
+  .projects-dossier-bar, .projects-dossier-scroll { padding-left: var(--sp-4); padding-right: var(--sp-4); }
+  .projects-dossier-name { font-size: var(--fs-3xl); }
 }

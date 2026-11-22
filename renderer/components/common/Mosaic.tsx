@@ -10,18 +10,21 @@ interface CellProps {
   end?: ReactNode;
   span?: number;
   rowSpan?: number;
+  /** Columns (of 12) when the mosaic is narrow (under 720px); default the full row. Pair halves so no hole is left. */
+  narrowSpan?: 6 | 12;
   as?: ElementType;
   className?: string;
   tone?: "accent" | "muted";
   children?: ReactNode;
 }
 
-type CellStyle = CSSProperties & { "--span": number; "--row-span"?: number };
+type CellStyle = CSSProperties & { "--span": number; "--row-span"?: number; "--narrow-span"?: number };
 
-export function MosaicCell({ label, end, span = 12, rowSpan, as: Tag = "section", className, tone, children }: CellProps) {
+export function MosaicCell({ label, end, span = 12, rowSpan, narrowSpan, as: Tag = "section", className, tone, children }: CellProps) {
   const labelId = useId();
   const style: CellStyle = { "--span": span };
   if (rowSpan) style["--row-span"] = rowSpan;
+  if (narrowSpan) style["--narrow-span"] = narrowSpan;
   const labelled = Boolean(label) && Tag === "section";
   return (
     <Tag className={cx("mosaic-cell", tone && `mosaic-cell-${tone}`, className)} style={style} aria-labelledby={labelled ? labelId : undefined}>

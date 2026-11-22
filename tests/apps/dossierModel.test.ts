@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { barcodeBars, fileSerial, formatDate, hasSiteDetails, siteDomain, siteRows, timeline } from "../../renderer/apps/projects/dossier/dossierModel";
+import { barcodeBars, fileSerial, formatDate, hasSiteDetails, remoteLabel, siteDomain, siteRows, timeline } from "../../renderer/apps/projects/dossier/dossierModel";
 import type { ProjectSite } from "../../shared/projects/record";
 
 const site = (o: Partial<ProjectSite> = {}): ProjectSite => ({ client: "", hosting: "", launchDate: null, services: [], notes: "", ...o });
@@ -59,5 +59,13 @@ describe("formatDate and timeline", () => {
     const t = timeline({ createdAt: 100, updatedAt: 100, lastCommitAt: 50, lastOpenedAt: null, scannedAt: 200, site: site({ launchDate: "1970-01-01" }) });
     expect(t.map((e) => e.key)).toEqual(["launched", "commit", "added", "edited", "scanned"]);
     expect(t[0].at).toBe(0);
+  });
+});
+
+describe("remoteLabel", () => {
+  it("shortens a remote URL", () => {
+    expect(remoteLabel("https://github.com/a/b")).toBe("github.com/a/b");
+    expect(remoteLabel("https://www.example.com/")).toBe("example.com");
+    expect(remoteLabel(null)).toBeNull();
   });
 });

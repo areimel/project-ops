@@ -9,10 +9,12 @@ import { useCommandHandlers, useShell, useTitleInfo } from "../../shell/ShellCon
 import { projectCount, scanMessage } from "../../utils/projectText";
 import { ActiveFilters } from "./ActiveFilters";
 import { FilterRail } from "./FilterRail";
-import { categoryValue, includeTag, revealFilters } from "./filterState";
-import { ProjectCard, type CardActions } from "./ProjectCard";
+import { revealFilters } from "./filterState";
+import { ProjectCard } from "./ProjectCard";
+import { ProjectDossier } from "./dossier/ProjectDossier";
+import { useProjectActions } from "./useProjectActions";
 import { ProjectDialog } from "./ProjectDialog";
-import { allCategories, allTags, pinnedSplit } from "./projectsModel";
+import { allCategories, allHosting, allServices, allTags, pinnedSplit } from "./projectsModel";
 import type { ProjectView } from "../../../shared/projects/view";
 import { ProjectsToolbar } from "./ProjectsToolbar";
 import { useProjectFilters } from "./useProjectFilters";
@@ -30,15 +32,17 @@ export default function ProjectsApp() {
   const searchRef = useRef<HTMLInputElement>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const [profile, setProfile] = useState<string | null>(null);
   const [pendingFocus, setPendingFocus] = useState<string | null>(null);
   const scrolledTo = useRef<string | null>(null);
   const now = useMemo(() => Date.now(), [projects]);
 
   useTitleInfo({ count: status === "ready" ? projectCount(projects.length) : undefined });
 
-  // ---- focus a project: a deep link, or a folder just added ----
-  // The router makes a new route object for every navigation, so opening the same project again refocuses it.
-  useEffect(() => { if (route.view === "app" && route.recordId) setPendingFocus(route.recordId); }, [route]);
+  // ---- a deep link opens the project page; a folder just added is focused in the grid ----
+  // The router makes a new route object for every navigation, so opening the same project again reopens it.
+  useEffect(() => { if (route.view === "app") setProfile(route.recordId ?? null); }, [route]);
+  const back = () => { const id = profile; setProfile(null); if (id) setPendingFocus(id); };
   const latestFilters = useLatest(view.filters);
   useEffect(() => {
     if (!pendingFocus || status !== "ready") return;
@@ -58,22 +62,7 @@ export default function ProjectsApp() {
   }, [selected, view.results]);
 
   // ---- actions ----
-  const latest = useLatest({ projects, api, view, attempt });
-  const actions = useMemo<CardActions>(() => {
-    const find = (id: string) => latest.current.projects.find((p) => p.id === id);
-    return {
-      open: (id, target) => void latest.current.attempt(() => latest.current.api.open(id, target)),
-      openLink: (id, key) => void latest.current.attempt(() => latest.current.api.openLink(id, key)),
-      copyPath: (id) => void latest.current.attempt(() => latest.current.api.copyPath(id), "Path copied"),
-      togglePin: (id) => {
-        const p = find(id);
-        if (p) void latest.current.attempt(() => latest.current.api.update(id, { pinned: !p.pinned }), p.pinned ? "Unpinned" : "Pinned");
-      },
-      edit: (id) => setEditing(id),
-      filterTag: (tag) => latest.current.view.setFilters((f) => includeTag(f, tag)),
-      filterCategory: (c) => latest.current.view.setFilters((f) => ({ ...f, category: categoryValue(c) })),
-    };
-  }, [latest]);
+  const actions = useProjectActions({ api, view, attempt, setEditing, setProfile });
 
   const addFolder = () => void attempt(api.addFolder, (r) => {
     if (r) setPendingFocus(r.id);
@@ -93,12 +82,20 @@ export default function ProjectsApp() {
     "projects.search": () => { searchRef.current?.focus(); searchRef.current?.select(); },
     "projects.add-folder": addFolder,
     "projects.rescan": rescan,
+    ...(profile ? { "projects.back": back } : {}),
     ...(view.filtered ? { "projects.clear-filters": view.clear } : {}),
   });
 
   const editingProject = editing ? projects.find((p) => p.id === editing) ?? null : null;
   const categories = useMemo(() => allCategories(projects), [projects]);
   const tags = useMemo(() => allTags(projects), [projects]);
+  const hosting = useMemo(() => allHosting(projects), [projects]);
+  const services = useMemo(() => allServices(projects), [projects]);
+  const dialog = editingProject && (
+    <ProjectDialog key={editingProject.id} project={editingProject} categories={categories} tags={tags} hosting={hosting} services={services}
+      onClose={() => setEditing(null)} onRemove={() => remove(editingProject.id)}
+      onSave={(patch) => attempt(() => api.update(editingProject.id, patch), "Saved")} />
+  );
   const split = pinnedSplit(view.results);
   const grid = (list: readonly ProjectView[], label: string) => (
     <ul className="projects-grid" aria-label={label}>
@@ -130,6 +127,15 @@ export default function ProjectsApp() {
     );
   }
 
+  if (profile) {
+    return (
+      <div className="app-root projects projects-dossier-root">
+        <ProjectDossier project={projects.find((p) => p.id === profile) ?? null} now={now} actions={actions} onBack={back} />
+        {dialog}
+      </div>
+    );
+  }
+
   return (
     <div className="app-root projects">
       <FilterRail facets={view.facets} filters={view.filters} filtered={view.filtered} onChange={view.setFilters} onClear={view.clear} />
@@ -150,11 +156,7 @@ export default function ProjectsApp() {
           </>) : grid(view.results, "Projects")}
         </div>
       </div>
-      {editingProject && (
-        <ProjectDialog key={editingProject.id} project={editingProject} categories={categories} tags={tags}
-          onClose={() => setEditing(null)} onRemove={() => remove(editingProject.id)}
-          onSave={(patch) => attempt(() => api.update(editingProject.id, patch), "Saved")} />
-      )}
+      {dialog}
     </div>
   );
 }

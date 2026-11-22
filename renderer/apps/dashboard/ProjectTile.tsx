@@ -28,7 +28,7 @@ function ProjectTileImpl({ project: p, note, actions: a }: Props) {
     <Card as="li" className="dashboard-tile" muted={cardMuted(p)} aria-label={p.name}>
       <CardBody className="dashboard-tile-body">
         <div className="dashboard-tile-head">
-          <button type="button" className="dashboard-tile-name" title={`Show ${p.name} in Projects`} onClick={() => a.show(p.id)}>
+          <button type="button" className="dashboard-tile-name" title={`Open ${p.name}`} onClick={() => a.show(p.id)}>
             {p.name}
           </button>
           <StatusDot tone={status.tone} className="dashboard-tile-status">{status.label}</StatusDot>

@@ -74,3 +74,16 @@ export function timeline(
     .sort((a, b) => a.e.at - b.e.at || a.i - b.i)
     .map(({ e }) => e);
 }
+
+/** A short "host/owner/repo" label for a remote URL, or null when there is none. */
+export function remoteLabel(repo: string | null): string | null {
+  if (!repo) return null;
+  try {
+    const u = new URL(repo);
+    const path = u.pathname.replace(/^\/+|\/+$/g, "");
+    const host = u.hostname.replace(/^www\./i, "");
+    return path ? `${host}/${path}` : host;
+  } catch {
+    return repo;
+  }
+}

@@ -21,11 +21,11 @@
 .mosaic-cell-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
 .mosaic-cell-end { display: flex; align-items: center; gap: var(--sp-2); color: var(--text-muted); }
 
+/* A container query styles the container's descendants, never the container: the grid keeps 12 columns and the
+   cells widen instead. Narrow: each cell takes the full row unless it asks for half (--narrow-span). Very narrow: one column. */
 @container (max-width: 720px) {
-  .mosaic { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-  .mosaic-cell { grid-column: span min(var(--span, 12), 6); }
+  .mosaic-cell { grid-column: span var(--narrow-span, 12); }
 }
 @container (max-width: 480px) {
-  .mosaic { grid-template-columns: minmax(0, 1fr); }
   .mosaic-cell { grid-column: 1 / -1; }
 }
