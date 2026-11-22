@@ -2,7 +2,7 @@
 // category hint, and the merge of a scan into the stored records. The file walk is projectScan.ts.
 import { isObject } from "../../shared/collections/heal";
 import {
-  PROJECT_LIMITS, emptyScan, overrideText,
+  PROJECT_LIMITS, emptyScan, emptySite, overrideText,
   type ProjectFields, type ProjectScan,
 } from "../../shared/projects/record";
 import type { ProjectRecord } from "../../shared/projects/view";
@@ -160,6 +160,7 @@ export function mergeScan(
       path: f.path, origin: "scan", rootId: f.rootId, missing: false, hidden: false,
       name: null, description: null, category: f.categoryHint.slice(0, PROJECT_LIMITS.category),
       tags: [], status: "active", pinned: false,
+      site: emptySite(),
       links: { repo: null, site: null, docs: null },
       lastOpenedAt: null,
       scan: { ...emptyScan(), ...f.scan, scannedAt: now },

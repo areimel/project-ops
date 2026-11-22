@@ -1,8 +1,8 @@
 // What the page may change on a project: user fields only, healed key by key.
-import { isObject, line, strList } from "../collections/heal";
+import { isObject, isoDate, line, strList, text } from "../collections/heal";
 import {
   PROJECT_LINK_KEYS, PROJECT_LIMITS, PROJECT_STATUSES, healLink, overrideText,
-  type ProjectFields, type ProjectLinks, type ProjectStatus,
+  type ProjectFields, type ProjectLinks, type ProjectSite, type ProjectStatus,
 } from "./record";
 
 export interface ProjectPatch {
@@ -12,6 +12,7 @@ export interface ProjectPatch {
   tags?: string[];
   status?: ProjectStatus;
   pinned?: boolean;
+  site?: Partial<ProjectSite>;   // only the keys sent; launchDate null or "" clears it
   links?: Partial<ProjectLinks>; // only the keys sent; null or "" clears one
 }
 
@@ -42,14 +43,28 @@ export function healProjectPatch(raw: unknown): ProjectPatch {
     }
     if (Object.keys(links).length > 0) out.links = links;
   }
+  if (isObject(raw.site)) {
+    const s = raw.site;
+    const site: Partial<ProjectSite> = {};
+    if (typeof s.client === "string") site.client = line(s.client, PROJECT_LIMITS.client);
+    if (typeof s.hosting === "string") site.hosting = line(s.hosting, PROJECT_LIMITS.hosting);
+    if (s.launchDate === null || (typeof s.launchDate === "string" && s.launchDate.trim() === "")) site.launchDate = null;
+    else {
+      const d = isoDate(s.launchDate);
+      if (d !== null) site.launchDate = d;
+    }
+    if (Array.isArray(s.services)) site.services = strList(s.services, PROJECT_LIMITS.services, PROJECT_LIMITS.service);
+    if (typeof s.notes === "string") site.notes = text(s.notes, PROJECT_LIMITS.notes);
+    if (Object.keys(site).length > 0) out.site = site;
+  }
   return out;
 }
 
 /**
- * The record's fields with a healed patch applied; `links` is merged key by key, so a patch that sends
- * only `links.site` keeps repo and docs. Main passes the result to `collection.update(id, ...)`.
+ * The record's fields with a healed patch applied; `links` and `site` are merged key by key, so a patch that
+ * sends only `links.site` keeps repo and docs. Main passes the result to `collection.update(id, ...)`.
  */
 export function applyProjectPatch(current: ProjectFields, patch: ProjectPatch): ProjectFields {
-  const { links, ...rest } = patch;
-  return { ...current, ...rest, links: { ...current.links, ...links } };
+  const { links, site, ...rest } = patch;
+  return { ...current, ...rest, links: { ...current.links, ...links }, site: { ...current.site, ...site } };
 }

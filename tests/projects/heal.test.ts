@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   applyProjectPatch, healLink, healProject, healProjectPatch, healRoot, projectSpec, rootSpec,
-  toProjectView, toProjectViews, toRootView, type ProjectRecord,
+  emptySite, healSite, toProjectView, toProjectViews, toRootView, type ProjectRecord,
 } from "../../shared/projects";
 
 const garbage = [undefined, null, 0, 1, "x", true, [], [1], () => 1];
@@ -49,7 +49,7 @@ describe("project heal", () => {
   it("fills defaults and drops unknown keys", () => {
     expect(healProject({ path: PATH, id: "x", extra: 1 })).toEqual({
       path: PATH, origin: "manual", rootId: null, missing: false, hidden: false, name: null, description: null,
-      category: "", tags: [], status: "active", pinned: false, links: { repo: null, site: null, docs: null }, lastOpenedAt: null,
+      category: "", tags: [], status: "active", pinned: false, site: emptySite(), links: { repo: null, site: null, docs: null }, lastOpenedAt: null,
       scan: { name: null, description: null, repoUrl: null, branch: null, lastCommitAt: null, dirty: null, stack: [], scannedAt: null },
     });
   });
@@ -137,6 +137,43 @@ describe("healProjectPatch", () => {
     const next = applyProjectPatch(current, healProjectPatch({ links: { site: "https://s.org" }, pinned: true, path: "/x" }));
     expect(next.links).toEqual({ repo: "https://r.org/", site: "https://s.org/", docs: "https://d.org/" });
     expect(next).toMatchObject({ path: PATH, hidden: true, pinned: true });
+  });
+});
+
+describe("site details", () => {
+  it("healSite defaults on garbage and heals key by key", () => {
+    for (const g of garbage) expect(healSite(g)).toEqual(emptySite());
+    expect(healSite({ client: " Acme\n Co ", hosting: 5, launchDate: "2026-02-30", services: ["SEO", "seo", 3, " Care "], notes: "a\r\nb\u0000" }))
+      .toEqual({ client: "Acme Co", hosting: "", launchDate: null, services: ["SEO", "Care"], notes: "a\nb" });
+    expect(healSite({ launchDate: "2026-03-01" }).launchDate).toBe("2026-03-01");
+  });
+
+  it("an old record without site heals to empty", () => {
+    expect(healProject({ path: PATH })?.site).toEqual(emptySite());
+    expect(record({ site: { client: "X" } }).site.client).toBe("X");
+  });
+
+  it("healProjectPatch site: valid kept, invalid dropped, launchDate clears", () => {
+    expect(healProjectPatch({ site: { client: " A ", hosting: "Netlify", launchDate: "2026-05-06", services: ["a", "a"], notes: "n" } }))
+      .toEqual({ site: { client: "A", hosting: "Netlify", launchDate: "2026-05-06", services: ["a"], notes: "n" } });
+    expect(healProjectPatch({ site: { launchDate: null } })).toEqual({ site: { launchDate: null } });
+    expect(healProjectPatch({ site: { launchDate: "  " } })).toEqual({ site: { launchDate: null } });
+    expect(healProjectPatch({ site: { launchDate: "2026-13-01" } })).toEqual({});
+    expect(healProjectPatch({ site: { client: 1, services: "x", notes: null } })).toEqual({});
+    expect(healProjectPatch({ site: "x" })).toEqual({});
+  });
+
+  it("applyProjectPatch merges site key by key", () => {
+    const current = record({ site: { client: "A", hosting: "H", notes: "keep" } });
+    const next = applyProjectPatch(current, healProjectPatch({ site: { client: "B" } }));
+    expect(next.site).toEqual({ client: "B", hosting: "H", launchDate: null, services: [], notes: "keep" });
+  });
+
+  it("toProjectView copies site", () => {
+    const r = record({ site: { services: ["a"] } });
+    const v = toProjectView(r, display);
+    expect(v.site).toEqual(r.site);
+    expect(v.site.services).not.toBe(r.site.services);
   });
 });
 

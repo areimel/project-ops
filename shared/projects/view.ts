@@ -1,7 +1,7 @@
 // The path-free view of a project: the only shape of a project the page ever receives.
 import type { RecordBase } from "../collections/base";
 import {
-  folderName, type ProjectFields, type ProjectLinks, type ProjectOrigin, type ProjectStatus,
+  folderName, type ProjectFields, type ProjectLinks, type ProjectOrigin, type ProjectSite, type ProjectStatus,
 } from "./record";
 
 export type ProjectRecord = RecordBase & ProjectFields;
@@ -18,6 +18,7 @@ export interface ProjectView {
   pinned: boolean;
   missing: boolean;
   origin: ProjectOrigin;
+  site: ProjectSite;             // the owner's site details
   links: ProjectLinks;           // effective: repo falls back to scan.repoUrl
   folder: string;                // display text from displayPath (`~/…/a/b`), never the path
   branch: string | null;
@@ -53,6 +54,7 @@ export function toProjectView(record: ProjectRecord, displayPath: (abs: string) 
     pinned: record.pinned,
     missing: record.missing,
     origin: record.origin,
+    site: { ...record.site, services: record.site.services.slice() },
     links: effectiveLinks(record),
     folder: displayPath(record.path),
     branch: scan.branch,

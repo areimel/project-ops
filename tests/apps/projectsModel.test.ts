@@ -10,7 +10,7 @@ function project(o: Partial<ProjectView> = {}): ProjectView {
   n += 1;
   return {
     id: String(n).padStart(16, "0"), createdAt: n, updatedAt: n, name: `Project ${n}`, description: null,
-    category: "", tags: [], status: "active", pinned: false, missing: false, origin: "scan", links: {} as ProjectView["links"],
+    category: "", tags: [], status: "active", pinned: false, missing: false, origin: "scan", links: {} as ProjectView["links"], site: { client: "", hosting: "", launchDate: null, services: [], notes: "" },
     folder: `~/code/p${n}`, branch: null, lastCommitAt: null, dirty: null, stack: [], scannedAt: null, lastOpenedAt: null,
     overrides: { name: null, description: null, links: {} as ProjectView["links"] },
     detected: { name: `Project ${n}`, description: null, repo: null },

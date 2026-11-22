@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { boolOrNull, isoDate, line, oneOf, strList, timestamp } from "../../shared/collections/heal";
+import { boolOrNull, isoDate, line, oneOf, strList, text, timestamp } from "../../shared/collections/heal";
 import { notes, tasks } from "./fixtures";
 
 const garbage = [undefined, null, 0, 1, "x", true, [], [1], () => 1];
@@ -52,5 +52,13 @@ describe("collection heal", () => {
     for (const x of [-1, Number.NaN, Infinity, "1", null]) expect(timestamp(x)).toBeNull();
     expect(boolOrNull(false)).toBe(false);
     expect(boolOrNull("true")).toBeNull();
+  });
+});
+
+describe("text", () => {
+  it("keeps line breaks and tabs, normalises endings, strips controls, trims and cuts", () => {
+    expect(text(5, 10)).toBe("");
+    expect(text("  a\r\nb\rc\td\u0000\u0007  ", 50)).toBe("a\nb\nc\td");
+    expect(text("abc  def", 4)).toBe("abc");
   });
 });

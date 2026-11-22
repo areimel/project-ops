@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { emptyScan, type ProjectFields } from "../../shared/projects/record";
+import { emptyScan, emptySite, type ProjectFields } from "../../shared/projects/record";
 import type { ProjectRecord } from "../../shared/projects/view";
 import {
   MAX_DEPTH, categoryHint, detectDescription, detectScan, detectStack, isProjectDir, mergeScan, shouldDescend,
@@ -82,7 +82,7 @@ describe("categoryHint", () => {
 const rec = (over: Partial<ProjectFields> & { path: string }, id = "0123456789abcdef"): ProjectRecord => ({
   id, createdAt: 10, updatedAt: 20,
   origin: "scan", rootId: "r1", missing: false, hidden: false, name: null, description: null, category: "",
-  tags: [], status: "active", pinned: false, links: { repo: null, site: null, docs: null }, lastOpenedAt: null, scan: emptyScan(),
+  tags: [], status: "active", pinned: false, site: emptySite(), links: { repo: null, site: null, docs: null }, lastOpenedAt: null, scan: emptyScan(),
   ...over,
 });
 const found = (path: string, over: Partial<FoundProject> = {}): FoundProject => ({

@@ -2,7 +2,7 @@
 // ProjectView (view.ts), and changes one only through a healed ProjectPatch (patch.ts).
 import type { CollectionSpec } from "../collections/base";
 import { isRecordId } from "../collections/base";
-import { bool, boolOrNull, isObject, line, oneOf, strList, timestamp } from "../collections/heal";
+import { bool, boolOrNull, isObject, isoDate, line, oneOf, strList, text, timestamp } from "../collections/heal";
 
 export const PROJECT_LIMITS = {
   max: 2000,          // records in projects.json, hidden ones included
@@ -16,6 +16,11 @@ export const PROJECT_LIMITS = {
   branch: 255,
   stack: 24,          // stack ids per project
   stackId: 32,
+  client: 80,
+  hosting: 48,
+  services: 20,        // service names per project
+  service: 40,
+  notes: 4000,
 } as const;
 
 export const PROJECT_STATUSES = ["active", "paused", "archived"] as const;
@@ -44,6 +49,15 @@ export interface ProjectScan {
   scannedAt: number | null;      // ms
 }
 
+/** The owner's site facts ("" = not set); `launchDate` is `YYYY-MM-DD`. */
+export interface ProjectSite {
+  client: string;
+  hosting: string;
+  launchDate: string | null;
+  services: string[];
+  notes: string;                 // multi-line
+}
+
 export interface ProjectFields {
   path: string;                  // absolute real path; main only, never sent to the page
   origin: ProjectOrigin;
@@ -56,6 +70,7 @@ export interface ProjectFields {
   tags: string[];
   status: ProjectStatus;
   pinned: boolean;
+  site: ProjectSite;             // user values
   links: ProjectLinks;           // user values; the view falls back to scan.repoUrl for repo
   lastOpenedAt: number | null;   // ms; set by main when projects:open succeeds, never by the page
   scan: ProjectScan;
@@ -110,6 +125,22 @@ export function overrideText(x: unknown, max: number): string | null {
   return s === "" ? null : s;
 }
 
+export function emptySite(): ProjectSite {
+  return { client: "", hosting: "", launchDate: null, services: [], notes: "" };
+}
+
+/** Site details from anything: each key healed on its own, missing ones empty. */
+export function healSite(x: unknown): ProjectSite {
+  if (!isObject(x)) return emptySite();
+  return {
+    client: line(x.client, PROJECT_LIMITS.client),
+    hosting: line(x.hosting, PROJECT_LIMITS.hosting),
+    launchDate: isoDate(x.launchDate),
+    services: strList(x.services, PROJECT_LIMITS.services, PROJECT_LIMITS.service),
+    notes: text(x.notes, PROJECT_LIMITS.notes),
+  };
+}
+
 export function emptyScan(): ProjectScan {
   return { name: null, description: null, repoUrl: null, branch: null, lastCommitAt: null, dirty: null, stack: [], scannedAt: null };
 }
@@ -145,6 +176,7 @@ export function healProject(raw: unknown): ProjectFields | null {
     tags: strList(raw.tags, PROJECT_LIMITS.tags, PROJECT_LIMITS.tag),
     status: oneOf(raw.status, PROJECT_STATUSES, "active"),
     pinned: bool(raw.pinned, false),
+    site: healSite(raw.site),
     links: healLinks(raw.links),
     lastOpenedAt: timestamp(raw.lastOpenedAt),
     scan: healScan(raw.scan),
