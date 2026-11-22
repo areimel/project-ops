@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 - 2026-11-22
+- Project dossier page: open a project from its card name, a dashboard tile or a deep link to see its details laid out as one page, with its folder, git state, stack, links and a timeline
+- Site details on each project: client, hosting, launch date, services used and notes, edited in the project dialog; notes are plain text and are not encrypted, so keep secrets out of them
+- Search also finds projects by client, hosting or services
+- "All projects" on the dossier returns to the grid with that project's card selected; the command palette has "Back to all projects"
+- Deep link project-ops://open/projects/<id> now opens the project's dossier page instead of only scrolling to its card
+
 ## 0.1.0 - 2026-11-18
 - Project Ops: the starter template's eight demo apps are replaced by one screen that lists your coding projects as cards
 - Scan folders in Settings: add parent folders such as ~/code_projects and each project inside is found, with its name, stack, git branch, last commit and uncommitted-changes marker

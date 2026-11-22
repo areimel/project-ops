@@ -19,6 +19,7 @@ Always finish with `pnpm typecheck && pnpm test` and check the exit status.
 | Search, filters, sort, facets | `tests/apps/projectsModel.test.ts` |
 | Tag cycle, rail tags, reveal, stored view state, card model | `tests/apps/projectsView.test.ts` |
 | Edit form and the patch it sends | `tests/apps/projectDraft.test.ts` |
+| Dossier model (serial, barcode, site rows, timeline) | `tests/apps/dossierModel.test.ts` |
 | Settings pickers and scan summary | `tests/projectsSettingsModel.test.ts` |
 | `pushStore` | `tests/pushStore.test.ts` |
 
@@ -35,6 +36,18 @@ Example: a `notes` text the owner types.
 7. Tests: `tests/projects/heal.test.ts` (defaults, limits, patch), then the page-side tests above.
 
 Never add a field main would later open (a path, a command) that the patch can set.
+
+## Site details and the dossier page
+
+Site details are the `site` field of the record (`ProjectSite` in `shared/projects/record.ts`: client, hosting, launch date as `YYYY-MM-DD` or null, services, notes). Their limits are in `PROJECT_LIMITS`; the patch heals each key on its own (`patch.ts`). The edit form's Site section is `renderer/apps/projects/SiteFields.tsx`, and `projectDraft.ts` sends only the changed keys.
+
+The dossier page is `renderer/apps/projects/dossier/`: `ProjectDossier.tsx` (the page and its file plate), `DossierCells.tsx` (one component per cell), `DossierGraphics.tsx` (hazard band, barcode, registration marks, stamp) and `dossier.css`. The layout is `Mosaic` and `MosaicCell` (`renderer/components/common/Mosaic.tsx`, styles in `renderer/styles/mosaic.css`): a 12-column hairline grid (the gaps are the lines). Under 720px of container width each cell takes the full row unless it sets `narrowSpan={6}` (pair two halves so no hole is left); under 480px everything is one column.
+
+To add a cell:
+
+1. Write its pure parts in `dossier/dossierModel.ts` (what to show, what is empty) and a test in `tests/apps/dossierModel.test.ts`. Keep branching out of the component.
+2. Add the component to `DossierCells.tsx` and place it in `ProjectDossier.tsx` as a `MosaicCell` with a `label` (kicker text) and `span` (columns, 12 wide by default); use `end` for a trailing control. Reuse `KeyValue`, `Button` and `EmptyState`.
+3. Colours and sizes come from tokens only; no hover motion.
 
 ## Add a launcher (editor or terminal)
 
