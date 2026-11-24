@@ -35,9 +35,9 @@ export default function StyleguideApp() {
   return (
     <div className="app-root styleguide">
       <div className="styleguide-scroll" ref={scroller}>
-        <PlateHeader entries={ENTRIES} choice={choice} onChoice={setChoice} />
+        <PlateHeader entries={ENTRIES} />
         <div className="styleguide-body">
-          <IndexRail entries={ENTRIES} active={active} onPick={setActive} />
+          <IndexRail entries={ENTRIES} choice={choice} onChoice={setChoice} active={active} onPick={setActive} />
           <main className="styleguide-main">
             {ENTRIES.map((e, i) => <Sheet key={e.id} entry={e} index={i} choice={choice} />)}
           </main>

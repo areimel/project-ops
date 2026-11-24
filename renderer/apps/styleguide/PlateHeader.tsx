@@ -1,19 +1,14 @@
-import { Segmented } from "../../components/common/Segmented";
 import { KeyValue, KeyValueList } from "../../components/common/KeyValue";
 import { ALL_TOKENS } from "../../theme/tokenList";
 import { Barcode, DotGrid, HazardBand, RegMarks, Stamp } from "../projects/dossier/DossierGraphics";
-import type { ModeChoice } from "./styleguideModel";
 import type { CatalogueEntry } from "./types";
 
-const OPTIONS: { value: ModeChoice; label: string }[] = [
-  { value: "dark", label: "Dark" }, { value: "light", label: "Light" }, { value: "both", label: "Both" },
-];
 const SERIAL = "5c0e1d94a7b3f268";
 
-interface Props { entries: readonly CatalogueEntry[]; choice: ModeChoice; onChoice(c: ModeChoice): void }
+interface Props { entries: readonly CatalogueEntry[] }
 
 /** The page's one bold moment: a spec plate in the manner of the dossier's file plate. */
-export function PlateHeader({ entries, choice, onChoice }: Props) {
+export function PlateHeader({ entries }: Props) {
   const patterns = entries.filter((e) => e.family === "patterns").length;
   const components = entries.filter((e) => e.family !== "patterns" && e.family !== "foundations").length;
   return (
@@ -24,10 +19,6 @@ export function PlateHeader({ entries, choice, onChoice }: Props) {
         <div className="styleguide-plate-main">
           <h1 className="styleguide-plate-title">Styleguide</h1>
           <p className="styleguide-plate-lead">Every token, component and pattern of this app, drawn from the code it ships, in light and dark.</p>
-          <div className="styleguide-plate-mode">
-            <span className="label">Show in</span>
-            <Segmented<ModeChoice> label="Show specimens in" options={OPTIONS} value={choice} onChange={onChoice} />
-          </div>
         </div>
         <div className="styleguide-plate-side">
           <KeyValueList className="styleguide-plate-table">

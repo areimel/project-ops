@@ -13,8 +13,6 @@
   letter-spacing: var(--track-heading); text-wrap: nowrap;
 }
 .styleguide-plate-lead { max-width: 52ch; margin-top: var(--sp-4); font-size: var(--fs-lg); }
-.styleguide-plate-mode { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); margin-top: var(--sp-5); }
-.styleguide-plate-mode .label { color: var(--text-muted); }
 .styleguide-plate-side { display: flex; flex-direction: column; justify-content: flex-end; gap: var(--sp-4); }
 .styleguide-plate-table { border: var(--line-w) solid var(--text); }
 .styleguide-plate-table .kv-row { padding: var(--sp-2) var(--sp-3); }
@@ -33,9 +31,15 @@
 .styleguide-main { container-type: inline-size; min-width: 0; padding: 0 var(--sp-7) var(--sp-7) var(--sp-6); }
 
 .styleguide-rail {
-  position: sticky; top: 0; max-height: 100cqh; overflow-y: auto;
+  position: sticky; top: 0; max-height: 100cqh; overflow: hidden auto;
   padding: var(--sp-4) var(--sp-3) var(--sp-6) var(--sp-4); border-right: var(--line-w) solid var(--line);
 }
+.styleguide-rail-mode {
+  display: flex; flex-direction: column; gap: var(--sp-2); margin: 0 0 var(--sp-4) var(--sp-3); padding-bottom: var(--sp-4);
+  border-bottom: var(--line-w) solid var(--line); color: var(--text-muted);
+}
+.styleguide-rail-mode .segmented { display: flex; }
+.styleguide-rail-mode .segmented > button { flex: 1; min-width: 0; padding-inline: var(--sp-2); }
 .styleguide-rail-group + .styleguide-rail-group { margin-top: var(--sp-4); }
 .styleguide-rail-head { margin: 0 0 var(--sp-1) var(--sp-3); color: var(--text-muted); font-family: var(--label-font); font-size: var(--label-size); }
 .styleguide-rail-list { margin: 0; padding: 0; list-style: none; }
@@ -57,6 +61,8 @@
     position: static; max-height: 180px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); border-right: 0; border-bottom: var(--line-w) solid var(--line);
   }
+  .styleguide-rail-mode { grid-column: 1 / -1; flex-direction: row; align-items: center; margin: 0; padding-bottom: var(--sp-3); }
+  .styleguide-rail-mode .segmented > button { flex: none; padding-inline: var(--sp-3); }
   .styleguide-rail-group + .styleguide-rail-group { margin-top: 0; }
   .styleguide-main { padding: 0 var(--sp-5) var(--sp-6); }
 }
