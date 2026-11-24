@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import { RESOURCE_LIMITS, type ResourceLinkPatch, type ResourceLinkView } from "../../../shared/resources/links";
 import { Button } from "../../components/common/Button";
 import { Combobox } from "../../components/common/Combobox";
@@ -19,7 +19,6 @@ interface Props {
 export function LinkDialog({ link, groups, onSave, onRemove, onClose }: Props) {
   const [draft, setDraft] = useState<LinkDraft>(() => (link ? draftFrom(link) : emptyDraft()));
   const [saving, setSaving] = useState(false);
-  const errorId = useId();
   const set = <K extends keyof LinkDraft>(key: K, value: LinkDraft[K]) => setDraft((d) => ({ ...d, [key]: value }));
   const invalid = draftInvalid(draft);
   const problem = urlProblem(draft.url);
@@ -41,16 +40,13 @@ export function LinkDialog({ link, groups, onSave, onRemove, onClose }: Props) {
         <Button variant="quiet" onClick={onClose}>Cancel</Button>
         <Button variant="primary" disabled={invalid || saving} onClick={save}>{link ? "Save changes" : "Add link"}</Button>
       </>}>
-      <form className="dashboard-form" onSubmit={(e) => { e.preventDefault(); void save(); }}>
+      <form className="form-grid" onSubmit={(e) => { e.preventDefault(); void save(); }}>
         <TextField label="Name" data-autofocus value={draft.name} onChange={(v) => set("name", v)}
           placeholder="Netlify" maxLength={RESOURCE_LIMITS.name} />
         <Combobox label="Group" value={draft.group} onChange={(v) => set("group", v)}
           suggestions={groups} placeholder="Optional, such as Hosting" maxLength={RESOURCE_LIMITS.group} />
-        <div className="dashboard-form-wide">
-          <TextField label="Address" value={draft.url} onChange={(v) => set("url", v)} invalid={problem !== null}
-            placeholder="https://" spellCheck={false} inputMode="url" aria-describedby={problem ? errorId : undefined} />
-          {problem && <p className="dashboard-form-error" id={errorId}>{problem}</p>}
-        </div>
+        <TextField className="form-wide" label="Address" value={draft.url} onChange={(v) => set("url", v)} error={problem ?? undefined}
+          placeholder="https://" spellCheck={false} inputMode="url" />
         <button type="submit" hidden />
       </form>
     </Dialog>

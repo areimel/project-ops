@@ -47,7 +47,4 @@
 @media (hover: none) { .dashboard-link-edit { opacity: 1; } }
 
 /* ---- Link form ---- */
-.dashboard-form { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
-.dashboard-form-wide { grid-column: 1 / -1; }
-.dashboard-form-error { margin-top: var(--sp-1); color: var(--danger); font-size: var(--fs-sm); }
 .dashboard-dialog-remove { margin-right: auto; }

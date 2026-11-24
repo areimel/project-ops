@@ -1,5 +1,6 @@
 import { useId, useRef, useState } from "react";
 import { Badge } from "./Badge";
+import { FieldError, FieldLabel } from "./Field";
 import { SuggestionList, optionId } from "./SuggestionList";
 import { addTags, decideKey, filterSuggestions, removeAt } from "./tagInputModel";
 
@@ -13,13 +14,16 @@ interface Props {
   maxLength?: number;
   placeholder?: string;
   className?: string;
+  /** What is wrong, in words: shown under the field, linked with `aria-describedby`, and marks it invalid. */
+  error?: string;
   /** Start with the suggestion list open (needs at least one suggestion not already chosen). */
   defaultOpen?: boolean;
 }
 
 /** Tags as removable badges plus a text input. Enter or "," adds, Backspace on empty removes the last, paste splits on commas. */
-export function TagInput({ label, hideLabel, value, onChange, suggestions = [], max, maxLength, placeholder, className = "", defaultOpen = false }: Props) {
+export function TagInput({ label, hideLabel, value, onChange, suggestions = [], max, maxLength, placeholder, className = "", error, defaultOpen = false }: Props) {
   const id = useId();
+  const errorId = `${id}-error`;
   const input = useRef<HTMLInputElement>(null);
   const [text, setText] = useState("");
   const [open, setOpen] = useState(defaultOpen);
@@ -45,11 +49,12 @@ export function TagInput({ label, hideLabel, value, onChange, suggestions = [], 
 
   return (
     <div className={`tag-input-field ${className}`.trim()}>
-      <label htmlFor={id} className={hideLabel ? "visually-hidden" : "text-field-label"}>{label}</label>
+      <FieldLabel htmlFor={id} hidden={hideLabel}>{label}</FieldLabel>
       <div className="tag-input" role="group" aria-label={`${label}, ${value.length} chosen`} onMouseDown={(e) => { if (e.target !== input.current) { e.preventDefault(); input.current?.focus(); } }}>
         {value.map((t, i) => <Badge key={t} onRemove={() => onChange(removeAt(value, i))}>{t}</Badge>)}
         <input id={id} ref={input} className="tag-input-text" role="combobox" aria-expanded={showing} aria-controls={`${id}-list`}
-          aria-autocomplete="list" aria-activedescendant={showing && active >= 0 ? optionId(`${id}-list`, active) : undefined}
+          aria-autocomplete="list" aria-invalid={error ? true : undefined} aria-describedby={error ? errorId : undefined}
+          aria-activedescendant={showing && active >= 0 ? optionId(`${id}-list`, active) : undefined}
           autoComplete="off" spellCheck={false} value={text} placeholder={value.length === 0 ? placeholder : undefined}
           onChange={(e) => { setText(e.target.value); setOpen(true); setActive(-1); }}
           onKeyDown={onKeyDown}
@@ -59,6 +64,7 @@ export function TagInput({ label, hideLabel, value, onChange, suggestions = [], 
           }}
           onBlur={() => { if (text.trim()) add(text); else reset(); }} />
       </div>
+      {error && <FieldError id={errorId}>{error}</FieldError>}
       {showing && <SuggestionList id={`${id}-list`} label={`${label} suggestions`} items={items} active={active} onPick={add} onHover={setActive} onClose={() => { setOpen(false); setActive(-1); }} />}
     </div>
   );

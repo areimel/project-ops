@@ -136,16 +136,8 @@
 .projects-card-foot .icon-btn[aria-pressed="true"] { background: none; color: var(--accent-text); }
 .projects-card-foot-end { display: flex; margin-left: auto; }
 
-/* ---- Edit form ---- */
-.projects-form { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
-.projects-form > .text-area-wrap, .projects-form-wide { grid-column: 1 / -1; }
-.projects-form .field { align-content: start; }
-.projects-form .field-control { min-height: var(--control-h); }
+/* ---- Edit form (.form-grid; these two only differ in columns and the narrow-window fold) ---- */
 .projects-form-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-3); }
-.projects-form-site { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
-.projects-form-site-title { grid-column: 1 / -1; }
-.projects-form-site > .text-area-wrap, .projects-form-site-wide { grid-column: 1 / -1; }
-.projects-form-error { margin-top: var(--sp-1); color: var(--danger); font-size: var(--fs-sm); }
 .projects-form-folder {
   display: flex; align-items: baseline; gap: var(--sp-4); padding-top: var(--sp-3);
   border-top: var(--line-w) solid var(--line); color: var(--text-muted);
@@ -167,5 +159,5 @@
   .projects-rail.is-open .projects-rail-toggle { border-bottom: var(--line-w) solid var(--line); }
   .projects-rail-group { padding: var(--sp-3) var(--sp-5); }
   .projects-toolbar, .projects-active, .scroll-area.projects-scroll { padding-left: var(--sp-4); padding-right: var(--sp-4); }
-  .projects-form, .projects-form-links, .projects-form-site { grid-template-columns: minmax(0, 1fr); }
+  .form-grid.projects-form, .projects-form-links, .form-grid.projects-form-site { grid-template-columns: minmax(0, 1fr); }
 }

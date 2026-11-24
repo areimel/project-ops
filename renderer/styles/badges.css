@@ -44,6 +44,7 @@
   transition: border-color var(--dur-fast) var(--ease);
 }
 .tag-input:hover { border-color: var(--text); }
+.tag-input:has(input[aria-invalid="true"]) { border-color: var(--danger); outline-color: var(--danger); }
 .tag-input:focus-within { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
 .tag-input .badge:has(:focus-visible) { outline: none; }
 .tag-input-text {

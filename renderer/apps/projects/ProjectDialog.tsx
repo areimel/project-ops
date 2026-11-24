@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import { PROJECT_LIMITS, PROJECT_LINK_KEYS, type ProjectLinkKey, type ProjectStatus } from "../../../shared/projects/record";
 import type { ProjectPatch } from "../../../shared/projects/patch";
 import type { ProjectView } from "../../../shared/projects/view";
@@ -36,7 +36,6 @@ interface Props {
 export function ProjectDialog({ project: p, categories, tags, hosting = [], services = [], onSave, onRemove, onClose }: Props) {
   const [draft, setDraft] = useState<ProjectDraft>(() => draftFromView(p));
   const [saving, setSaving] = useState(false);
-  const baseId = useId();
   const set = <K extends keyof ProjectDraft>(key: K, value: ProjectDraft[K]) => setDraft((d) => ({ ...d, [key]: value }));
   const setLink = (key: ProjectLinkKey, value: string) => setDraft((d) => ({ ...d, links: { ...d.links, [key]: value } }));
   const invalid = draftInvalid(draft);
@@ -58,7 +57,7 @@ export function ProjectDialog({ project: p, categories, tags, hosting = [], serv
         <Button variant="quiet" onClick={onClose}>Cancel</Button>
         <Button variant="primary" disabled={invalid || saving} onClick={save}>Save changes</Button>
       </>}>
-      <form className="projects-form" onSubmit={(e) => { e.preventDefault(); void save(); }}>
+      <form className="form-grid projects-form" onSubmit={(e) => { e.preventDefault(); void save(); }}>
         <TextField label="Name" data-autofocus value={draft.name} onChange={(v) => set("name", v)}
           placeholder={p.detected.name} maxLength={PROJECT_LIMITS.name} />
         <Combobox label="Category" value={draft.category} onChange={(v) => set("category", v)}
@@ -66,7 +65,7 @@ export function ProjectDialog({ project: p, categories, tags, hosting = [], serv
         <TextArea label="Description" value={draft.description} rows={3}
           onChange={(v) => set("description", v)} placeholder={p.detected.description ?? "No description found"}
           maxLength={PROJECT_LIMITS.description} />
-        <TagInput className="projects-form-wide" label="Tags" value={draft.tags} onChange={(v) => set("tags", v)}
+        <TagInput className="form-wide" label="Tags" value={draft.tags} onChange={(v) => set("tags", v)}
           suggestions={tags} max={PROJECT_LIMITS.tags} maxLength={PROJECT_LIMITS.tag} placeholder="Add a tag and press Enter" />
         <Field label="Status">
           <Segmented label="Status" options={STATUS_OPTIONS} value={draft.status} onChange={(v) => set("status", v)} />
@@ -75,16 +74,13 @@ export function ProjectDialog({ project: p, categories, tags, hosting = [], serv
           <Switch checked={draft.pinned} label="Pin to the top" onChange={(v) => set("pinned", v)} />
         </Field>
 
-        <div className="projects-form-links projects-form-wide">
+        <div className="projects-form-links form-wide">
           {PROJECT_LINK_KEYS.map((k) => {
             const problem = linkProblem(draft.links[k]);
             const placeholder = k === "repo" && p.detected.repo ? p.detected.repo : "https://";
             return (
-              <div key={k}>
-                <TextField label={LINK_LABELS[k]} value={draft.links[k]} onChange={(v) => setLink(k, v)} invalid={problem !== null}
-                  placeholder={placeholder} spellCheck={false} inputMode="url" aria-describedby={problem ? `${baseId}-${k}` : undefined} />
-                {problem && <p className="projects-form-error" id={`${baseId}-${k}`}>{problem}</p>}
-              </div>
+              <TextField key={k} label={LINK_LABELS[k]} value={draft.links[k]} onChange={(v) => setLink(k, v)} error={problem ?? undefined}
+                placeholder={placeholder} spellCheck={false} inputMode="url" />
             );
           })}
         </div>
@@ -92,7 +88,7 @@ export function ProjectDialog({ project: p, categories, tags, hosting = [], serv
         <SiteFields site={draft.site} onChange={(v) => set("site", v)}
           hostingSuggestions={hosting} serviceSuggestions={services} />
 
-        <p className="projects-form-folder projects-form-wide">
+        <p className="projects-form-folder form-wide">
           <span className="label">Folder</span>
           <span className="projects-form-folder-path" title={p.folder}>{p.folder}</span>
         </p>
