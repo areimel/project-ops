@@ -10,6 +10,12 @@
 .badge-solid { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .badge-solid .badge-count { color: inherit; }
 .badge-quiet { border-color: transparent; color: var(--text-muted); }
+/* Tags are the owner's words: the text face in sentence case, not the mono label. */
+.badge.badge-tag { font-family: var(--font-text); font-size: var(--fs-sm); font-weight: var(--fw-regular); letter-spacing: 0; text-transform: none; }
+.badge.badge-tag .badge-count { font-family: var(--font-mono); font-size: var(--fs-xs); }
+
+/* A wrapping row of badges. Set --chip-gap for a wider gap. */
+.chip-row { display: flex; flex-wrap: wrap; gap: var(--chip-gap, var(--sp-1)); }
 
 /* Button parts: bare, so the badge draws the box. */
 .badge-main, .badge-remove {

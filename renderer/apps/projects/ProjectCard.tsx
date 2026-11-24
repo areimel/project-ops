@@ -53,9 +53,9 @@ function ProjectCardImpl({ project: p, selected, now, actions: a }: Props) {
         </h3>
         {p.description && <p className="projects-card-desc" title={p.description}>{p.description}</p>}
         {p.tags.length > 0 && (
-          <div className="projects-card-chips">
+          <div className="chip-row projects-card-chips">
             {tags.shown.map((t) => (
-              <Badge key={t} className="projects-tag" title={`Show only ${t}`} onClick={() => a.filterTag(t)}>{t}</Badge>
+              <Badge key={t} variant="tag" title={`Show only ${t}`} onClick={() => a.filterTag(t)}>{t}</Badge>
             ))}
             {tags.more > 0 && <span className="projects-card-more label" title={p.tags.slice(TAG_CAP).join(", ")}>+{tags.more}</span>}
           </div>

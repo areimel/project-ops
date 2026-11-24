@@ -43,11 +43,11 @@ export function GitCell({ p, now }: { p: ProjectView; now: number }) {
   );
 }
 
-function Group({ label, items }: { label: string; items: readonly string[] }) {
+function Group({ label, items, tag }: { label: string; items: readonly string[]; tag?: boolean }) {
   return (
     <div className="projects-dossier-group">
       <span className="label projects-dossier-sub">{label}</span>
-      {items.length === 0 ? <NoneText /> : <div className="projects-dossier-chips">{items.map((s) => <Badge key={s}>{s}</Badge>)}</div>}
+      {items.length === 0 ? <NoneText /> : <div className="chip-row projects-dossier-chips">{items.map((s) => <Badge key={s} variant={tag ? "tag" : undefined}>{s}</Badge>)}</div>}
     </div>
   );
 }
@@ -56,7 +56,7 @@ export function StackCell({ p }: { p: ProjectView }) {
   return (
     <MosaicCell label="Stack and services" span={4}>
       <Group label="Stack" items={p.stack.map(stackLabel)} />
-      <Group label="Services" items={p.site.services} />
+      <Group label="Services" items={p.site.services} tag />
     </MosaicCell>
   );
 }

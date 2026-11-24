@@ -17,7 +17,7 @@ export function ActiveFilters({ filters, onChange, onClear }: Props) {
   return (
     <div className="projects-active" role="group" aria-label="Active filters">
       {chips.map((c) => (
-        <Badge key={c.key} className="projects-tag" onRemove={() => onChange(c.remove)}>{c.label}</Badge>
+        <Badge key={c.key} variant="tag" onRemove={() => onChange(c.remove)}>{c.label}</Badge>
       ))}
       {chips.length > 1 && <Button variant="link" className="projects-active-clear" onClick={onClear}>Clear all</Button>}
     </div>

@@ -35,7 +35,6 @@
 .projects-cat-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .projects-cat-count { flex: none; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--text-muted); }
 
-.projects-chips { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
 .projects-more { margin-top: var(--sp-3); font-size: var(--fs-sm); }
 
 .projects-rail-foot {
@@ -64,10 +63,6 @@
   padding: var(--sp-2) var(--sp-5); border-bottom: var(--line-w) solid var(--line);
 }
 .projects-active-clear { margin-left: var(--sp-1); font-size: var(--fs-sm); }
-
-/* Tags are the owner's words: the text face in sentence case, not the mono label. */
-.badge.projects-tag { font-family: var(--font-text); font-size: var(--fs-sm); font-weight: var(--fw-regular); letter-spacing: 0; text-transform: none; }
-.badge.projects-tag .badge-count { font-family: var(--font-mono); font-size: var(--fs-xs); }
 
 /* Pinned and other projects, when the result has both. */
 .projects-group { margin-bottom: var(--sp-3); }
@@ -104,7 +99,7 @@
   margin-top: calc(-1 * var(--sp-1)); color: var(--text-muted); font-size: var(--fs-md); line-height: 1.55;
   overflow: hidden; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;
 }
-.projects-card-chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1); }
+.projects-card-chips { align-items: center; }
 .projects-card-more { padding: 0 var(--sp-1); color: var(--text-muted); }
 
 /* Trait rows sit at the bottom of the body so rows line up across a grid row. */

@@ -57,7 +57,7 @@
 }
 .projects-dossier-name:focus { outline: none; }
 .projects-dossier-desc { margin: 0; max-width: 70ch; color: var(--text-muted); font-size: var(--fs-lg); line-height: 1.5; }
-.projects-dossier-chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
+.projects-dossier-chips { --chip-gap: var(--sp-2); align-items: center; }
 .projects-dossier-pin { display: inline-flex; align-items: center; gap: var(--sp-1); color: var(--accent-text); font-family: var(--label-font); font-size: var(--label-size); letter-spacing: var(--label-track); text-transform: uppercase; }
 .projects-dossier-serial { font-family: var(--font-mono); font-size: var(--fs-sm); letter-spacing: 0.06em; word-break: break-all; }
 .projects-dossier-origin { color: var(--text-muted); font-size: var(--fs-sm); }

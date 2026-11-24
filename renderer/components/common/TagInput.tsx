@@ -51,7 +51,7 @@ export function TagInput({ label, hideLabel, value, onChange, suggestions = [], 
     <div className={`tag-input-field ${className}`.trim()}>
       <FieldLabel htmlFor={id} hidden={hideLabel}>{label}</FieldLabel>
       <div className="tag-input" role="group" aria-label={`${label}, ${value.length} chosen`} onMouseDown={(e) => { if (e.target !== input.current) { e.preventDefault(); input.current?.focus(); } }}>
-        {value.map((t, i) => <Badge key={t} onRemove={() => onChange(removeAt(value, i))}>{t}</Badge>)}
+        {value.map((t, i) => <Badge key={t} variant="tag" onRemove={() => onChange(removeAt(value, i))}>{t}</Badge>)}
         <input id={id} ref={input} className="tag-input-text" role="combobox" aria-expanded={showing} aria-controls={`${id}-list`}
           aria-autocomplete="list" aria-invalid={error ? true : undefined} aria-describedby={error ? errorId : undefined}
           aria-activedescendant={showing && active >= 0 ? optionId(`${id}-list`, active) : undefined}

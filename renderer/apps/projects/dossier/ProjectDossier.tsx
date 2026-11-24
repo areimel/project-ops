@@ -58,9 +58,9 @@ export function ProjectDossier({ project: p, now, actions: a, onBack }: DossierP
             <h1 className="projects-dossier-name" tabIndex={-1} ref={headingRef}>{p.name}</h1>
             {p.description && <p className="projects-dossier-desc">{p.description}</p>}
             {(p.tags.length > 0 || p.pinned) && (
-              <div className="projects-dossier-chips">
+              <div className="chip-row projects-dossier-chips">
                 {p.pinned && <span className="projects-dossier-pin"><Icon name="pin" size={14} /> Pinned</span>}
-                {p.tags.map((t) => <Badge key={t}>{t}</Badge>)}
+                {p.tags.map((t) => <Badge key={t} variant="tag">{t}</Badge>)}
               </div>
             )}
           </MosaicCell>
