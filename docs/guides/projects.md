@@ -2,7 +2,7 @@
 
 How the pieces fit is in `CLAUDE.md` ("How it fits together"). This guide lists what to touch for the common changes and where each test lives. Terms: a **record** is a stored project (with a real path, main only); a **view** (`ProjectView`) is what the page gets, with no path; a **patch** is what the page may send back, healed by `healProjectPatch`; a **scan** reads folders under the scan roots.
 
-Always finish with `pnpm typecheck && pnpm test` and check the exit status.
+Always finish with `pnpm typecheck && pnpm test` and check the exit status. Before changing card, dialog or dossier markup, read the matching sheets in the styleguide (`docs/guides/styleguide.md`; the project card, trait rows, dossier cells and dialog form are under `renderer/apps/styleguide/entries/patterns/`).
 
 ## Where each test lives
 
@@ -31,7 +31,7 @@ Example: a `notes` text the owner types.
 2. `shared/projects/patch.ts`: if the owner edits it, add it to `ProjectPatch` and `healProjectPatch` (an invalid value drops the key).
 3. `shared/projects/view.ts`: add it to `ProjectView` and `toProjectView`. If the edit form must tell "set by you" from "detected", follow `overrides` and `detected`.
 4. (A field only main writes, like `lastOpenedAt`, skips the patch step: `healProjectPatch` must keep ignoring it.) Records are built by hand in two places that need the new field: `newManualProject` in `electron/features/projectsCore.ts` and the new-record literal in `mergeScan` in `electron/features/projectScanCore.ts`.
-5. Page: show it in `renderer/apps/projects/ProjectCard.tsx`, edit it in `ProjectDialog.tsx` and `projectDraft.ts` (`ProjectDraft`, `draftFromView`, `draftPatch`), filter or search it in `projectsModel.ts` (`matchesQuery`, `passes`, facets, `ProjectFilters`; stored filters are healed in `filterState.ts`, so a new filter needs a line in `healViewState`).
+5. Page: show it in `renderer/apps/projects/ProjectCard.tsx` (git, link and open-button pieces shared with the dossier and the dashboard tile are in `ProjectParts.tsx`), edit it in `ProjectDialog.tsx` (a `FormDialog` with `.form-grid`; fields take `error`) and `projectDraft.ts` (`ProjectDraft`, `draftFromView`, `draftPatch`), filter or search it in `projectsModel.ts` (`matchesQuery`, `passes`, facets, `ProjectFilters`; stored filters are healed in `filterState.ts`, so a new filter needs a line in `healViewState`).
 6. Export and import need nothing: the bundle holds whole records and heals them.
 7. Tests: `tests/projects/heal.test.ts` (defaults, limits, patch), then the page-side tests above.
 
@@ -46,7 +46,7 @@ The dossier page is `renderer/apps/projects/dossier/`: `ProjectDossier.tsx` (the
 To add a cell:
 
 1. Write its pure parts in `dossier/dossierModel.ts` (what to show, what is empty) and a test in `tests/apps/dossierModel.test.ts`. Keep branching out of the component.
-2. Add the component to `DossierCells.tsx` and place it in `ProjectDossier.tsx` as a `MosaicCell` with a `label` (kicker text) and `span` (columns, 12 wide by default); use `end` for a trailing control. Reuse `KeyValue`, `Button` and `EmptyState`.
+2. Add the component to `DossierCells.tsx` and place it in `ProjectDossier.tsx` as a `MosaicCell` with a `label` (kicker text) and `span` (columns, 12 wide by default); use `end` for a trailing control. Reuse `KeyValue`, `Button` and `EmptyState`. A new cell or card piece also gets a pattern sheet or an edit to the existing one in the styleguide.
 3. Colours and sizes come from tokens only; no hover motion.
 
 ## Add a launcher (editor or terminal)

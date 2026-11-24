@@ -6,6 +6,13 @@
 - Search also finds projects by client, hosting or services
 - "All projects" on the dossier returns to the grid with that project's card selected; the command palette has "Back to all projects"
 - Deep link project-ops://open/projects/<id> now opens the project's dossier page instead of only scrolling to its card
+- Project cards: the footer buttons are now in the order editor, terminal, folder
+- Tags read in sentence case everywhere (the project page and the edit dialog), as typed
+- A selected row in lists shows a 2 px accent bar
+- The Editor button's accessible name now starts with "Editor"
+- Status colours, toasts, the title block and the project stamp share one set of tones
+- Form fields in the project and link dialogs can show an error message under the field
+- Development builds have a Styleguide screen (Ctrl/Cmd+3) that catalogues every colour, component and pattern in dark and light; release builds do not include it
 
 ## 0.1.0 - 2026-11-18
 - Project Ops: the starter template's eight demo apps are replaced by one screen that lists your coding projects as cards

@@ -30,6 +30,19 @@ What is left. Tests and screenshot runs cover the logic and the first paint; the
 - Windows and macOS launchers are untested (`pnpm dist:win` / `pnpm dist:mac` never run).
 - `website/` is still the App Template site (see the rebrand item above).
 
+## Styleguide follow-ups
+
+- [ ] Hover, focus and pressed states are live only in the styleguide; there is no way to freeze them for a capture or a review.
+- [ ] Unused tokens in `renderer/theme/tokens.css`: `--grid`, `--r-pill`, `--z-base`, `--z-chrome`, `--fw-bold` (no `var()` use anywhere). Remove them or use them; `tokenList.ts` and its test follow.
+- [ ] Unused components kept on purpose, with "not in use" sheets: `Panel`, `Slider`, `SplitPane`. Delete them if still unused when a second theme or app lands.
+- [ ] Unused props and variants the sheets mark "not in use": `Badge` `solid` and `quiet`, `Toolbar` `end` and the plain toolbar (every use sets `inset="page"`), `MosaicCell` `tone`, `rowSpan` and `end`, `TextArea` `mono` and `fill`, `SectionHead` level 4.
+- [ ] `Field` takes `htmlFor`, but a control that is not an input (a custom group) gets no label link; the label is not tied to it.
+- [ ] `TagInput` at its `max` silently ignores further tags; it shows no message.
+- [ ] `Toast`'s Undo is a raw `btn btn-link` button, not `Button`.
+- [ ] `DossierGraphics` (hazard band, barcode, stamp) is used by the dossier and the styleguide only; move it to `components/common` at a third use.
+- [ ] The error screen (`ErrorBoundary`) and the info and error toasts were not captured after the tone change.
+- [ ] `pnpm build:release` has run on Linux only; `dist:win` and `dist:mac` never ran, so the release flag is untested there.
+
 ## Product ideas left out
 
 - Windows launchers: `.cmd` shims (`code.cmd`) need an explicit `cmd.exe /d /s /c` call with safe quoting (see the comment in `electron/features/launch.ts`).
