@@ -25,7 +25,7 @@ export function ResourceLinks({ links, full, onOpen, onEdit, onAdd }: Props) {
       {groups.length === 0 ? (
         <p className="dashboard-hint">Keep the tools you open all the time here: hosting, domains, analytics. They open in your browser.</p>
       ) : (
-        <div className="dashboard-links">
+        <div className="card-grid dashboard-links">
           {groups.map((g) => (
             <div key={g.group} className="dashboard-link-group">
               <h3 className="label dashboard-link-group-name">{g.group === "" ? "General" : g.group}</h3>

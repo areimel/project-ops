@@ -10,7 +10,11 @@
 /* Muted dims the text only; the border and focus ring keep their colour. */
 .card.is-muted .card-body, .card.is-muted .card-header, .card.is-muted .kv-value { color: var(--text-muted); }
 
-.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--sp-4); }
+/* The one grid for cards, tiles and link columns. An owner sets --card-min and --card-gap. */
+.card-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--card-min, 280px), 1fr));
+  gap: var(--card-gap, var(--sp-4)); margin: 0; padding: 0; list-style: none;
+}
 
 .card-header {
   display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);

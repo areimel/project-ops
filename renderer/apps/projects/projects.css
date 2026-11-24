@@ -73,11 +73,8 @@
 .projects-group { margin-bottom: var(--sp-3); }
 .projects-grid + .projects-group { margin-top: var(--sp-6); }
 
-/* ---- Grid: separate cards with a gap, each with its own full border ---- */
-.projects-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(296px, 1fr)); gap: var(--sp-4);
-  margin: 0; padding: 0; list-style: none;
-}
+/* ---- Grid: separate cards with a gap, each with its own full border (.card-grid) ---- */
+.projects-grid { --card-min: 296px; }
 .projects-card { position: relative; content-visibility: auto; contain-intrinsic-size: auto 360px; }
 
 .projects-card .card-header { min-height: 37px; }

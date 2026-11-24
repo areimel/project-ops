@@ -101,7 +101,7 @@ export default function ProjectsApp() {
   );
   const split = pinnedSplit(view.results);
   const grid = (list: readonly ProjectView[], label: string) => (
-    <ul className="projects-grid" aria-label={label}>
+    <ul className="card-grid projects-grid" aria-label={label}>
       {list.map((p) => <ProjectCard key={p.id} project={p} selected={p.id === selected} now={now} actions={actions} />)}
     </ul>
   );

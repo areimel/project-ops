@@ -52,7 +52,7 @@ export default function DashboardApp() {
   };
 
   const tiles = (list: readonly ProjectView[], label: string, note: (p: ProjectView) => string) => (
-    <ul className="dashboard-tiles" aria-label={label}>
+    <ul className="card-grid dashboard-tiles" aria-label={label}>
       {list.map((p) => <ProjectTile key={p.id} project={p} note={note(p)} actions={actions} />)}
     </ul>
   );
