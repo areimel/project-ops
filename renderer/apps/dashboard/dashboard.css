@@ -4,8 +4,8 @@
 .dashboard-page { display: flex; flex-direction: column; gap: var(--sp-6); max-width: 1280px; margin: 0 auto; padding: var(--sp-5); }
 .dashboard-page > .empty-state { margin: var(--sp-6) 0; }
 
-.dashboard-section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); min-height: var(--control-h); margin-bottom: var(--sp-3); }
-.dashboard-hint { margin: 0; max-width: 64ch; color: var(--text-muted); font-size: var(--fs-sm); line-height: 1.5; }
+.dashboard .section-head { min-height: var(--control-h); margin-bottom: var(--sp-3); }
+.dashboard-hint { max-width: 64ch; }
 
 /* ---- Project tiles ---- */
 .dashboard-tiles { --card-min: 220px; --card-gap: var(--sp-3); }

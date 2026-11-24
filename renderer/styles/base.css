@@ -58,6 +58,10 @@ svg { display: block; flex: none; }
   width: var(--bullet); height: var(--bullet); background: var(--accent);
 }
 
+/* Quiet text: a short line of help, and plain muted colour. */
+.hint { margin: 0; color: var(--text-muted); font-size: var(--fs-sm); line-height: 1.5; }
+.text-muted { color: var(--text-muted); }
+
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
   overflow: hidden; clip-path: inset(50%); white-space: nowrap;

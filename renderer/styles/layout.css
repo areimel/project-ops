@@ -22,6 +22,9 @@
 .list-row-meta { flex: none; color: var(--text-muted); }
 .list-row-trailing { display: flex; align-items: center; flex: none; gap: var(--sp-1); }
 
+/* A section heading row: the kicker on the left, optional content on the right. */
+.section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+
 .toolbar {
   display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap;
   min-height: 48px; padding: var(--sp-2) var(--sp-3); border-bottom: var(--line-w) solid var(--line);

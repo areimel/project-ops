@@ -2,6 +2,7 @@ import type { ResourceLinkView } from "../../../shared/resources/links";
 import { Button } from "../../components/common/Button";
 import { Icon } from "../../components/common/Icon";
 import { IconButton } from "../../components/common/IconButton";
+import { SectionHead } from "../../components/common/SectionHead";
 import { groupLinks } from "./dashboardModel";
 
 interface Props {
@@ -17,13 +18,11 @@ export function ResourceLinks({ links, full, onOpen, onEdit, onAdd }: Props) {
   const groups = groupLinks(links);
   return (
     <section className="dashboard-section" aria-label="Resources">
-      <div className="dashboard-section-head">
-        <h2 className="kicker">Resources</h2>
+      <SectionHead title="Resources" end={
         <Button variant="quiet" icon="plus" disabled={full} title={full ? "The list is full. Remove a link to add another." : undefined}
-          onClick={onAdd}>Add link</Button>
-      </div>
+          onClick={onAdd}>Add link</Button>} />
       {groups.length === 0 ? (
-        <p className="dashboard-hint">Keep the tools you open all the time here: hosting, domains, analytics. They open in your browser.</p>
+        <p className="hint dashboard-hint">Keep the tools you open all the time here: hosting, domains, analytics. They open in your browser.</p>
       ) : (
         <div className="card-grid dashboard-links">
           {groups.map((g) => (

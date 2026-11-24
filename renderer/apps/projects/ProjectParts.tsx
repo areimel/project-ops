@@ -63,7 +63,7 @@ export function DirtyMark() {
 
 /** The muted fallback for a value that is not there ("None") or could not be read ("Unknown"). */
 export function NoneText({ children = "None" }: { children?: string }) {
-  return <span className="projects-none">{children}</span>;
+  return <span className="text-muted">{children}</span>;
 }
 
 /** The Branch and Last commit rows. Render only when the folder is a repository (`gitInfo(p) !== "none"`). */

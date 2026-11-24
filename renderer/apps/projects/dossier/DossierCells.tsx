@@ -20,7 +20,7 @@ export function SiteCell({ p, onEdit }: { p: ProjectView; onEdit(): void }) {
         <KeyValueList>{rows.map((r) => <KeyValue key={r.key} label={r.label}>{r.value}</KeyValue>)}</KeyValueList>
       ) : (
         <>
-          <p className="projects-dossier-muted">{hasSiteDetails(p) ? "No client, hosting or launch date" : "No site details yet"}</p>
+          <p className="hint">{hasSiteDetails(p) ? "No client, hosting or launch date" : "No site details yet"}</p>
           <div><Button variant="quiet" icon="pencil" onClick={onEdit}>{hasSiteDetails(p) ? "Edit site details" : "Add site details"}</Button></div>
         </>
       )}
@@ -33,7 +33,7 @@ export function GitCell({ p, now }: { p: ProjectView; now: number }) {
   const remote = remoteLabel(p.detected.repo);
   return (
     <MosaicCell label="Git" span={4} narrowSpan={6}>
-      {git === "none" && !p.branch ? <p className="projects-dossier-muted">Git: None</p> : (
+      {git === "none" && !p.branch ? <p className="hint">Git: None</p> : (
         <KeyValueList>
           <GitRows project={p} now={now} />
           {remote && <KeyValue label="Remote">{remote}</KeyValue>}
@@ -65,7 +65,7 @@ export function NotesCell({ p }: { p: ProjectView }) {
   const notes = p.site.notes.trim();
   return (
     <MosaicCell label="Notes" span={8}>
-      {notes ? <p className="projects-dossier-notes">{p.site.notes}</p> : <p className="projects-dossier-muted">No notes</p>}
+      {notes ? <p className="projects-dossier-notes">{p.site.notes}</p> : <p className="hint">No notes</p>}
     </MosaicCell>
   );
 }
@@ -74,7 +74,7 @@ export function LinksCell({ p, onOpen }: { p: ProjectView; onOpen(key: ProjectLi
   const keys = linkKeys(p);
   return (
     <MosaicCell label="Links" span={4}>
-      {keys.length === 0 ? <p className="projects-dossier-muted">No links</p> : (
+      {keys.length === 0 ? <p className="hint">No links</p> : (
         <div className="projects-dossier-links">
           <ProjectLinks project={p} onOpen={onOpen} />
         </div>
@@ -92,7 +92,7 @@ export function TimelineCell({ p, now }: { p: ProjectView; now: number }) {
             <span className="projects-dossier-event-mark" aria-hidden="true" />
             <span className="label">{e.label}</span>
             <span className="projects-dossier-event-date" title={new Date(e.at).toLocaleString()}>{formatDate(e.at)}</span>
-            <span className="projects-dossier-muted">{relativeTime(e.at, now)}</span>
+            <span className="text-muted">{relativeTime(e.at, now)}</span>
           </li>
         ))}
       </ol>

@@ -109,7 +109,6 @@
 .projects-path { display: flex; justify-content: flex-end; min-width: 0; }
 .projects-path-head { flex: 0 1000 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .projects-path-tail { flex: 0 1 auto; min-width: 4ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.projects-rail-hint { margin: 0; color: var(--text-muted); font-size: var(--fs-sm); line-height: 1.5; }
 
 .projects-card-foot { gap: 0; padding: var(--sp-2); }
 .projects-card-open { margin-right: var(--sp-2); padding: 0 var(--sp-3); }

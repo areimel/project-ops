@@ -3,6 +3,7 @@ import { RESOURCE_LIMITS } from "../../../shared/resources/links";
 import type { ProjectView } from "../../../shared/projects/view";
 import { Button } from "../../components/common/Button";
 import { EmptyState } from "../../components/common/EmptyState";
+import { SectionHead } from "../../components/common/SectionHead";
 import { Spinner } from "../../components/common/Spinner";
 import { useAttempt } from "../../hooks/useAttempt";
 import { useLatest } from "../../hooks/useLatest";
@@ -73,26 +74,23 @@ export default function DashboardApp() {
             action={<Button variant="primary" onClick={allProjects}>Go to Projects</Button>} />
         ) : (<>
           <section className="dashboard-section" aria-label="Pinned">
-            <div className="dashboard-section-head">
-              <h2 className="kicker">Pinned</h2>
-              <Button variant="link" onClick={allProjects}>All projects</Button>
-            </div>
+            <SectionHead title="Pinned" end={<Button variant="link" onClick={allProjects}>All projects</Button>} />
             {pinned.length > 0
               ? tiles(pinned, "Pinned projects", (p) => (p.lastCommitAt === null ? "" : `Commit ${relativeTime(p.lastCommitAt, now)}`))
-              : <p className="dashboard-hint">Nothing is pinned. Pin a project on the Projects screen to keep it here.</p>}
+              : <p className="hint dashboard-hint">Nothing is pinned. Pin a project on the Projects screen to keep it here.</p>}
           </section>
           <section className="dashboard-section" aria-label="Recent">
-            <div className="dashboard-section-head"><h2 className="kicker">Recent</h2></div>
+            <SectionHead title="Recent" />
             {recent.length > 0
               ? tiles(recent, "Recently opened projects", (p) => `Opened ${relativeTime(p.lastOpenedAt, now)}`)
-              : <p className="dashboard-hint">Projects you open in an editor, a terminal or the file manager are listed here, newest first.</p>}
+              : <p className="hint dashboard-hint">Projects you open in an editor, a terminal or the file manager are listed here, newest first.</p>}
           </section>
         </>)}
 
         {res.status === "error" ? (
           <section className="dashboard-section" aria-label="Resources">
-            <div className="dashboard-section-head"><h2 className="kicker">Resources</h2></div>
-            <p className="dashboard-hint">Your links could not be loaded: {res.error} <Button variant="link" onClick={() => void res.reload()}>Try again</Button></p>
+            <SectionHead title="Resources" />
+            <p className="hint dashboard-hint">Your links could not be loaded: {res.error} <Button variant="link" onClick={() => void res.reload()}>Try again</Button></p>
           </section>
         ) : (
           <ResourceLinks links={res.links} full={full} onAdd={() => setDialog("new")} onEdit={setDialog}

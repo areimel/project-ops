@@ -1,5 +1,6 @@
 import { PROJECT_LIMITS } from "../../../shared/projects/record";
 import { Combobox } from "../../components/common/Combobox";
+import { SectionHead } from "../../components/common/SectionHead";
 import { TagInput } from "../../components/common/TagInput";
 import { TextArea } from "../../components/common/TextArea";
 import { TextField } from "../../components/common/TextField";
@@ -18,7 +19,7 @@ export function SiteFields({ site, onChange, hostingSuggestions, serviceSuggesti
   const problem = dateProblem(site.launchDate);
   return (
     <section className="form-grid form-wide projects-form-site" aria-label="Site">
-      <h3 className="kicker form-wide">Site</h3>
+      <SectionHead title="Site" level={3} className="form-wide" />
       <TextField label="Client" value={site.client} onChange={(v) => set("client", v)} maxLength={PROJECT_LIMITS.client} />
       <Combobox label="Hosting" value={site.hosting} onChange={(v) => set("hosting", v)}
         suggestions={hostingSuggestions} maxLength={PROJECT_LIMITS.hosting} />

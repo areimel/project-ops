@@ -1,5 +1,4 @@
 /* The pieces in ProjectParts.tsx. Tokens only. */
-.projects-none { color: var(--text-muted); }
 .projects-dirty { margin-left: var(--sp-2); vertical-align: 1px; }
 .projects-link {
   display: inline-flex; align-items: center; gap: 2px; padding: 0; border: 0; background: none; color: var(--text);

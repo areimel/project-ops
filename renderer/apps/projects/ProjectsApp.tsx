@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../components/common/Button";
 import { EmptyState } from "../../components/common/EmptyState";
+import { SectionHead } from "../../components/common/SectionHead";
 import { Spinner } from "../../components/common/Spinner";
 import { useAttempt } from "../../hooks/useAttempt";
 import { useLatest } from "../../hooks/useLatest";
@@ -152,9 +153,9 @@ export default function ProjectsApp() {
             <EmptyState icon="filter" title="No projects match" body="Nothing fits the search and filters you have set."
               action={<Button variant="quiet" icon="close" onClick={view.clear}>Clear filters</Button>} />
           ) : split > 0 ? (<>
-            <h2 className="kicker projects-group">Pinned</h2>
+            <SectionHead title="Pinned" className="projects-group" />
             {grid(view.results.slice(0, split), "Pinned projects")}
-            <h2 className="kicker projects-group">Other projects</h2>
+            <SectionHead title="Other projects" className="projects-group" />
             {grid(view.results.slice(split), "Other projects")}
           </>) : grid(view.results, "Projects")}
         </div>
