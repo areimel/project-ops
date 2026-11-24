@@ -41,6 +41,11 @@ What is left. Tests and screenshot runs cover the logic and the first paint; the
 - [ ] `Toast`'s Undo is a raw `btn btn-link` button, not `Button`.
 - [ ] `DossierGraphics` (hazard band, barcode, stamp) is used by the dossier and the styleguide only; move it to `components/common` at a third use.
 - [ ] The error screen (`ErrorBoundary`) and the info and error toasts were not captured after the tone change.
+- [ ] With an `error` set, `Combobox` and `TagInput` open their suggestion list below the error message, not below the input (the list hangs from the wrapper that also holds the message). No screen passes `error` to either yet; anchor the list to the input before one does.
+- [ ] `ProjectsToolbar` keeps its own `.projects-toolbar-end` wrapper instead of `Toolbar`'s `end` prop, because `.toolbar-end` (`flex: 1 1 0`) wraps differently.
+- [ ] The dossier bar and the projects toolbar have `role="toolbar"` without arrow-key movement between their controls.
+- [ ] The styleguide's Toast specimens are live regions, so a screen reader announces them when the page opens.
+- [ ] `scripts/check-release.mjs` runs only from `pnpm build:release`; running `electron-builder` by hand after `pnpm build` would package the styleguide unchecked.
 - [ ] `pnpm build:release` has run on Linux only; `dist:win` and `dist:mac` never ran, so the release flag is untested there.
 
 ## Product ideas left out

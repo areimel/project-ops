@@ -76,7 +76,7 @@ export interface CatalogueEntry {
 - `exports`: the names a reader imports from it.
 - `purpose`: one or two sentences on what the part is.
 - `useFor`, `notFor`: when to pick it and what to pick instead (name the other part).
-- `snippet`: copy-ready code, shown with a Copy button.
+- `snippet`: copy-ready code. One click on it selects it all (the page cannot write the clipboard: the session grants no such permission).
 - `specimens`: at least one; the live examples.
 - `status`: `"not-in-use"` stamps the whole sheet when no screen uses the part yet.
 - `notes`: extra facts and limits, shown under the specimens.
