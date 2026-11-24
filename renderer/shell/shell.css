@@ -149,4 +149,4 @@ html, body, #root { height: 100%; }
 /* Error boundary fallback */
 .error-screen { display: grid; place-items: center; padding: var(--sp-5); }
 .error-screen .empty-state-icon { color: var(--danger); border-color: var(--danger); }
-.error-screen-actions { display: flex; gap: var(--sp-2); justify-content: center; margin-top: var(--sp-3); }
+.error-screen-actions { flex-wrap: nowrap; justify-content: center; margin-top: var(--sp-3); }

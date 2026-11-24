@@ -41,11 +41,7 @@
 /* ---- page ---- */
 .projects.projects-dossier-root { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
 .projects-dossier { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
-.projects-dossier-bar {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-2) var(--sp-3);
-  padding: var(--sp-3) var(--sp-5); border-bottom: var(--line-w) solid var(--line);
-}
-.projects-dossier-bar-end { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
+.projects-dossier-bar { justify-content: space-between; }
 .projects-dossier-mosaic { max-width: 1200px; margin: 0 auto; }
 .projects-dossier-plate { padding: 0; }
 .projects-dossier-status { align-items: flex-start; }
@@ -81,9 +77,8 @@
 .projects-dossier-location { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-3); }
 .projects-dossier-path { min-width: 0; font-family: var(--font-mono); font-size: var(--fs-sm); overflow-wrap: anywhere; }
 .projects-dossier-path-head { color: var(--text-muted); }
-.projects-dossier-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
 
 @media (max-width: 700px) {
-  .projects-dossier-bar, .scroll-area.projects-dossier-scroll { padding-left: var(--sp-4); padding-right: var(--sp-4); }
+  .toolbar.projects-dossier-bar, .scroll-area.projects-dossier-scroll { padding-left: var(--sp-4); padding-right: var(--sp-4); }
   .projects-dossier-name { font-size: var(--fs-3xl); }
 }

@@ -19,7 +19,7 @@ function Fallback({ error, onReload }: { error: Error; onReload(): void }) {
         icon="warning" title="This screen stopped working"
         body={`Something went wrong while drawing it: ${error.message || "unknown error"}. Your saved data is not affected.`}
         action={(
-          <div className="error-screen-actions">
+          <div className="btn-row error-screen-actions">
             <Button onClick={onReload}>Reload this screen</Button>
             <Button variant="quiet" onClick={() => navigate({ type: "home" })}>Go home</Button>
           </div>

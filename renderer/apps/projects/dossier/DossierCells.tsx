@@ -109,7 +109,7 @@ export function LocationCell({ p, actions: a }: { p: ProjectView; actions: CardA
           {folder.head && <span className="projects-dossier-path-head">{folder.head}</span>}
           <strong>{folder.tail}</strong>
         </span>
-        <span className="projects-dossier-actions">
+        <span className="btn-row">
           <OpenActions project={p} labels="all" onOpen={(t) => a.open(p.id, t)} />
           <IconButton icon="copy" label="Copy path" onClick={() => a.copyPath(p.id)} />
         </span>

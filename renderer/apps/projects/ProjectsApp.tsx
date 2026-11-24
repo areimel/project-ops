@@ -122,7 +122,7 @@ export default function ProjectsApp() {
       <div className="app-root projects projects-center">
         <EmptyState icon="folder" title="No projects yet"
           body="Add a folder that holds your projects and each one inside it is listed here. Or add a single project folder."
-          action={<div className="projects-empty-actions">
+          action={<div className="btn-row projects-empty-actions">
             <Button variant="primary" icon="plus" onClick={addRoot}>Add a scan folder</Button>
             <Button variant="quiet" onClick={addFolder}>Add one folder</Button>
           </div>} />

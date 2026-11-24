@@ -2,7 +2,8 @@
 
 .projects { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 0; }
 .projects.projects-center { display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; overflow: auto; }
-.projects-empty-actions { display: flex; justify-content: center; gap: var(--sp-2); }
+/* nowrap: in the empty state's shrink-to-fit grid a wrapping row would collapse to one button wide. */
+.projects-empty-actions { flex-wrap: nowrap; justify-content: center; }
 
 /* ---- Rail ---- */
 .projects-rail {
@@ -45,10 +46,6 @@
 
 /* ---- Main column ---- */
 .projects-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
-.projects-toolbar {
-  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3);
-  padding: var(--sp-3) var(--sp-5); border-bottom: var(--line-w) solid var(--line);
-}
 .projects-search { flex: 1 1 200px; max-width: 340px; }
 .projects-search input { padding-left: var(--sp-3); }
 .projects-sort .dropdown-text { font-family: var(--label-font); font-size: var(--label-size); font-weight: var(--label-weight); letter-spacing: var(--label-track); text-transform: uppercase; }
@@ -142,6 +139,6 @@
   .projects-rail:not(.is-open) .projects-rail-groups { display: none; }
   .projects-rail.is-open .projects-rail-toggle { border-bottom: var(--line-w) solid var(--line); }
   .projects-rail-group { padding: var(--sp-3) var(--sp-5); }
-  .projects-toolbar, .projects-active, .scroll-area.projects-scroll { padding-left: var(--sp-4); padding-right: var(--sp-4); }
+  .toolbar.projects-toolbar, .projects-active, .scroll-area.projects-scroll { padding-left: var(--sp-4); padding-right: var(--sp-4); }
   .form-grid.projects-form, .projects-form-links, .form-grid.projects-form-site { grid-template-columns: minmax(0, 1fr); }
 }

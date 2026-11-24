@@ -6,6 +6,7 @@ import { EmptyState } from "../../../components/common/EmptyState";
 import { Icon } from "../../../components/common/Icon";
 import { IconButton } from "../../../components/common/IconButton";
 import { Mosaic, MosaicCell } from "../../../components/common/Mosaic";
+import { Toolbar } from "../../../components/common/Toolbar";
 import { cardCategory, cardStatus } from "../cardModel";
 import type { CardActions } from "../ProjectCard";
 import { GitCell, LinksCell, LocationCell, NotesCell, SiteCell, StackCell, TimelineCell } from "./DossierCells";
@@ -40,14 +41,14 @@ export function ProjectDossier({ project: p, now, actions: a, onBack }: DossierP
   const serial = fileSerial(p.id);
   return (
     <div className="projects-dossier">
-      <div className="projects-dossier-bar">
+      <Toolbar label="Project" inset="page" className="projects-dossier-bar">
         <Button variant="quiet" onClick={onBack}>All projects</Button>
-        <span className="projects-dossier-bar-end">
+        <span className="btn-row">
           <Button variant="quiet" icon="refresh" onClick={() => a.refresh(p.id)}>Refresh</Button>
           <IconButton icon="pin" label={p.pinned ? "Unpin" : "Pin to the top"} aria-pressed={p.pinned} onClick={() => a.togglePin(p.id)} />
           <Button variant="quiet" icon="pencil" onClick={() => a.edit(p.id)}>Edit</Button>
         </span>
-      </div>
+      </Toolbar>
       <div className="scroll-area projects-dossier-scroll">
         <Mosaic className="projects-dossier-mosaic" aria-label="Project file">
           <MosaicCell as="div" span={12} className="projects-dossier-plate"><HazardBand>File {serial}</HazardBand></MosaicCell>
