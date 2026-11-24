@@ -22,13 +22,13 @@ export const entry = {
     "A boxed group of settings or form fields: use Panel.",
     "A single row in a short list: use ListRow.",
   ],
-  snippet: "<Card as=\"li\" muted={p.missing} selected={revealed} aria-label={p.name}>\n  <CardHeader start={p.category}\n    end={<StatusDot tone=\"success\">Active</StatusDot>} />\n  <CardBody><h3>{p.name}</h3></CardBody>\n  <CardFooter><Button variant=\"quiet\">Open</Button></CardFooter>\n</Card>",
+  snippet: "<Card as=\"li\" muted={p.missing} selected={revealed} aria-label={p.name}>\n  <CardHeader start={p.category}\n    end={<StatusDot tone=\"accent\">Active</StatusDot>} />\n  <CardBody><h3>{p.name}</h3></CardBody>\n  <CardFooter><Button variant=\"quiet\">Open</Button></CardFooter>\n</Card>",
   specimens: [
     {
       label: "Header, body and footer", width: 320,
       render: () => (
         <Card aria-label="project-ops">
-          <CardHeader start="Desktop apps" end={<StatusDot tone="success">Active</StatusDot>} />
+          <CardHeader start="Desktop apps" end={<StatusDot tone="accent">Active</StatusDot>} />
           <CardBody><h3>project-ops</h3><p>Desktop organizer for the owner's coding projects.</p></CardBody>
           <CardFooter><Button variant="quiet" icon="code">Editor</Button><Button variant="quiet" icon="folder">Folder</Button></CardFooter>
         </Card>
@@ -43,7 +43,7 @@ export const entry = {
       label: "Muted (missing folder)", width: 320,
       render: () => (
         <Card muted aria-label="old-site">
-          <CardHeader start="Client sites" end={<StatusDot tone="muted">Missing</StatusDot>} />
+          <CardHeader start="Client sites" end={<StatusDot tone="danger">Folder missing</StatusDot>} />
           <CardBody><h3>old-site</h3><p>The folder was moved or renamed.</p></CardBody>
         </Card>
       ),
@@ -52,7 +52,7 @@ export const entry = {
       label: "Selected", width: 320,
       render: () => (
         <Card selected aria-label="project-ops">
-          <CardHeader start="Desktop apps" end={<StatusDot tone="accent">Paused</StatusDot>} />
+          <CardHeader start="Desktop apps" end={<StatusDot tone="muted">Paused</StatusDot>} />
           {body}
         </Card>
       ),

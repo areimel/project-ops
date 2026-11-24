@@ -18,7 +18,7 @@ function sample(): ReactNode {
     <Mosaic aria-label="Project file">
       <MosaicCell as="div" span={12}><p className="kicker">File 0123-4567</p></MosaicCell>
       <MosaicCell label="Identity" span={6}><p>project-ops</p><p className="styleguide-muted">Desktop organizer</p></MosaicCell>
-      <MosaicCell label="Status" span={3} narrowSpan={6}><Badge>Active</Badge></MosaicCell>
+      <MosaicCell label="Status" span={3} narrowSpan={6}><div className="styleguide-row"><Badge>Active</Badge></div></MosaicCell>
       <MosaicCell label="Serial" span={3} narrowSpan={6}><p>0123-4567</p></MosaicCell>
       <MosaicCell label="Site" span={4} narrowSpan={6}>{facts()}</MosaicCell>
       <MosaicCell label="Git" span={4} narrowSpan={6}>
