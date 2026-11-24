@@ -63,7 +63,7 @@ export function ProjectDialog({ project: p, categories, tags, hosting = [], serv
           placeholder={p.detected.name} maxLength={PROJECT_LIMITS.name} />
         <Combobox label="Category" value={draft.category} onChange={(v) => set("category", v)}
           suggestions={categories} placeholder="Uncategorised" maxLength={PROJECT_LIMITS.category} />
-        <TextArea className="projects-form-desc" label="Description" value={draft.description} rows={3}
+        <TextArea label="Description" value={draft.description} rows={3}
           onChange={(v) => set("description", v)} placeholder={p.detected.description ?? "No description found"}
           maxLength={PROJECT_LIMITS.description} />
         <TagInput className="projects-form-wide" label="Tags" value={draft.tags} onChange={(v) => set("tags", v)}
@@ -80,7 +80,7 @@ export function ProjectDialog({ project: p, categories, tags, hosting = [], serv
             const problem = linkProblem(draft.links[k]);
             const placeholder = k === "repo" && p.detected.repo ? p.detected.repo : "https://";
             return (
-              <div key={k} className="projects-form-link">
+              <div key={k}>
                 <TextField label={LINK_LABELS[k]} value={draft.links[k]} onChange={(v) => setLink(k, v)} invalid={problem !== null}
                   placeholder={placeholder} spellCheck={false} inputMode="url" aria-describedby={problem ? `${baseId}-${k}` : undefined} />
                 {problem && <p className="projects-form-error" id={`${baseId}-${k}`}>{problem}</p>}

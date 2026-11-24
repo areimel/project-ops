@@ -1,4 +1,4 @@
-/* Text inputs, labelled rows, checkbox. Field labels use the mono label in base.css. */
+/* Text inputs, labelled rows. Field labels use the mono label in base.css. */
 
 .text-field { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
 .text-field-label, .field-label { color: var(--text-muted); }
@@ -28,4 +28,3 @@
 .field-control { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
 .field-hint { font-size: var(--fs-sm); color: var(--text-muted); }
 
-.checkbox { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); cursor: pointer; }

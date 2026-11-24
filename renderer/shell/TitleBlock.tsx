@@ -5,7 +5,7 @@ export function TitleBlock({ model }: { model: TitleBlockModel }) {
   return (
     <aside className="title-block" aria-label="Details">
       <span className="title-block-name">{model.name}</span>
-      <span className="title-block-view label">{model.view}</span>
+      <span className="label">{model.view}</span>
       {model.count && <span className="title-block-count label">{model.count}</span>}
       {model.state && (
         // Not a live region while saving: autosave would announce "Saving" and "Saved" on every pause in typing.

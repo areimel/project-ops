@@ -24,7 +24,7 @@ export const OTHER_TOKENS = [
   "r", "r-pill", "hazard-w", "line-w", "focus-w", "focus-offset", "control-h", "bullet",
   "z-base", "z-chrome", "z-popover", "z-dialog", "z-toast",
   "dur-fast", "dur", "dur-glitch", "ease",
-  "titlebar-h", "footer-h", "content-max",
+  "titlebar-h", "footer-h",
   "shadow-float",
 ] as const;
 

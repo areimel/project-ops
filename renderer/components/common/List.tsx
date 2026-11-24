@@ -6,7 +6,7 @@ export function List({ label, className, ...rest }: HTMLAttributes<HTMLUListElem
 
 /**
  * One row. With `onSelect` the title is the button that selects it; without it the title is plain text
- * (use that when the row's own control, such as a checkbox, does the work). `secondary` is a quieter second
+ * (use that when the row's own control, such as a switch, does the work). `secondary` is a quieter second
  * line under the title; `wrap` lets the title run to several lines instead of cutting it with an ellipsis.
  * `optionId` makes the row an option of a listbox (give the `List` `role="listbox"`): the row itself is clicked,
  * `selected` becomes `aria-selected`, and focus stays wherever the owner keeps it (a combobox input).

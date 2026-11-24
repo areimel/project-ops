@@ -43,7 +43,6 @@
 .accent-hex { width: 9rem; }
 .settings-note { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-sm); color: var(--text); }
 .settings-note.is-warning, .settings-note.is-error { color: var(--danger); }
-.settings-note .icon { flex: none; }
 .settings-muted { color: var(--text-muted); font-size: var(--fs-md); }
 
 /* About: trait rows, key in the mono label style, value in body text. */
