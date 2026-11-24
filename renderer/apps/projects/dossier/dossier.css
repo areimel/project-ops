@@ -46,8 +46,6 @@
   padding: var(--sp-3) var(--sp-5); border-bottom: var(--line-w) solid var(--line);
 }
 .projects-dossier-bar-end { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
-.projects-dossier-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: var(--sp-5); }
-.projects-dossier-scroll > .empty-state { margin-top: var(--sp-6); }
 .projects-dossier-mosaic { max-width: 1200px; margin: 0 auto; }
 .projects-dossier-plate { padding: 0; }
 .projects-dossier-status { align-items: flex-start; }
@@ -86,6 +84,6 @@
 .projects-dossier-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
 
 @media (max-width: 700px) {
-  .projects-dossier-bar, .projects-dossier-scroll { padding-left: var(--sp-4); padding-right: var(--sp-4); }
+  .projects-dossier-bar, .scroll-area.projects-dossier-scroll { padding-left: var(--sp-4); padding-right: var(--sp-4); }
   .projects-dossier-name { font-size: var(--fs-3xl); }
 }

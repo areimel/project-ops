@@ -32,6 +32,10 @@
 .split-pane-start { min-width: 0; min-height: 0; overflow: auto; border-right: var(--line-w) solid var(--line); }
 .split-pane-end { min-width: 0; min-height: 0; overflow: auto; }
 
+/* The scrolling body of a screen under its toolbar. An app adds its own narrow-width padding. */
+.scroll-area { flex: 1; min-height: 0; overflow-y: auto; padding: var(--sp-5); }
+.scroll-area > .empty-state { margin-top: var(--sp-6); }
+
 .empty-state {
   display: grid; justify-items: center; gap: var(--sp-3); max-width: 400px;
   margin: 0 auto; padding: var(--sp-7) var(--sp-5); text-align: center;

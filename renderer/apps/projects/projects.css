@@ -57,8 +57,6 @@
 .projects-count { color: var(--text-muted); white-space: nowrap; }
 .projects-toolbar-end { display: flex; gap: var(--sp-2); margin-left: auto; }
 .projects-toolbar .spinner { width: 12px; height: 12px; }
-.projects-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: var(--sp-5); }
-.projects-scroll > .empty-state { margin-top: var(--sp-6); }
 
 /* Active filters: removable chips under the toolbar. */
 .projects-active {
@@ -171,6 +169,6 @@
   .projects-rail:not(.is-open) .projects-rail-groups { display: none; }
   .projects-rail.is-open .projects-rail-toggle { border-bottom: var(--line-w) solid var(--line); }
   .projects-rail-group { padding: var(--sp-3) var(--sp-5); }
-  .projects-toolbar, .projects-active, .projects-scroll { padding-left: var(--sp-4); padding-right: var(--sp-4); }
+  .projects-toolbar, .projects-active, .scroll-area.projects-scroll { padding-left: var(--sp-4); padding-right: var(--sp-4); }
   .projects-form, .projects-form-links, .projects-form-site { grid-template-columns: minmax(0, 1fr); }
 }

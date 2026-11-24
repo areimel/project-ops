@@ -29,7 +29,7 @@ export function ProjectDossier({ project: p, now, actions: a, onBack }: DossierP
   if (!p) {
     return (
       <div className="projects-dossier">
-        <div className="projects-dossier-scroll">
+        <div className="scroll-area projects-dossier-scroll">
           <EmptyState icon="folder" title="This project is not in the list"
             action={<Button variant="quiet" onClick={onBack}>All projects</Button>} />
         </div>
@@ -48,7 +48,7 @@ export function ProjectDossier({ project: p, now, actions: a, onBack }: DossierP
           <Button variant="quiet" icon="pencil" onClick={() => a.edit(p.id)}>Edit</Button>
         </span>
       </div>
-      <div className="projects-dossier-scroll">
+      <div className="scroll-area projects-dossier-scroll">
         <Mosaic className="projects-dossier-mosaic" aria-label="Project file">
           <MosaicCell as="div" span={12} className="projects-dossier-plate"><HazardBand>File {serial}</HazardBand></MosaicCell>
 

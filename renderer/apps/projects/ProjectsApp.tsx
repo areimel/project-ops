@@ -147,7 +147,7 @@ export default function ProjectsApp() {
           sort={view.sort} onSort={view.setSort} shown={view.results.length} total={projects.length}
           scanning={scanning} onAddFolder={addFolder} onRescan={rescan} />
         <ActiveFilters filters={view.filters} onChange={view.setFilters} onClear={view.clear} />
-        <div className="projects-scroll">
+        <div className="scroll-area projects-scroll">
           {view.results.length === 0 ? (
             <EmptyState icon="filter" title="No projects match" body="Nothing fits the search and filters you have set."
               action={<Button variant="quiet" icon="close" onClick={view.clear}>Clear filters</Button>} />
