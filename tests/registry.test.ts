@@ -1,11 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { COMMAND_ID } from "../shared/commands";
-import { APPS } from "../renderer/apps/registry";
+import { APPS, BASE_APPS, DEV_APPS } from "../renderer/apps/registry";
 import { activeCommands } from "../renderer/shell/commandTable";
 
 describe("app registry", () => {
   it("has the dashboard first (the home screen), then projects", () => {
-    expect(APPS.map((a) => a.id)).toEqual(["dashboard", "projects"]);
+    expect(BASE_APPS.map((a) => a.id)).toEqual(["dashboard", "projects"]);
+  });
+  it("lists the dev-only apps separately (a later step adds the styleguide)", () => {
+    expect(DEV_APPS.map((a) => a.id)).toEqual([]);
+  });
+  it("joins dev apps after the base apps only when the build flag is on", () => {
+    expect(typeof __STYLEGUIDE__).toBe("boolean");
+    expect(APPS).toEqual(__STYLEGUIDE__ ? [...BASE_APPS, ...DEV_APPS] : BASE_APPS);
   });
   it("has unique ids, a valid shape, a name and a summary", () => {
     expect(new Set(APPS.map((a) => a.id)).size).toBe(APPS.length);
