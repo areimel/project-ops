@@ -1,4 +1,5 @@
 import { Button } from "../../../../components/common/Button";
+import { IconButton } from "../../../../components/common/IconButton";
 import { TextField } from "../../../../components/common/TextField";
 import { Toolbar } from "../../../../components/common/Toolbar";
 import { Live } from "../../Live";
@@ -28,10 +29,10 @@ export const entry = {
       render: () => (
         <Live initial="">
           {(query, set) => (
-            <Toolbar label="Projects" inset="page">
-              <TextField label="Search projects" hideLabel placeholder="Search projects" value={query} onChange={set} />
-              <span className="label">{query ? "1 / 6" : "6 / 6"} projects</span>
-              <div className="styleguide-row">
+            <Toolbar label="Projects" inset="page" className="projects-toolbar">
+              <TextField className="projects-search" type="search" label="Search projects" hideLabel placeholder="Search projects" value={query} onChange={set} />
+              <span className="label projects-count">{query ? "1 / 6" : "6 / 6"}</span>
+              <div className="projects-toolbar-end">
                 <Button variant="quiet" icon="plus">Add folder</Button>
                 <Button variant="quiet" icon="refresh">Rescan</Button>
               </div>
@@ -43,10 +44,11 @@ export const entry = {
     {
       label: "Project page bar", wide: true,
       render: () => (
-        <Toolbar label="Project" inset="page">
+        <Toolbar label="Project" inset="page" className="projects-dossier-bar">
           <Button variant="quiet">All projects</Button>
           <span className="btn-row">
             <Button variant="quiet" icon="refresh">Refresh</Button>
+            <IconButton icon="pin" label="Pin to the top" />
             <Button variant="quiet" icon="pencil">Edit</Button>
           </span>
         </Toolbar>

@@ -35,15 +35,15 @@ export const entry = {
       ),
     },
     {
-      label: "New link", minHeight: 300,
+      label: "New link", wide: true, minHeight: 330,
       render: () => <LinkDialog inline link={null} groups={GROUPS} onSave={saved} onRemove={noop} onClose={noop} />,
     },
     {
-      label: "Edit link", minHeight: 300,
+      label: "Edit link", wide: true, minHeight: 330,
       render: () => <LinkDialog inline link={RESOURCE_LINKS[0]} groups={GROUPS} onSave={saved} onRemove={noop} onClose={noop} />,
     },
     {
-      label: "Field error: the link is not https", minHeight: 300,
+      label: "Field error: the link is not https", wide: true, minHeight: 330,
       render: () => <LinkDialog inline link={BAD_URL} groups={GROUPS} onSave={saved} onRemove={noop} onClose={noop} />,
     },
   ],

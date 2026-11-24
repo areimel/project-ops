@@ -36,9 +36,9 @@ export const entry = {
   snippet: "<section className=\"dashboard-section\" aria-label=\"Pinned\">\n  <SectionHead title=\"Pinned\"\n    end={<Button variant=\"link\" onClick={allProjects}>All projects</Button>} />\n  <p className=\"hint dashboard-hint\">Nothing is pinned.</p>\n</section>\n\n<SectionHead title=\"Other projects\" className=\"projects-group\" />\n<SectionHead title=\"Site\" level={3} className=\"form-wide\" />",
   specimens: [
     {
-      label: "Dashboard head with an action and a hint", width: 560,
+      label: "Dashboard heads with an action and a hint", wide: true,
       render: () => (
-        <div className="dashboard">
+        <div className="dashboard" style={{ display: "grid", gap: "var(--sp-6)" }}>
           <section className="dashboard-section" aria-label="Pinned">
             <SectionHead title="Pinned" end={<Button variant="link" onClick={noop}>All projects</Button>} />
             <p className="hint dashboard-hint">Nothing is pinned. Pin a project on the Projects screen to keep it here.</p>

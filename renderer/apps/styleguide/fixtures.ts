@@ -11,10 +11,12 @@ const DAY = 24 * HOUR;
 const NO_LINKS = { repo: null, site: null, docs: null };
 
 let counter = 0;
-/** A project view with sensible defaults; ids are 16 hex characters and unique per call. */
+/** A project view with sensible defaults; ids are 16 hex characters, unique per call and spread so serials differ. */
 export function fixtureProject(overrides: Partial<ProjectView> = {}): ProjectView {
   counter += 1;
-  const id = counter.toString(16).padStart(16, "0");
+  // Mixed, so the serial and the barcode (drawn from the first characters) differ from project to project.
+  const mix = (k: number) => ((counter * k) >>> 0).toString(16).padStart(8, "0");
+  const id = mix(2654435761) + mix(2246822519);
   const name = overrides.name ?? `Project ${counter}`;
   return {
     id, createdAt: FIXTURE_NOW - 60 * DAY, updatedAt: FIXTURE_NOW - 3 * DAY, name, description: "A short description of what this project is.",

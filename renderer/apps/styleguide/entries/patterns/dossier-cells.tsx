@@ -73,7 +73,7 @@ export const entry = {
   specimens: [
     { label: "A project with site details", wide: true, render: () => page(PROJECTS.pinned) },
     { label: "No git, no site details", wide: true, render: () => page(EMPTY) },
-    { label: "640 px: cells take narrowSpan", width: 640, render: () => page(PROJECTS.dirty) },
+    { label: "Narrow page, 640 px", width: 640, render: () => page(PROJECTS.dirty) },
   ],
   notes: [
     "Spans: Site, Git, Stack and Links take 4; Notes takes 8; Timeline and Location take 12. Site and Git have narrowSpan 6 so they pair under 720 px; the rest fall to a full row.",

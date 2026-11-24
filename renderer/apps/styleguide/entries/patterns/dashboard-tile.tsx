@@ -22,7 +22,7 @@ export const entry = {
   snippet: "<ul className=\"card-grid dashboard-tiles\" aria-label={label}>\n  {projects.map((p) => (\n    <ProjectTile key={p.id} project={p}\n      note={noteFor(p)} actions={actions} />\n  ))}\n</ul>\n// note: \"Opened today\", \"Commit 3 days ago\"\n// actions: { open(id, target), show(id) }",
   specimens: [
     {
-      label: "Normal, dirty and missing in the real grid", wide: true,
+      label: "Clean, uncommitted changes and missing folder", wide: true,
       render: () => (
         <ul className="card-grid dashboard-tiles" aria-label="Projects">
           <ProjectTile project={PROJECTS.pinned} note="Opened 5 hours ago" actions={NOOP_TILE_ACTIONS} />
@@ -32,17 +32,10 @@ export const entry = {
       ),
     },
     {
-      label: "Normal", width: 240,
+      label: "Paused and no git", wide: true,
       render: () => (
-        <ul className="card-grid dashboard-tiles" aria-label="Tile" style={{ "--card-min": "100%" } as React.CSSProperties}>
+        <ul className="card-grid dashboard-tiles" aria-label="Projects">
           <ProjectTile project={PROJECTS.paused} note="Commit 80 days ago" actions={NOOP_TILE_ACTIONS} />
-        </ul>
-      ),
-    },
-    {
-      label: "No git", width: 240,
-      render: () => (
-        <ul className="card-grid dashboard-tiles" aria-label="Tile" style={{ "--card-min": "100%" } as React.CSSProperties}>
           <ProjectTile project={PROJECTS.noGit} note="Opened today" actions={NOOP_TILE_ACTIONS} />
         </ul>
       ),

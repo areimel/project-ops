@@ -50,7 +50,7 @@ export const entry = {
       ),
     },
     {
-      label: "Registration marks need a positioned box with padding",
+      label: "Registration marks",
       width: 280,
       render: () => (
         <div style={{ position: "relative", padding: 32, minHeight: 96 }}>
@@ -84,6 +84,7 @@ export const entry = {
   notes: [
     "These are decoration reserved for a record's title plate and this catalogue's header. Do not add them to ordinary sections.",
     "RegMarks places four marks in the nearest positioned ancestor, so the box needs position: relative and padding (the identity cell's class gives both). HazardBand, Barcode, Stamp and DotGrid are hidden from assistive technology except Stamp, which carries text.",
+    "The Stamp has four tones, but a success stamp is drawn in the plain text colour, not green. Active uses the accent, Paused the muted colour, Folder missing the danger colour.",
     "Helpers: fileSerial(id) gives PO-XXXX-XXXX-XXXX; barcodeBars(id) gives the bars. Both are pure and tested in dossierModel.ts.",
   ],
 } satisfies CatalogueEntry;

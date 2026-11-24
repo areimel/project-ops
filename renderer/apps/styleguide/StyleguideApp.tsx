@@ -3,6 +3,7 @@ import { resolveMode } from "../../../shared/theme";
 import { useSettings } from "../../hooks/useSettings";
 import { useShell, useTitleInfo } from "../../shell/ShellContext";
 import { useSystemDark } from "../../theme/useTheme";
+import "../../settings/settings.css";
 import "../dashboard/dashboard.css";
 import "../projects/dossier/dossier.css";
 import "../projects/projects.css";

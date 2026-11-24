@@ -38,7 +38,7 @@ export const entry = {
       render: () => <StatusDot tone="danger">Folder missing</StatusDot>,
     },
     {
-      label: "Light only (label kept for screen readers)",
+      label: "Light only, label hidden",
       render: () => (
         <div className="styleguide-row">
           <StatusDot tone="danger" hideLabel>Folder missing</StatusDot>

@@ -10,7 +10,7 @@ export const entry = {
   family: "patterns",
   source: "renderer/apps/dashboard/ResourceLinks.tsx",
   exports: ["ResourceLinks", "groupLinks"],
-  purpose: "The owner's own links (hosting, analytics and the like) on the dashboard, under group headings, with an Add link button and a pencil to edit each one. A link opens in the browser.",
+  purpose: "The owner's own links (hosting, analytics and the like) on the dashboard, under group headings, with an Add link button. A link opens in the browser; a pencil that shows on hover or focus edits it.",
   useFor: [
     "The Resources section of the dashboard.",
     "A short list of the owner's named https links that are grouped by a label they chose.",
