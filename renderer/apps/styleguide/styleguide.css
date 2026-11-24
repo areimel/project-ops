@@ -1,0 +1,62 @@
+/* Styleguide page: plate header, index rail, scroll area. Classes start styleguide-; tokens only. */
+.styleguide { container: styleguide / size; background: var(--bg); color: var(--text); }
+.styleguide-scroll { height: 100%; min-height: 0; overflow-y: auto; }
+
+/* ---- plate ---- */
+.styleguide-plate { background: var(--bg); border-bottom: var(--line-w) solid var(--text); }
+.styleguide-plate-body {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: var(--sp-6);
+  padding: var(--sp-5) var(--sp-7) var(--sp-5);
+}
+.styleguide-plate-title {
+  margin: 0; font-size: calc(var(--fs-display) * 1.75); line-height: 0.9; font-weight: var(--fw-heavy);
+  letter-spacing: var(--track-heading); text-wrap: nowrap;
+}
+.styleguide-plate-lead { max-width: 52ch; margin-top: var(--sp-4); font-size: var(--fs-lg); }
+.styleguide-plate-mode { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); margin-top: var(--sp-5); }
+.styleguide-plate-mode .label { color: var(--text-muted); }
+.styleguide-plate-side { display: flex; flex-direction: column; justify-content: flex-end; gap: var(--sp-4); }
+.styleguide-plate-table { border: var(--line-w) solid var(--text); }
+.styleguide-plate-table .kv-row { padding: var(--sp-2) var(--sp-3); }
+.styleguide-plate-table .kv-row + .kv-row { border-top: var(--line-w) solid var(--text); }
+.styleguide-plate-stamp { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
+.styleguide-plate-foot {
+  display: grid; grid-template-columns: minmax(0, 1fr) 280px; align-items: center; gap: var(--sp-6);
+  padding: var(--sp-3) var(--sp-7); border-top: var(--line-w) solid var(--line);
+}
+.styleguide-plate-limits { max-width: 75ch; font-size: var(--fs-sm); color: var(--text-muted); }
+.styleguide-plate-code { display: flex; flex-direction: column; gap: var(--sp-1); }
+.styleguide-plate-serial { color: var(--text-muted); }
+
+/* ---- body: rail and sheets ---- */
+.styleguide-body { display: grid; grid-template-columns: 224px minmax(0, 1fr); align-items: start; }
+.styleguide-main { container-type: inline-size; min-width: 0; padding: 0 var(--sp-7) var(--sp-7) var(--sp-6); }
+
+.styleguide-rail {
+  position: sticky; top: 0; max-height: 100cqh; overflow-y: auto;
+  padding: var(--sp-4) var(--sp-3) var(--sp-6) var(--sp-4); border-right: var(--line-w) solid var(--line);
+}
+.styleguide-rail-group + .styleguide-rail-group { margin-top: var(--sp-4); }
+.styleguide-rail-head { margin: 0 0 var(--sp-1) var(--sp-3); color: var(--text-muted); font-family: var(--label-font); font-size: var(--label-size); }
+.styleguide-rail-list { margin: 0; padding: 0; list-style: none; }
+.styleguide-rail-item {
+  display: block; width: 100%; padding: var(--sp-1) var(--sp-3); border: 0; background: none; text-align: left;
+  font-size: var(--fs-sm); color: var(--text-muted);
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.styleguide-rail-item:hover { background: var(--hover); color: var(--text); }
+.styleguide-rail-item[aria-current="true"] { background: var(--selected); color: var(--text); box-shadow: inset 2px 0 0 var(--accent); }
+.styleguide-rail-item:focus-visible { outline-offset: -2px; }
+
+@container styleguide (max-width: 900px) {
+  .styleguide-plate-body { grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); padding: var(--sp-5) var(--sp-5) var(--sp-4); }
+  .styleguide-plate-title { font-size: calc(var(--fs-display) * 1.4); }
+  .styleguide-plate-foot { grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); }
+  .styleguide-body { grid-template-columns: minmax(0, 1fr); }
+  .styleguide-rail {
+    position: static; max-height: 180px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); border-right: 0; border-bottom: var(--line-w) solid var(--line);
+  }
+  .styleguide-rail-group + .styleguide-rail-group { margin-top: 0; }
+  .styleguide-main { padding: 0 var(--sp-5) var(--sp-6); }
+}

@@ -7,8 +7,8 @@ describe("app registry", () => {
   it("has the dashboard first (the home screen), then projects", () => {
     expect(BASE_APPS.map((a) => a.id)).toEqual(["dashboard", "projects"]);
   });
-  it("lists the dev-only apps separately (a later step adds the styleguide)", () => {
-    expect(DEV_APPS.map((a) => a.id)).toEqual([]);
+  it("lists the dev-only apps separately", () => {
+    expect(DEV_APPS.map((a) => a.id)).toEqual(["styleguide"]);
   });
   it("joins dev apps after the base apps only when the build flag is on", () => {
     expect(typeof __STYLEGUIDE__).toBe("boolean");
