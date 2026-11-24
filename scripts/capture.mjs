@@ -12,7 +12,7 @@
 //   APP_CAPTURE_DISPLAY=77                  (X display number)
 // Captures run one at a time (a lock makes concurrent callers wait); --size may not exceed the nested screen.
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, rmSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -23,6 +23,7 @@ const SCREEN = process.env.APP_CAPTURE_SCREEN || "1680x1000+110+1780";
 const SOCKET = `/tmp/.X11-unix/X${NUM}`;
 const LOCK = join(tmpdir(), `project-ops-capture-${NUM}.lock`);
 const VALUE_FLAGS = new Set(["out", "size", "profile", "link", "eval", "delay", "keys"]);
+const SWITCHES = new Set(["seed", "seed-light", "empty", "stop"]);   // --seed is the default, accepted for clarity
 
 function fail(message) {
   console.error(`capture: ${message}`);
@@ -38,43 +39,72 @@ function parseArgs(argv) {
     if (VALUE_FLAGS.has(key)) {
       if (i + 1 >= argv.length) fail(`--${key} needs a value`);
       o[key] = argv[++i];
-    } else o[key] = true;
+    } else if (SWITCHES.has(key)) o[key] = true;
+    else fail(`unknown option ${a}`);
   }
   return o;
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/** True when an X server answers on the nested display (a socket file alone can be a crashed server's). */
+function displayAlive() {
+  return existsSync(SOCKET) && spawnSync("xdpyinfo", ["-display", `:${NUM}`], { stdio: "ignore" }).status === 0;
+}
+
+function clearDeadDisplay() {
+  rmSync(SOCKET, { force: true });
+  rmSync(`/tmp/.X${NUM}-lock`, { force: true });
+}
+
 async function ensureDisplay() {
-  if (existsSync(SOCKET)) return;
+  if (displayAlive()) return;
+  clearDeadDisplay();
   const which = spawnSync("sh", ["-c", "command -v Xephyr"], { encoding: "utf8" });
   if (which.status !== 0) fail("Xephyr is not installed (Debian/Ubuntu: xserver-xephyr)");
   const child = spawn("Xephyr", [`:${NUM}`, "-screen", SCREEN, "-ac", "-br", "-no-host-grab", "-title", "Project Ops test windows"],
     { detached: true, stdio: "ignore" });
   child.unref();
-  for (let i = 0; i < 50 && !existsSync(SOCKET); i++) await sleep(100);
-  if (!existsSync(SOCKET)) fail(`the nested display :${NUM} did not start`);
+  for (let i = 0; i < 50 && !displayAlive(); i++) await sleep(100);
+  if (!displayAlive()) fail(`the nested display :${NUM} did not start`);
   await sleep(300);
 }
 
-/** One capture at a time, whoever asks: wait for the lock; a lock older than three minutes is a dead run's. */
+function lockOwnerAlive() {
+  try {
+    process.kill(Number(readFileSync(join(LOCK, "pid"), "utf8")), 0);
+    return true;
+  } catch (e) {
+    return e?.code === "EPERM";
+  }
+}
+
+/** One capture at a time, whoever asks: wait for the lock. A lock whose owner process is gone is taken over. */
 async function takeLock() {
   for (let i = 0; i < 1500; i++) {
     try {
       mkdirSync(LOCK);
+      writeFileSync(join(LOCK, "pid"), String(process.pid));
       return;
     } catch {
-      try {
-        if (Date.now() - statSync(LOCK).mtimeMs > 180000) rmSync(LOCK, { recursive: true, force: true });
-      } catch { /* released meanwhile */ }
-      await sleep(200);
+      await sleep(200);   // also gives a new owner time to write its pid before anyone judges the lock dead
+      if (existsSync(LOCK) && !lockOwnerAlive()) rmSync(LOCK, { recursive: true, force: true });
     }
   }
   fail("another capture held the lock for five minutes");
 }
 
+let locked = false;
+function dropLock() {
+  if (locked) rmSync(LOCK, { recursive: true, force: true });
+  locked = false;
+}
+// Ctrl-C reaches Electron too; once it has gone the handler runs, so the lock never outlives the run.
+for (const signal of ["SIGINT", "SIGTERM"]) process.on(signal, () => { dropLock(); process.exit(130); });
+
 function stopDisplay() {
   const r = spawnSync("pkill", ["-f", `^Xephyr :${NUM} `]);
+  clearDeadDisplay();
   console.log(r.status === 0 ? `capture: stopped display :${NUM}` : `capture: display :${NUM} was not running`);
 }
 
@@ -112,11 +142,12 @@ if (o.keys) env.APP_CAPTURE_KEYS = o.keys;
 const electron = join(ROOT, "node_modules/.bin/electron");
 const args = ["--no-sandbox", "--ozone-platform=x11", `--user-data-dir=${profile}`, ROOT, ...(o.link ? [o.link] : [])];
 await takeLock();
+locked = true;
 let run;
 try {
   run = spawnSync(electron, args, { cwd: ROOT, env, encoding: "utf8", timeout: 120000 });
 } finally {
-  rmSync(LOCK, { recursive: true, force: true });
+  dropLock();
 }
 const lines = `${run.stdout ?? ""}${run.stderr ?? ""}`.split("\n").filter((l) => /^\[(eval|eval error|capture error)\]/.test(l));
 for (const l of lines) console.log(l);
