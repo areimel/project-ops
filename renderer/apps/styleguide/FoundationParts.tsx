@@ -9,17 +9,19 @@ export function useTokenValues(names: readonly string[]): [React.RefObject<HTMLD
   const ref = useRef<HTMLDivElement>(null);
   const [settings] = useSettings();
   const [values, setValues] = useState<Record<string, string>>({});
+  const key = names.join(",");   // callers build `names` afresh each render: depend on its content, not its identity
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
+    const list = key.split(",");
     // The frame applies its accent override in its own layout effect, which runs after ours; wait one frame.
     const read = () => {
       const cs = getComputedStyle(el);
-      setValues(Object.fromEntries(names.map((n) => [n, cs.getPropertyValue(`--${n}`).trim()])));
+      setValues(Object.fromEntries(list.map((n) => [n, cs.getPropertyValue(`--${n}`).trim()])));
     };
     const id = requestAnimationFrame(read);
     return () => cancelAnimationFrame(id);
-  }, [names, settings.accent, settings.theme]);
+  }, [key, settings.accent, settings.theme]);
   return [ref, values];
 }
 

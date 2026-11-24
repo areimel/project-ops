@@ -45,8 +45,8 @@
   transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }
 .styleguide-rail-item:hover { background: var(--hover); color: var(--text); }
-.styleguide-rail-item[aria-current="true"] { background: var(--selected); color: var(--text); box-shadow: inset 2px 0 0 var(--accent); }
-.styleguide-rail-item:focus-visible { outline-offset: -2px; }
+.styleguide-rail-item[aria-current="true"] { background: var(--selected); color: var(--text); box-shadow: inset var(--select-bar) 0 0 var(--accent); }
+.styleguide-rail-item:focus-visible { outline-offset: calc(-1 * var(--focus-w)); }
 
 @container styleguide (max-width: 900px) {
   .styleguide-plate-body { grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); padding: var(--sp-5) var(--sp-5) var(--sp-4); }

@@ -58,6 +58,9 @@
 .styleguide-specimen { min-width: 0; max-width: 100%; position: relative; }
 .styleguide-error { padding: var(--sp-2) var(--sp-3); border: var(--line-w) solid var(--danger); color: var(--danger); font-size: var(--fs-sm); }
 
+.styleguide-bar-hint { font-size: var(--fs-sm); color: var(--text-muted); }
+/* One click selects the whole snippet: the page may not write the clipboard (the session grants no such permission). */
+.styleguide-snippet code { user-select: all; }
 .styleguide-snippet {
   margin: 0; padding: var(--sp-4); overflow-x: auto; background: var(--surface); border: var(--line-w) solid var(--line);
   font-size: var(--fs-sm); line-height: 1.5; tab-size: 2;

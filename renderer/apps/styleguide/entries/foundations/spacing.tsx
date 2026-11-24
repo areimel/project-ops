@@ -42,6 +42,6 @@ export const entry = {
     },
     { label: "Layers", render: () => <TokenRows names={["z-base", "z-chrome", "z-popover", "z-dialog", "z-toast"]} unused={["z-base", "z-chrome"]} /> },
     { label: "Motion", render: () => <TokenRows names={["dur-fast", "dur", "dur-glitch", "ease"]} /> },
-    { label: "Shell sizes and shadow", render: () => <TokenRows names={["titlebar-h", "footer-h", "content-max", "shadow-float"]} unused={["content-max"]} /> },
+    { label: "Shell sizes and shadow", render: () => <TokenRows names={["titlebar-h", "footer-h", "shadow-float"]} /> },
   ],
 } satisfies CatalogueEntry;

@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Button } from "../../components/common/Button";
-import { useShell } from "../../shell/ShellContext";
 import { Stamp } from "../projects/dossier/DossierGraphics";
 import { SpecimenBoundary } from "./SpecimenBoundary";
 import { SpecimenFrames } from "./SpecimenFrame";
@@ -33,21 +32,12 @@ function List({ title, items }: { title: string; items: string[] }) {
 
 interface Props { entry: CatalogueEntry; index: number; choice: ModeChoice }
 
-/** The one renderer every catalogue entry goes through. */
-export function Sheet({ entry, index, choice }: Props) {
-  const { toast } = useShell();
+/** The one renderer every catalogue entry goes through. Memoised: the scroll spy re-renders the page as the reader scrolls. */
+export const Sheet = memo(function Sheet({ entry, index, choice }: Props) {
   const [round, setRound] = useState(0);
   const heading = `${anchorId(entry.id)}-title`;
   const family = FAMILIES.find((f) => f.id === entry.family)?.title ?? entry.family;
 
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(entry.snippet);
-      toast("success", "Copied");
-    } catch {
-      toast("error", "Could not copy the snippet");
-    }
-  };
 
   return (
     <section id={anchorId(entry.id)} className="styleguide-sheet" aria-labelledby={heading}>
@@ -87,9 +77,9 @@ export function Sheet({ entry, index, choice }: Props) {
 
       <div className="styleguide-bar">
         <span className="styleguide-bar-title label">Snippet</span>
-        <Button variant="quiet" onClick={() => void copy()}>Copy</Button>
+        <span className="styleguide-bar-hint">Click the code to select it all</span>
       </div>
       <pre className="styleguide-snippet"><code>{entry.snippet}</code></pre>
     </section>
   );
-}
+});
