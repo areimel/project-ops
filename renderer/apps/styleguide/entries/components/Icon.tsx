@@ -25,9 +25,9 @@ export const entry = {
       label: "Sizes",
       render: () => (
         <div className="styleguide-row">
-          <span className="styleguide-small"><Icon name="pin" size={16} /> 16</span>
-          <span className="styleguide-small"><Icon name="pin" /> 20 (default)</span>
-          <span className="styleguide-small"><Icon name="pin" size={28} /> 28</span>
+          <span className="styleguide-small styleguide-inline"><Icon name="pin" size={16} /> 16</span>
+          <span className="styleguide-small styleguide-inline"><Icon name="pin" /> 20 (default)</span>
+          <span className="styleguide-small styleguide-inline"><Icon name="pin" size={28} /> 28</span>
         </div>
       ),
     },
@@ -36,7 +36,7 @@ export const entry = {
       render: () => (
         <div className="styleguide-row">
           <Icon name="info" />
-          <span className="styleguide-muted"><Icon name="info" /> Muted text colour</span>
+          <span className="styleguide-muted styleguide-inline"><Icon name="info" /> Muted text colour</span>
           <Button variant="primary" icon="warning">Accent ink</Button>
           <Button variant="danger" icon="trash">Danger ink</Button>
         </div>
@@ -65,7 +65,8 @@ export const entry = {
       label: "With text", wide: true,
       render: () => (
         <p>
-          <Icon name="pin" size={14} /> Pinned, and a link that opens outside the app <Icon name="arrowUpRight" size={12} />
+          <span className="styleguide-inline"><Icon name="pin" size={14} /> Pinned</span>, and{" "}
+          <span className="styleguide-inline">a link that opens outside the app <Icon name="arrowUpRight" size={12} /></span>
         </p>
       ),
     },

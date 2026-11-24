@@ -7,8 +7,8 @@
 .styleguide-sheet-stamp { position: absolute; top: 0; right: 0; }
 .styleguide-source { display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-4); margin: 0; font-size: var(--fs-xs); color: var(--text-muted); }
 .styleguide-source code, .styleguide-snippet, .styleguide-token code, .styleguide-icon code { font-family: var(--font-mono); }
-.styleguide-purpose { max-width: 70ch; margin-top: var(--sp-4); font-size: var(--fs-lg); }
-.styleguide-uses { display: grid; grid-template-columns: repeat(2, minmax(0, 36ch)); gap: var(--sp-5); margin-top: var(--sp-4); }
+.styleguide-purpose { max-width: 70ch; margin-top: var(--sp-3); font-size: var(--fs-lg); }
+.styleguide-uses { display: grid; grid-template-columns: repeat(2, minmax(0, 36ch)); gap: var(--sp-5); margin-top: var(--sp-3); }
 .styleguide-use-head { margin: 0 0 var(--sp-2); color: var(--text-muted); font-family: var(--label-font); font-size: var(--label-size); }
 .styleguide-use ul { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--sp-2); font-size: var(--fs-sm); }
 .styleguide-use li { position: relative; padding-left: var(--sp-4); }
@@ -17,7 +17,8 @@
 }
 .styleguide-use:first-child li::before { background: var(--accent); }
 .styleguide-use:last-child li::before { border: var(--line-w) solid var(--text-muted); }
-.styleguide-note { max-width: 75ch; margin-top: var(--sp-3); font-size: var(--fs-sm); color: var(--text-muted); }
+.styleguide-notes { display: grid; gap: var(--sp-2); max-width: 75ch; }
+.styleguide-note { margin: 0; font-size: var(--fs-sm); color: var(--text-muted); }
 
 .styleguide-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-top: var(--sp-5); padding-bottom: var(--sp-2); }
 .styleguide-bar-title { color: var(--text-muted); }
@@ -27,26 +28,32 @@
 .styleguide-frames.is-both { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @container (max-width: 760px) { .styleguide-frames.is-both { grid-template-columns: minmax(0, 1fr); } }
 .styleguide-frame {
-  position: relative; contain: layout; min-width: 0;
+  position: relative; contain: layout; min-width: 0; overflow: clip;
   background: var(--bg); color: var(--text); font-family: var(--font-text);
-  border-top: var(--line-w) solid var(--line); border-left: var(--line-w) solid var(--line);
+  border: var(--line-w) solid var(--line);
 }
 .styleguide-frame-label {
   margin: 0; padding: var(--sp-1) var(--sp-3); color: var(--text-muted); background: var(--surface-raised);
   border-right: var(--line-w) solid var(--line); border-bottom: var(--line-w) solid var(--line);
 }
 
-/* ---- specimen grid: hairlines from cell borders, so a short last row leaves no hole ---- */
-.styleguide-specimens { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+/* ---- specimen grid: cells draw their right and bottom hairlines; the grid runs 1px under the frame's border
+   (clipped), so outer edges are the frame's own and a short row ends at the frame instead of an open hole.
+   A row-wide cell draws its own top line over a hole left in the row above. ---- */
+.styleguide-specimens {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  margin: 0 calc(-1 * var(--line-w)) calc(-1 * var(--line-w)) 0;
+}
 .styleguide-cell {
   min-width: 0; padding: var(--sp-4);
   border-right: var(--line-w) solid var(--line); border-bottom: var(--line-w) solid var(--line);
 }
-.styleguide-cell.is-wide { grid-column: 1 / -1; }
+.styleguide-cell.is-wide { grid-column: 1 / -1; margin-top: calc(-1 * var(--line-w)); border-top: var(--line-w) solid var(--line); }
 .styleguide-cell-label { margin: 0 0 var(--sp-3); color: var(--text-muted); }
 .styleguide-cell-tag {
   display: inline-block; margin-left: var(--sp-2); padding: 0 var(--sp-1); border: var(--line-w) solid var(--text-muted);
-  font-size: var(--fs-xs);
+  font-family: var(--label-font); font-size: var(--label-size); font-weight: var(--label-weight);
+  letter-spacing: var(--label-track); text-transform: uppercase; color: var(--text-muted);
 }
 .styleguide-specimen { min-width: 0; max-width: 100%; position: relative; }
 .styleguide-error { padding: var(--sp-2) var(--sp-3); border: var(--line-w) solid var(--danger); color: var(--danger); font-size: var(--fs-sm); }
@@ -64,6 +71,9 @@
 .styleguide-box { display: inline-block; width: var(--sp-6); height: var(--sp-5); border: var(--line-w) solid var(--text); }
 .styleguide-bar-sample { display: block; height: var(--sp-3); background: var(--accent); }
 .styleguide-lines { display: inline-block; }
+.styleguide-inline { display: inline-flex; align-items: center; gap: var(--sp-1); vertical-align: middle; }
+.styleguide-pad { padding: var(--sp-3) var(--sp-4); }
+.styleguide-keys { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: center; gap: var(--sp-2) var(--sp-4); }
 
 .styleguide-token-rows { display: grid; }
 .styleguide-token-row, .styleguide-type-row { padding: var(--sp-2) 0; border-bottom: var(--line-w) solid var(--line); }

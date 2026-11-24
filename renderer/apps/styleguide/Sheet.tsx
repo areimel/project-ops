@@ -4,13 +4,13 @@ import { useShell } from "../../shell/ShellContext";
 import { Stamp } from "../projects/dossier/DossierGraphics";
 import { SpecimenBoundary } from "./SpecimenBoundary";
 import { SpecimenFrames } from "./SpecimenFrame";
-import { anchorId, sheetSerial, FAMILIES, type ModeChoice } from "./styleguideModel";
+import { anchorId, sheetSerial, spansRow, stackFrames, FAMILIES, type ModeChoice } from "./styleguideModel";
 import type { CatalogueEntry, Specimen } from "./types";
 
 function Cell({ s }: { s: Specimen }) {
   const style = s.width ? { width: `min(100%, ${s.width}px)` } : undefined;
   return (
-    <div className={`styleguide-cell${s.wide ? " is-wide" : ""}`}>
+    <div className={`styleguide-cell${spansRow(s) ? " is-wide" : ""}`}>
       <p className="styleguide-cell-label label">
         {s.label}
         {s.notInUse && <span className="styleguide-cell-tag">Not in use yet</span>}
@@ -66,19 +66,24 @@ export function Sheet({ entry, index, choice }: Props) {
         <List title="Use for" items={entry.useFor} />
         <List title="Not for" items={entry.notFor} />
       </div>
-      {entry.notes?.map((n) => <p key={n} className="styleguide-note">{n}</p>)}
-
       <div className="styleguide-bar">
         <span className="styleguide-bar-title label">Specimens</span>
         <Button variant="quiet" onClick={() => setRound((r) => r + 1)}>Reset specimens</Button>
       </div>
-      <SpecimenFrames key={round} choice={choice}>
+      <SpecimenFrames key={round} choice={choice} stacked={stackFrames(entry.specimens)}>
         {() => (
           <div className="styleguide-specimens">
             {entry.specimens.map((s) => <Cell key={s.label} s={s} />)}
           </div>
         )}
       </SpecimenFrames>
+
+      {entry.notes && entry.notes.length > 0 && (
+        <>
+          <div className="styleguide-bar"><span className="styleguide-bar-title label">Notes</span></div>
+          <div className="styleguide-notes">{entry.notes.map((n) => <p key={n} className="styleguide-note">{n}</p>)}</div>
+        </>
+      )}
 
       <div className="styleguide-bar">
         <span className="styleguide-bar-title label">Snippet</span>

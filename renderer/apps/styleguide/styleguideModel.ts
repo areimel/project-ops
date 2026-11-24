@@ -1,7 +1,7 @@
 // Pure logic of the styleguide: entry checks and order, the index rail, mode frames, scroll spy, contrast table.
 import type { ResolvedMode } from "../../../shared/theme";
 import { contrastRatio, isHex } from "../../theme/color";
-import type { CatalogueEntry, Family } from "./types";
+import type { CatalogueEntry, Family, Specimen } from "./types";
 
 export const FAMILIES: { id: Family; title: string }[] = [
   { id: "foundations", title: "Foundations" },
@@ -50,6 +50,23 @@ export type ModeChoice = "dark" | "light" | "both";
 
 export function framesFor(choice: ModeChoice): ResolvedMode[] {
   return choice === "both" ? ["dark", "light"] : [choice];
+}
+
+/** Widest fixed width that still fits a grid cell (cells are at least 260 px, about 290 to 320 in practice). */
+export const CELL_WIDTH = 320;
+
+/** A specimen takes a whole row when it asks to, or when its fixed width would not fit a cell (it would be clamped). */
+export const spansRow = (s: Pick<Specimen, "wide" | "width">) => Boolean(s.wide) || (s.width ?? 0) > CELL_WIDTH;
+
+/** In Both mode, frames sit side by side only when every specimen fits a cell; a sheet with a row-wide specimen stacks them. */
+export const stackFrames = (specimens: readonly Pick<Specimen, "wide" | "width">[]) => specimens.some(spansRow);
+
+/** The rail's scrollTop that keeps an item (top and height within the rail) in view, moving as little as possible. */
+export function railScrollTop(itemTop: number, itemHeight: number, scrollTop: number, viewHeight: number, margin = 0): number {
+  if (itemTop - margin < scrollTop) return Math.max(0, itemTop - margin);
+  const bottom = itemTop + itemHeight + margin;
+  if (bottom > scrollTop + viewHeight) return Math.max(0, Math.min(itemTop - margin, bottom - viewHeight));
+  return scrollTop;
 }
 
 /** The sheet the reader is on: the last one whose top has reached `offset`, else the first. */

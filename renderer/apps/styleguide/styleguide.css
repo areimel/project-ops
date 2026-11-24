@@ -5,25 +5,21 @@
 /* ---- plate ---- */
 .styleguide-plate { background: var(--bg); border-bottom: var(--line-w) solid var(--text); }
 .styleguide-plate-body {
-  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: var(--sp-6);
-  padding: var(--sp-5) var(--sp-7) var(--sp-5);
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 352px; gap: var(--sp-6);
+  padding: var(--sp-5) var(--sp-7);
 }
 .styleguide-plate-title {
   margin: 0; font-size: calc(var(--fs-display) * 1.75); line-height: 0.9; font-weight: var(--fw-heavy);
   letter-spacing: var(--track-heading); text-wrap: nowrap;
 }
 .styleguide-plate-lead { max-width: 52ch; margin-top: var(--sp-4); font-size: var(--fs-lg); }
-.styleguide-plate-side { display: flex; flex-direction: column; justify-content: flex-end; gap: var(--sp-4); }
+.styleguide-plate-limits { max-width: 60ch; margin-top: var(--sp-3); font-size: var(--fs-sm); color: var(--text-muted); }
+.styleguide-plate-side { display: flex; flex-direction: column; gap: var(--sp-4); }
 .styleguide-plate-table { border: var(--line-w) solid var(--text); }
-.styleguide-plate-table .kv-row { padding: var(--sp-2) var(--sp-3); }
+.styleguide-plate-table .kv-row { padding: var(--sp-1) var(--sp-3); }
 .styleguide-plate-table .kv-row + .kv-row { border-top: var(--line-w) solid var(--text); }
-.styleguide-plate-stamp { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
-.styleguide-plate-foot {
-  display: grid; grid-template-columns: minmax(0, 1fr) 280px; align-items: center; gap: var(--sp-6);
-  padding: var(--sp-3) var(--sp-7); border-top: var(--line-w) solid var(--line);
-}
-.styleguide-plate-limits { max-width: 75ch; font-size: var(--fs-sm); color: var(--text-muted); }
-.styleguide-plate-code { display: flex; flex-direction: column; gap: var(--sp-1); }
+.styleguide-plate-mark { display: flex; flex-direction: column; gap: var(--sp-2); }
+.styleguide-plate-mark-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-2) var(--sp-3); }
 .styleguide-plate-serial { color: var(--text-muted); }
 
 /* ---- body: rail and sheets ---- */
@@ -31,7 +27,7 @@
 .styleguide-main { container-type: inline-size; min-width: 0; padding: 0 var(--sp-7) var(--sp-7) var(--sp-6); }
 
 .styleguide-rail {
-  position: sticky; top: 0; max-height: 100cqh; overflow: hidden auto;
+  position: sticky; top: 0; max-height: 100cqh; overflow: hidden auto; overscroll-behavior: contain;
   padding: var(--sp-4) var(--sp-3) var(--sp-6) var(--sp-4); border-right: var(--line-w) solid var(--line);
 }
 .styleguide-rail-mode {
@@ -55,7 +51,7 @@
 @container styleguide (max-width: 900px) {
   .styleguide-plate-body { grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); padding: var(--sp-5) var(--sp-5) var(--sp-4); }
   .styleguide-plate-title { font-size: calc(var(--fs-display) * 1.4); }
-  .styleguide-plate-foot { grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); }
+  .styleguide-plate-side { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: end; }
   .styleguide-body { grid-template-columns: minmax(0, 1fr); }
   .styleguide-rail {
     position: static; max-height: 180px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));

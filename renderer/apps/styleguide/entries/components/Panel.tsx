@@ -24,7 +24,7 @@ export const entry = {
       render: () => (
         <Panel>
           <PanelHeader title="Sort" />
-          <p className="styleguide-muted">Panel body</p>
+          <p className="styleguide-muted styleguide-pad">Panel body</p>
         </Panel>
       ),
     },
@@ -35,7 +35,7 @@ export const entry = {
           <PanelHeader title="Filters">
             <span className="styleguide-small">3 active</span>
           </PanelHeader>
-          <p className="styleguide-muted">Panel body</p>
+          <p className="styleguide-muted styleguide-pad">Panel body</p>
         </Panel>
       ),
     },
@@ -43,7 +43,7 @@ export const entry = {
       label: "Without a header", width: 280,
       render: () => (
         <Panel>
-          <p className="styleguide-muted">A panel with no header</p>
+          <p className="styleguide-muted styleguide-pad">A panel with no header</p>
         </Panel>
       ),
     },

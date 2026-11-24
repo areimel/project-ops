@@ -21,11 +21,12 @@ function Frame({ mode, labelled, children }: { mode: ResolvedMode; labelled: boo
   );
 }
 
-/** One frame per mode of the choice; `children` is called per frame so each gets its own copy of the specimens. */
-export function SpecimenFrames({ choice, children }: { choice: ModeChoice; children: (mode: ResolvedMode) => ReactNode }) {
+/** One frame per mode of the choice; `children` is called per frame so each gets its own copy of the specimens.
+ *  `stacked` puts the two frames of Both under each other (for sheets whose specimens need the full width). */
+export function SpecimenFrames({ choice, stacked = false, children }: { choice: ModeChoice; stacked?: boolean; children: (mode: ResolvedMode) => ReactNode }) {
   const modes = framesFor(choice);
   return (
-    <div className={`styleguide-frames${modes.length > 1 ? " is-both" : ""}`}>
+    <div className={`styleguide-frames${modes.length > 1 && !stacked ? " is-both" : ""}`}>
       {modes.map((m) => <Frame key={m} mode={m} labelled={modes.length > 1}>{children(m)}</Frame>)}
     </div>
   );

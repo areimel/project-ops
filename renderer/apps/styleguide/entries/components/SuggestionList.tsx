@@ -4,9 +4,15 @@ import type { CatalogueEntry } from "../../types";
 
 const noop = () => {};
 
-function Sample(p: { label: string; items: string[]; active: number }) {
+/** The list under a read-only field, as Combobox and TagInput mount it: the field's wrapper is the positioned parent. */
+function Sample(p: { label: string; value: string; items: string[]; active: number }) {
   const id = useId();
-  return <SuggestionList id={id} label={p.label} items={p.items} active={p.active} onPick={noop} onClose={noop} />;
+  return (
+    <div className="text-field combobox">
+      <input aria-label={p.label.replace(" suggestions", "")} value={p.value} readOnly />
+      <SuggestionList id={id} label={p.label} items={p.items} active={p.active} onPick={noop} onClose={noop} />
+    </div>
+  );
 }
 const TAGS = ["client-site", "internal", "prototype", "wordpress"];
 const MANY = ["astro", "docker", "electron", "go", "node", "php", "python", "react", "rust", "svelte", "typescript", "vite", "vue", "wordpress"];
@@ -29,9 +35,9 @@ export const entry = {
   ],
   snippet: "{showing && (\n  <SuggestionList\n    id={`${id}-list`}\n    label=\"Category suggestions\"\n    items={items}\n    active={active}\n    onPick={pick}\n    onHover={setActive}\n    onClose={() => setOpen(false)}\n  />\n)}",
   specimens: [
-    { label: "A few items, one active", minHeight: 170, render: () => <Sample label="Tag suggestions" items={TAGS} active={1} /> },
-    { label: "Long list scrolls", minHeight: 270, render: () => <Sample label="Stack suggestions" items={MANY} active={0} /> },
-    { label: "Long item", minHeight: 110, render: () => <Sample label="Category suggestions" items={["Client work for a regional hospitality group"]} active={-1} /> },
+    { label: "A few items, one active", minHeight: 210, render: () => <Sample label="Tag suggestions" value="i" items={TAGS} active={1} /> },
+    { label: "Long list scrolls", minHeight: 290, render: () => <Sample label="Stack suggestions" value="" items={MANY} active={0} /> },
+    { label: "Long item", minHeight: 90, render: () => <Sample label="Category suggestions" value="Client" items={["Client work for a regional hospitality group"]} active={-1} /> },
   ],
   notes: [
     "The list is positioned top: 100% inside its parent, so the parent must be position relative. It caps at 240px and scrolls.",

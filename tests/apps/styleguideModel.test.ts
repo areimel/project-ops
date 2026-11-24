@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  FAMILIES, activeEntry, anchorId, collectEntries, contrastGrade, contrastPairs, framesFor, railGroups, sheetSerial,
+  FAMILIES, activeEntry, anchorId, collectEntries, contrastGrade, contrastPairs, framesFor, railGroups, railScrollTop, sheetSerial, spansRow, stackFrames,
 } from "../../renderer/apps/styleguide/styleguideModel";
 
 const spec = { label: "x", render: () => null };
@@ -58,5 +58,35 @@ describe("contrast", () => {
     expect(pairs).toHaveLength(1);
     expect(pairs[0]).toMatchObject({ fg: "text", bg: "bg", grade: "AAA" });
     expect(pairs[0].ratio).toBeCloseTo(21, 0);
+  });
+});
+
+describe("spansRow and stackFrames", () => {
+  it("spans the row when wide or wider than a cell", () => {
+    expect(spansRow({})).toBe(false);
+    expect(spansRow({ width: 320 })).toBe(false);
+    expect(spansRow({ width: 420 })).toBe(true);
+    expect(spansRow({ wide: true })).toBe(true);
+  });
+  it("stacks the frames when any specimen spans the row", () => {
+    expect(stackFrames([{}, { width: 280 }])).toBe(false);
+    expect(stackFrames([{}, { width: 640 }])).toBe(true);
+    expect(stackFrames([{ wide: true }])).toBe(true);
+  });
+});
+
+describe("railScrollTop", () => {
+  it("keeps the scroll when the item is in view", () => {
+    expect(railScrollTop(100, 20, 50, 200)).toBe(50);
+  });
+  it("scrolls up to an item above the view", () => {
+    expect(railScrollTop(30, 20, 50, 200, 8)).toBe(22);
+    expect(railScrollTop(4, 20, 50, 200, 8)).toBe(0);
+  });
+  it("scrolls down just enough for an item below the view", () => {
+    expect(railScrollTop(300, 20, 50, 200, 8)).toBe(128);
+  });
+  it("shows the top of an item taller than the view", () => {
+    expect(railScrollTop(300, 400, 0, 200, 8)).toBe(292);
   });
 });

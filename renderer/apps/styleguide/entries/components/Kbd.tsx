@@ -22,10 +22,10 @@ export const entry = {
     {
       label: "Platform spelling",
       render: () => (
-        <div className="styleguide-row">
-          <span className="styleguide-small">mac={"{false}"} <Kbd k="CmdOrCtrl+O" mac={false} /></span>
-          <span className="styleguide-small">mac <Kbd k="CmdOrCtrl+O" mac /></span>
-          <span className="styleguide-small">This machine <Kbd k="CmdOrCtrl+O" /></span>
+        <div className="styleguide-keys styleguide-small">
+          <span>Linux and Windows</span><Kbd k="CmdOrCtrl+O" mac={false} />
+          <span>macOS</span><Kbd k="CmdOrCtrl+O" mac />
+          <span>This machine</span><Kbd k="CmdOrCtrl+O" />
         </div>
       ),
     },
