@@ -20,9 +20,10 @@ export function useToasts(): {
   return { items, push, dismiss };
 }
 
-export function ToastHost({ items, onDismiss }: { items: ToastItem[]; onDismiss(id: number): void }) {
+/** `inline` lays the stack out in normal flow instead of fixed to the window corner (the styleguide). */
+export function ToastHost({ items, onDismiss, inline = false }: { items: ToastItem[]; onDismiss(id: number): void; inline?: boolean }) {
   return (
-    <div className="toast-host" aria-live="polite">
+    <div className={`toast-host${inline ? " is-inline" : ""}`} aria-live="polite">
       {items.map((t) => (
         <div key={t.id} className={`toast toast-${t.kind}`} role={t.kind === "error" ? "alert" : undefined}>
           <span>{t.message}</span>

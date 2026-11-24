@@ -11,12 +11,14 @@ interface Props {
   placeholder?: string;
   maxLength?: number;
   className?: string;
+  /** Start with the suggestion list open (needs at least one matching suggestion). */
+  defaultOpen?: boolean;
 }
 
 /** A single-value text input with a suggestion list; free text is allowed. `onChange` fires on every edit and pick. */
-export function Combobox({ label, hideLabel, value, onChange, suggestions, placeholder, maxLength, className = "" }: Props) {
+export function Combobox({ label, hideLabel, value, onChange, suggestions, placeholder, maxLength, className = "", defaultOpen = false }: Props) {
   const id = useId();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [active, setActive] = useState(-1);
   const items = filterSuggestions(suggestions, [], value);
   const showing = open && items.length > 0;

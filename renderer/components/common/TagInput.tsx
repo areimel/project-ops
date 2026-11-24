@@ -13,14 +13,16 @@ interface Props {
   maxLength?: number;
   placeholder?: string;
   className?: string;
+  /** Start with the suggestion list open (needs at least one suggestion not already chosen). */
+  defaultOpen?: boolean;
 }
 
 /** Tags as removable badges plus a text input. Enter or "," adds, Backspace on empty removes the last, paste splits on commas. */
-export function TagInput({ label, hideLabel, value, onChange, suggestions = [], max, maxLength, placeholder, className = "" }: Props) {
+export function TagInput({ label, hideLabel, value, onChange, suggestions = [], max, maxLength, placeholder, className = "", defaultOpen = false }: Props) {
   const id = useId();
   const input = useRef<HTMLInputElement>(null);
   const [text, setText] = useState("");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [active, setActive] = useState(-1);
   const items = text.trim() || open ? filterSuggestions(suggestions, value, text) : [];
   const showing = open && items.length > 0;

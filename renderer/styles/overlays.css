@@ -39,6 +39,8 @@
   position: fixed; inset: 0; z-index: var(--z-dialog); display: grid; place-items: center; padding: var(--sp-4);
   background: var(--scrim);
 }
+/* Shown in place (Dialog `inline`): no viewport cover, no scrim. */
+.dialog-backdrop.is-inline { position: static; display: block; padding: 0; background: none; }
 .dialog {
   display: flex; flex-direction: column; width: 480px; max-width: 100%; max-height: calc(100vh - 2 * var(--sp-5));
   background: var(--surface); color: var(--text);
@@ -67,6 +69,7 @@
   position: fixed; right: var(--sp-4); bottom: calc(var(--footer-h) + var(--sp-3)); z-index: var(--z-toast);
   display: flex; flex-direction: column; align-items: flex-end; gap: var(--sp-2); pointer-events: none;
 }
+.toast-host.is-inline { position: static; align-items: flex-start; }
 .toast {
   --toast-light: var(--text-muted);
   display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4);
