@@ -1,0 +1,11 @@
+/* The pieces in ProjectParts.tsx. Tokens only. */
+.projects-none { color: var(--text-muted); }
+.projects-dirty { margin-left: var(--sp-2); vertical-align: 1px; }
+.projects-link {
+  display: inline-flex; align-items: center; gap: 2px; padding: 0; border: 0; background: none; color: var(--text);
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: var(--line-w); text-decoration-color: var(--line);
+  transition: color var(--dur-fast) var(--ease), text-decoration-color var(--dur-fast) var(--ease);
+}
+.projects-link + .projects-link { margin-left: var(--sp-3); }
+.projects-link:hover { color: var(--accent-text); text-decoration-color: currentColor; }
+.card.is-muted .projects-link { color: var(--text-muted); }

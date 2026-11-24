@@ -118,16 +118,6 @@
 .projects-path-head { flex: 0 1000 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .projects-path-tail { flex: 0 1 auto; min-width: 4ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .projects-rail-hint { margin: 0; color: var(--text-muted); font-size: var(--fs-sm); line-height: 1.5; }
-.projects-none { color: var(--text-muted); }
-.projects-dirty { margin-left: var(--sp-2); vertical-align: 1px; }
-.projects-link {
-  display: inline-flex; align-items: center; gap: 2px; padding: 0; border: 0; background: none; color: var(--text);
-  text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: var(--line-w); text-decoration-color: var(--line);
-  transition: color var(--dur-fast) var(--ease), text-decoration-color var(--dur-fast) var(--ease);
-}
-.projects-link + .projects-link { margin-left: var(--sp-3); }
-.projects-link:hover { color: var(--accent-text); text-decoration-color: currentColor; }
-.card.is-muted .projects-link { color: var(--text-muted); }
 
 .projects-card-foot { gap: 0; padding: var(--sp-2); }
 .projects-card-open { margin-right: var(--sp-2); padding: 0 var(--sp-3); }

@@ -1,11 +1,10 @@
 import { memo } from "react";
 import type { OpenTarget } from "../../../shared/projects/record";
 import type { ProjectView } from "../../../shared/projects/view";
-import { Button } from "../../components/common/Button";
 import { Card, CardBody, CardFooter } from "../../components/common/Card";
-import { IconButton } from "../../components/common/IconButton";
 import { StatusDot } from "../../components/common/StatusDot";
-import { cardMuted, cardStatus } from "../projects/cardModel";
+import { branchTitle, cardMuted, cardStatus } from "../projects/cardModel";
+import { DirtyMark, OpenActions } from "../projects/ProjectParts";
 
 /** What a tile can ask for, by project id, so one stable object serves every tile. */
 export interface TileActions {
@@ -34,18 +33,15 @@ function ProjectTileImpl({ project: p, note, actions: a }: Props) {
           <StatusDot tone={status.tone} className="dashboard-tile-status">{status.label}</StatusDot>
         </div>
         <p className="dashboard-tile-meta">
-          <span className="dashboard-tile-branch" title={p.dirty ? `${p.branch ?? "No branch"}: uncommitted changes` : p.branch ?? undefined}>
+          <span className="dashboard-tile-branch" title={branchTitle(p)}>
             {gone ? "Folder missing" : p.branch ?? "No git"}
-            {p.dirty && !gone && <span className="bullet dashboard-dirty" title="Uncommitted changes"><span className="visually-hidden">, uncommitted changes</span></span>}
+            {p.dirty && !gone && <DirtyMark />}
           </span>
           <span className="dashboard-tile-note">{note}</span>
         </p>
       </CardBody>
       <CardFooter className="dashboard-tile-foot">
-        <Button variant="quiet" icon="code" className="dashboard-tile-open" aria-label={`Open ${p.name} in editor`} title="Open in editor"
-          disabled={gone} onClick={() => a.open(p.id, "editor")}>Editor</Button>
-        <IconButton icon="terminal" label="Open terminal here" disabled={gone} onClick={() => a.open(p.id, "terminal")} />
-        <IconButton icon="folder" label="Open folder" disabled={gone} onClick={() => a.open(p.id, "folder")} />
+        <OpenActions project={p} editorClassName="dashboard-tile-open" onOpen={(t) => a.open(p.id, t)} />
       </CardFooter>
     </Card>
   );

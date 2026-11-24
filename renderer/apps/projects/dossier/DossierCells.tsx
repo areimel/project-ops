@@ -1,18 +1,16 @@
-import { PROJECT_LINK_KEYS, type ProjectLinkKey } from "../../../../shared/projects/record";
+import type { ProjectLinkKey } from "../../../../shared/projects/record";
 import type { ProjectView } from "../../../../shared/projects/view";
 import { Badge } from "../../../components/common/Badge";
 import { Button } from "../../../components/common/Button";
-import { Icon } from "../../../components/common/Icon";
 import { IconButton } from "../../../components/common/IconButton";
 import { KeyValue, KeyValueList } from "../../../components/common/KeyValue";
 import { MosaicCell } from "../../../components/common/Mosaic";
-import { GIT_UNREAD_NOTE, gitInfo, splitFolder, stackLabel } from "../cardModel";
+import { gitInfo, linkKeys, splitFolder, stackLabel } from "../cardModel";
 import type { CardActions } from "../ProjectCard";
+import { GitRows, NoneText, OpenActions, ProjectLinks } from "../ProjectParts";
 import { relativeTime } from "../projectsModel";
 import { formatDate, hasSiteDetails, remoteLabel, siteRows, timeline } from "./dossierModel";
 
-const LINK_LABELS: Record<ProjectLinkKey, string> = { repo: "Repo", site: "Site", docs: "Docs" };
-const None = ({ children = "None" }: { children?: string }) => <span className="projects-none">{children}</span>;
 
 export function SiteCell({ p, onEdit }: { p: ProjectView; onEdit(): void }) {
   const rows = siteRows(p);
@@ -37,13 +35,7 @@ export function GitCell({ p, now }: { p: ProjectView; now: number }) {
     <MosaicCell label="Git" span={4} narrowSpan={6}>
       {git === "none" && !p.branch ? <p className="projects-dossier-muted">Git: None</p> : (
         <KeyValueList>
-          <KeyValue label="Branch" title={p.dirty ? `${p.branch ?? "No branch"}: uncommitted changes` : p.branch ?? undefined}>
-            {p.branch ?? <None />}
-            {p.dirty && <span className="bullet projects-dirty" title="Uncommitted changes"><span className="visually-hidden">, uncommitted changes</span></span>}
-          </KeyValue>
-          <KeyValue label="Last commit" title={git === "read" ? new Date(p.lastCommitAt!).toLocaleString() : GIT_UNREAD_NOTE}>
-            {git === "read" ? relativeTime(p.lastCommitAt, now) : <None>Unknown</None>}
-          </KeyValue>
+          <GitRows project={p} now={now} />
           {remote && <KeyValue label="Remote">{remote}</KeyValue>}
         </KeyValueList>
       )}
@@ -55,7 +47,7 @@ function Group({ label, items }: { label: string; items: readonly string[] }) {
   return (
     <div className="projects-dossier-group">
       <span className="label projects-dossier-sub">{label}</span>
-      {items.length === 0 ? <None /> : <div className="projects-dossier-chips">{items.map((s) => <Badge key={s}>{s}</Badge>)}</div>}
+      {items.length === 0 ? <NoneText /> : <div className="projects-dossier-chips">{items.map((s) => <Badge key={s}>{s}</Badge>)}</div>}
     </div>
   );
 }
@@ -79,16 +71,12 @@ export function NotesCell({ p }: { p: ProjectView }) {
 }
 
 export function LinksCell({ p, onOpen }: { p: ProjectView; onOpen(key: ProjectLinkKey): void }) {
-  const keys = PROJECT_LINK_KEYS.filter((k) => p.links[k] !== null);
+  const keys = linkKeys(p);
   return (
     <MosaicCell label="Links" span={4}>
       {keys.length === 0 ? <p className="projects-dossier-muted">No links</p> : (
         <div className="projects-dossier-links">
-          {keys.map((k) => (
-            <button key={k} type="button" className="projects-link" title={p.links[k] ?? undefined} onClick={() => onOpen(k)}>
-              {LINK_LABELS[k]}<Icon name="arrowUpRight" size={12} />
-            </button>
-          ))}
+          <ProjectLinks project={p} onOpen={onOpen} />
         </div>
       )}
     </MosaicCell>
@@ -114,7 +102,6 @@ export function TimelineCell({ p, now }: { p: ProjectView; now: number }) {
 
 export function LocationCell({ p, actions: a }: { p: ProjectView; actions: CardActions }) {
   const folder = splitFolder(p.folder);
-  const gone = p.missing;
   return (
     <MosaicCell label="Location" span={12}>
       <div className="projects-dossier-location">
@@ -123,9 +110,7 @@ export function LocationCell({ p, actions: a }: { p: ProjectView; actions: CardA
           <strong>{folder.tail}</strong>
         </span>
         <span className="projects-dossier-actions">
-          <Button variant="quiet" icon="code" disabled={gone} onClick={() => a.open(p.id, "editor")}>Editor</Button>
-          <Button variant="quiet" icon="terminal" disabled={gone} onClick={() => a.open(p.id, "terminal")}>Terminal</Button>
-          <Button variant="quiet" icon="folder" disabled={gone} onClick={() => a.open(p.id, "folder")}>Folder</Button>
+          <OpenActions project={p} labels="all" onOpen={(t) => a.open(p.id, t)} />
           <IconButton icon="copy" label="Copy path" onClick={() => a.copyPath(p.id)} />
         </span>
       </div>

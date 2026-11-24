@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  capList, cardCategory, cardMuted, cardStatus, gitInfo, splitFolder, stackLabel, traitRows,
+  LINK_LABELS, branchTitle, capList, cardCategory, cardMuted, cardStatus, gitInfo, lastCommitTitle, linkKeys, splitFolder, stackLabel, traitRows,
 } from "../../renderer/apps/projects/cardModel";
 import {
   VIEW_STATE_KEY, activeFilters, categoryValue, cycleTag, healViewState, includeTag, revealFilters, tagState, visibleTags,
@@ -171,5 +171,24 @@ describe("pinnedSplit", () => {
     expect(pinnedSplit([project(), project()])).toBe(0);
     expect(pinnedSplit([project({ pinned: true }), project({ pinned: true })])).toBe(0);
     expect(pinnedSplit([project({ pinned: true }), project({ pinned: true }), project()])).toBe(2);
+  });
+});
+
+describe("shared card and dossier parts", () => {
+  it("lists the links a project has in the fixed order, each with a label", () => {
+    expect(linkKeys(project())).toEqual([]);
+    const p = project({ links: { repo: "https://a.example/", site: null, docs: "https://b.example/" } });
+    expect(linkKeys(p)).toEqual(["repo", "docs"]);
+    expect(linkKeys(p).map((k) => LINK_LABELS[k])).toEqual(["Repo", "Docs"]);
+  });
+  it("words the branch tooltip, with a note for uncommitted changes", () => {
+    expect(branchTitle({ branch: "main", dirty: false })).toBe("main");
+    expect(branchTitle({ branch: null, dirty: null })).toBeUndefined();
+    expect(branchTitle({ branch: "main", dirty: true })).toBe("main: uncommitted changes");
+    expect(branchTitle({ branch: null, dirty: true })).toBe("No branch: uncommitted changes");
+  });
+  it("words the last-commit tooltip: the time when read, the reason when not", () => {
+    expect(lastCommitTitle({ branch: "main", lastCommitAt: 1_700_000_000_000 })).toBe(new Date(1_700_000_000_000).toLocaleString());
+    expect(lastCommitTitle({ branch: "main", lastCommitAt: null })).toMatch(/not read/);
   });
 });

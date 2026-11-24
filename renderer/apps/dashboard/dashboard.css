@@ -22,7 +22,6 @@
 .dashboard-tile-meta { display: flex; justify-content: space-between; gap: var(--sp-2); margin: 0; color: var(--text-muted); font-size: var(--fs-sm); }
 .dashboard-tile-branch { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: var(--fs-xs); }
 .dashboard-tile-note { flex: none; white-space: nowrap; }
-.dashboard-dirty { margin-left: var(--sp-2); vertical-align: 1px; }
 .dashboard-tile-foot { gap: 0; padding: var(--sp-2); }
 .dashboard-tile-open { margin-right: auto; padding: 0 var(--sp-3); }
 .dashboard-tile-foot .icon-btn { color: var(--text-muted); }
