@@ -16,6 +16,7 @@ import { useAttempt } from "../hooks/useAttempt";
 import { useShell } from "../shell/ShellContext";
 import { projectCount, scanMessage } from "../utils/projectText";
 import { launcherChoices, settingFromValue } from "./projectsSettingsModel";
+import { SettingsSection } from "./SettingsSection";
 
 /** One picker for the program a project opens in: the same field for the editor and the terminal. */
 function LauncherField(p: { kind: LauncherKind; settingKey: "editor" | "terminal"; label: string; hint: string }) {
@@ -81,14 +82,13 @@ export function ProjectsSection() {
     reloadLaunchers().catch((e: unknown) => console.error("Could not check for programs:", e)).finally(() => setChecking(false));
   };
   return (
-    <section className="settings-section" aria-labelledby="set-projects">
-      <h2 id="set-projects">Projects</h2>
+    <SettingsSection id="set-projects" title="Projects">
       <ScanFolders />
       <LauncherField kind="editor" settingKey="editor" label="Code editor" hint="Used by Open in editor." />
       <LauncherField kind="terminal" settingKey="terminal" label="Terminal" hint="Used by Open in terminal." />
       <Field label="Installed programs" hint="Looks for editors and terminals again, for example after you install one.">
         <Button variant="quiet" icon="refresh" disabled={checking} onClick={check}>Check again</Button>
       </Field>
-    </section>
+    </SettingsSection>
   );
 }

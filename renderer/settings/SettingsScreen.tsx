@@ -5,17 +5,17 @@ import { AboutSection } from "./AboutSection";
 import { AppearanceSection } from "./AppearanceSection";
 import { DataSection } from "./DataSection";
 import { ProjectsSection } from "./ProjectsSection";
+import { SettingsSection } from "./SettingsSection";
 import "./settings.css";
 
 function BehaviourSection() {
   const [closeToTray, setCloseToTray] = useSetting("closeToTray");
   return (
-    <section className="settings-section" aria-labelledby="set-behaviour">
-      <h2 id="set-behaviour">Behaviour</h2>
+    <SettingsSection id="set-behaviour" title="Behaviour">
       <Field label="Close to tray" hint="Closing the window keeps the app running in the tray. Needs a visible tray icon.">
         <Switch label="Close to tray" checked={closeToTray} onChange={setCloseToTray} />
       </Field>
-    </section>
+    </SettingsSection>
   );
 }
 

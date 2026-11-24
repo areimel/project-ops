@@ -5,6 +5,7 @@ import { Button } from "../components/common/Button";
 import { Field } from "../components/common/Field";
 import { CHANGELOG } from "../utils/changelog";
 import { CREDITS } from "../utils/credits";
+import { SettingsSection } from "./SettingsSection";
 
 const LINKS: { key: LinkKey; label: string }[] = [
   { key: "website", label: "Website" }, { key: "issues", label: "Report an issue" }, { key: "source", label: "Source code" },
@@ -18,10 +19,9 @@ export function AboutSection() {
   const recent = CHANGELOG.slice(0, 3);
 
   return (
-    <section className="settings-section" aria-labelledby="set-about">
-      <h2 id="set-about">About</h2>
+    <SettingsSection id="set-about" title="About">
       <Field label={brand.name} hint={brand.tagline}>
-        <dl className="about-facts">
+        <dl className="settings-about-facts">
           <dt className="label">Version</dt><dd>{info?.version ?? CREDITS.version}</dd>
           <dt className="label">Electron</dt><dd>{info?.electron ?? "Not available"}</dd>
           <dt className="label">Chrome</dt><dd>{info?.chrome ?? "Not available"}</dd>
@@ -34,16 +34,16 @@ export function AboutSection() {
       </Field>
       {recent.length > 0 && (
         <Field label="Recent changes">
-          <ul className="about-list">
+          <ul className="settings-about-list">
             {recent.map((c) => <li key={c.version}>{c.version}{c.date ? `, ${c.date}` : ""}</li>)}
           </ul>
         </Field>
       )}
       <Field label="Credits" hint={brand.copyright}>
         {CREDITS.thirdParty.length > 0
-          ? <ul className="about-list">{CREDITS.thirdParty.map((t) => <li key={t}>{t}</li>)}</ul>
+          ? <ul className="settings-about-list">{CREDITS.thirdParty.map((t) => <li key={t}>{t}</li>)}</ul>
           : <span className="settings-muted">No third-party notices listed.</span>}
       </Field>
-    </section>
+    </SettingsSection>
   );
 }

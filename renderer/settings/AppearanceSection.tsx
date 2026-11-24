@@ -9,6 +9,7 @@ import { TextField } from "../components/common/TextField";
 import { useSettings } from "../hooks/useSettings";
 import { useSystemDark } from "../theme/useTheme";
 import { accentIsHardToRead, normalizeHex } from "./themeTokens";
+import { SettingsSection } from "./SettingsSection";
 
 const MODES: { value: ModeSetting; label: string }[] = [
   { value: "light", label: "Light" }, { value: "dark", label: "Dark" }, { value: "system", label: "System" },
@@ -44,17 +45,16 @@ export function AppearanceSection() {
   };
 
   return (
-    <section className="settings-section" aria-labelledby="set-appearance">
-      <h2 id="set-appearance">Appearance</h2>
+    <SettingsSection id="set-appearance" title="Appearance">
       <Field label="Mode" hint="System follows your operating system.">
         <Segmented<ModeSetting> label="Mode" options={MODES} value={settings.mode} onChange={(m) => save({ mode: m })} />
       </Field>
       <Field label="Accent" hint="Replaces the orange accent.">
-        <div className="accent-control">
-          <div className="accent-row">
-            <input type="color" className="accent-swatch" aria-label="Accent colour" value={shown}
+        <div className="settings-accent-control">
+          <div className="settings-accent-row">
+            <input type="color" className="settings-accent-swatch" aria-label="Accent colour" value={shown}
               onChange={(e) => save({ accent: e.target.value })} />
-            <TextField label="Accent hex colour" hideLabel className="accent-hex" value={draft} maxLength={7} spellCheck={false}
+            <TextField label="Accent hex colour" hideLabel className="settings-accent-hex" value={draft} maxLength={7} spellCheck={false}
               invalid={invalid} onChange={onHex} onBlur={onBlur} />
             <Button variant="quiet" disabled={settings.accent === null} onClick={() => save({ accent: null })}>Use default accent</Button>
           </div>
@@ -67,6 +67,6 @@ export function AppearanceSection() {
           )}
         </div>
       </Field>
-    </section>
+    </SettingsSection>
   );
 }

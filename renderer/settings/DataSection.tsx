@@ -3,6 +3,7 @@ import { Button } from "../components/common/Button";
 import { Field } from "../components/common/Field";
 import { useAttempt } from "../hooks/useAttempt";
 import { useShell } from "../shell/ShellContext";
+import { SettingsSection } from "./SettingsSection";
 
 /** Export, import, show folder and reset. Each action says what happened in a toast, with the same words as its button. */
 export function DataSection() {
@@ -47,8 +48,7 @@ export function DataSection() {
   }, "Could not reset your data. Close the app and try again.");
 
   return (
-    <section className="settings-section" aria-labelledby="set-data">
-      <h2 id="set-data">Data</h2>
+    <SettingsSection id="set-data" title="Data">
       <Field label="Backup" hint="Projects, scan folders and settings go into one file you can move to another computer. The file contains folder paths from this computer.">
         <Button variant="quiet" icon="save" disabled={busy} onClick={exportData}>Export data</Button>
         <Button variant="quiet" icon="folder" disabled={busy} onClick={importData}>Import data</Button>
@@ -59,6 +59,6 @@ export function DataSection() {
       <Field label="Reset" hint="Deletes your projects, scan folders, resource links and settings. Folders on disk are not touched.">
         <Button variant="danger" icon="trash" disabled={busy} onClick={reset}>Reset all data</Button>
       </Field>
-    </section>
+    </SettingsSection>
   );
 }
