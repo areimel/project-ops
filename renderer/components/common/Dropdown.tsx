@@ -32,7 +32,8 @@ export function Dropdown<T extends string | number>(p: Props<T>) {
   const menu = useRef<HTMLUListElement>(null);
 
   const unavailable = p.disabled || p.options.length === 0;
-  const close = (refocus: boolean) => { setOpen(false); if (refocus) btn.current?.focus(); };
+  // A menu that was only pre-opened (never opened by the owner) closes without pulling focus to its button.
+  const close = (refocus: boolean) => { setOpen(false); if (refocus && userOpened.current) btn.current?.focus(); };
   const show = () => {
     if (unavailable) return;
     setActive(Math.max(0, p.options.findIndex((o) => o.value === p.selected)));

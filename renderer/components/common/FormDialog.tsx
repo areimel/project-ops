@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
+import { saveStep } from "./fieldModel";
 
 interface Props<P> {
   title: string;
@@ -34,12 +35,16 @@ export function FormDialog<P>({
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
-    if (invalid || saving) return;
-    const next = patch();
-    if (next === null) { onClose(); return; }
+    const step = saveStep(invalid || saving, patch);
+    if (step.kind === "ignore") return;
+    if (step.kind === "close") { onClose(); return; }
     setSaving(true);
-    const ok = await onSave(next);
-    setSaving(false);
+    let ok = false;
+    try {
+      ok = await onSave(step.patch);
+    } finally {
+      setSaving(false);   // a save that throws must not leave the form stuck on "saving"
+    }
     if (ok) onClose();
   };
 
