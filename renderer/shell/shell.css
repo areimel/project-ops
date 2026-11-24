@@ -126,10 +126,9 @@ html, body, #root { height: 100%; }
   padding: 0 var(--sp-4);
 }
 .title-block > .title-block-name::before { content: ""; width: var(--bullet); height: var(--bullet); background: var(--accent); }
-.title-block-count, .title-block-state { color: var(--text-muted); }
-.title-block-state.is-unsaved { color: var(--text); }
-.title-block-state.is-error { color: var(--danger); }
-.title-block-state.is-saved { color: var(--success); }
+.title-block-count { color: var(--text-muted); }
+.title-block-state { color: var(--tone-text); }
+.title-block-state.is-unsaved { --tone-text: var(--text); }
 @media (max-width: 760px) { .title-block-count { display: none; } }
 
 /* Command palette, shortcut help, confirm */

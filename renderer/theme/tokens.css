@@ -37,6 +37,7 @@
   --hazard-w: 10px;
   --line-w: 1px; --focus-w: 2px; --focus-offset: 3px;
   --control-h: 34px;
+  --select-bar: 2px;   /* the accent bar on the left of a selected row */
   --bullet: 7px;   /* the solid accent square used as a bullet or status light */
 
   /* Layers */

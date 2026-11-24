@@ -21,7 +21,7 @@ export const OTHER_TOKENS = [
   "font-text", "font-display", "font-mono",
   "lh-tight", "lh-body", "track-heading",
   "label-font", "label-size", "label-weight", "label-track",
-  "r", "r-pill", "hazard-w", "line-w", "focus-w", "focus-offset", "control-h", "bullet",
+  "r", "r-pill", "hazard-w", "line-w", "focus-w", "focus-offset", "control-h", "bullet", "select-bar",
   "z-base", "z-chrome", "z-popover", "z-dialog", "z-toast",
   "dur-fast", "dur", "dur-glitch", "ease",
   "titlebar-h", "footer-h",

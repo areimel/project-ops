@@ -11,6 +11,11 @@ export const SAVE_LABEL: Record<SaveState, string> = {
   saved: "Saved", saving: "Saving", unsaved: "Unsaved changes", error: "Save failed",
 };
 
+/** The tone the footer state is drawn in; "unsaved" and the plain version text are drawn by their own rules over muted. */
+export function stateTone(tone: SaveState | "plain"): "success" | "danger" | "muted" {
+  return tone === "saved" ? "success" : tone === "error" ? "danger" : "muted";
+}
+
 export interface TitleBlockModel {
   name: string;
   view: string;

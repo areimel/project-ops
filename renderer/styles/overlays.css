@@ -73,14 +73,10 @@
 }
 .toast-host.is-inline { position: static; align-items: flex-start; }
 .toast {
-  --toast-light: var(--text-muted);
   display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4);
   min-width: 240px; max-width: 420px; padding: var(--sp-3) var(--sp-4); pointer-events: auto;
   background: var(--surface-raised); color: var(--text);
-  border: var(--line-w) solid var(--control-border); border-left: 3px solid var(--toast-light); border-radius: var(--r);
+  border: var(--line-w) solid var(--control-border); border-left: 3px solid var(--tone, var(--text-muted)); border-radius: var(--r);
   box-shadow: var(--shadow-float); font-size: var(--fs-md);
 }
 .toast-actions { display: inline-flex; align-items: center; gap: var(--sp-1); }
-.toast-success { --toast-light: var(--success); }
-.toast-error { --toast-light: var(--danger); }
-.toast-info { --toast-light: var(--accent); }

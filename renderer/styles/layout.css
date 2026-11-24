@@ -8,7 +8,7 @@
   transition: background-color var(--dur-fast) var(--ease);
 }
 .list-row:hover { background: var(--hover); }
-.list-row.is-selected { background: var(--selected); box-shadow: inset 3px 0 0 var(--accent); }   /* a selection bar, not a shadow */
+.list-row.is-selected { background: var(--selected); box-shadow: inset var(--select-bar) 0 0 var(--accent); }   /* a selection bar, not a shadow */
 .list-row-leading { display: flex; align-items: center; color: var(--text-muted); }
 .list-row-title {
   display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 2px;

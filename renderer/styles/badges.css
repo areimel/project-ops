@@ -36,11 +36,8 @@
 
 /* Status light: a solid square and its label. */
 .status { display: inline-flex; align-items: center; gap: var(--sp-2); color: var(--text); white-space: nowrap; }
-.status::before { content: ""; flex: none; width: var(--bullet); height: var(--bullet); background: var(--accent); }
-.status-success::before { background: var(--success); }
-.status-muted { color: var(--text-muted); }
-.status-muted::before { background: var(--text-muted); }
-.status-danger::before { background: var(--danger); }
+.status::before { content: ""; flex: none; width: var(--bullet); height: var(--bullet); background: var(--tone, var(--accent)); }
+.status.tone-muted { color: var(--tone-text); }
 
 /* Tag input: a text-field look around the badges and a bare input. */
 .tag-input-field, .combobox { position: relative; display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
@@ -61,5 +58,5 @@
 
 /* Suggestion list: the dropdown menu, with a highlighted row that follows the arrow keys. */
 .suggestion-list { top: 100%; right: 0; max-height: 240px; overflow-y: auto; }
-.suggestion-list .dropdown-item.is-active { background: var(--hover); box-shadow: inset 2px 0 0 var(--accent); }
+.suggestion-list .dropdown-item.is-active { background: var(--hover); box-shadow: inset var(--select-bar) 0 0 var(--accent); }
 .tag-input-field > .suggestion-list { top: calc(100% + var(--sp-1)); }

@@ -58,6 +58,13 @@ svg { display: block; flex: none; }
   width: var(--bullet); height: var(--bullet); background: var(--accent);
 }
 
+/* Tones: what a status light, a toast, the footer state and a stamp paint with. --tone fills (a light, an edge);
+   --tone-text colours text or a thin line. Set one class, read the two variables. */
+.tone-accent { --tone: var(--accent); --tone-text: var(--accent-text); }
+.tone-success { --tone: var(--success); --tone-text: var(--success); }
+.tone-muted { --tone: var(--text-muted); --tone-text: var(--text-muted); }
+.tone-danger { --tone: var(--danger); --tone-text: var(--danger); }
+
 /* Quiet text: a short line of help, and plain muted colour. */
 .hint { margin: 0; color: var(--text-muted); font-size: var(--fs-sm); line-height: 1.5; }
 .text-muted { color: var(--text-muted); }

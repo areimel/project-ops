@@ -20,15 +20,13 @@
 .projects-dossier-reg-br { bottom: var(--sp-2); right: var(--sp-2); border-bottom-width: var(--line-w); border-right-width: var(--line-w); }
 
 .projects-dossier-stamp {
-  --stamp: var(--accent); display: inline-block; padding: 3px; color: var(--stamp);
-  outline: var(--focus-w) solid var(--stamp); outline-offset: 0;
+  display: inline-block; padding: 3px; color: var(--tone-text);
+  outline: var(--focus-w) solid var(--tone-text); outline-offset: 0;
 }
-.projects-dossier-stamp-accent { --stamp: var(--accent-text, var(--accent)); }
-.projects-dossier-stamp-danger { --stamp: var(--danger); }
-.projects-dossier-stamp-muted { --stamp: var(--text-muted); }
-.projects-dossier-stamp-success { --stamp: var(--text); }
+/* A success stamp is plain text colour, not green. */
+.projects-dossier-stamp.tone-success { --tone-text: var(--text); }
 .projects-dossier-stamp-inner {
-  display: block; padding: var(--sp-1) var(--sp-3); border: var(--line-w) solid var(--stamp);
+  display: block; padding: var(--sp-1) var(--sp-3); border: var(--line-w) solid var(--tone-text);
   font-family: var(--label-font); font-size: var(--fs-md); font-weight: var(--fw-medium);
   letter-spacing: 0.18em; text-transform: uppercase; line-height: 1.4; overflow-wrap: anywhere;
 }

@@ -30,7 +30,7 @@ function ProjectTileImpl({ project: p, note, actions: a }: Props) {
           <button type="button" className="dashboard-tile-name" title={`Open ${p.name}`} onClick={() => a.show(p.id)}>
             {p.name}
           </button>
-          <StatusDot tone={status.tone} className="dashboard-tile-status">{status.label}</StatusDot>
+          <StatusDot tone={status.tone} hideLabel className="dashboard-tile-status">{status.label}</StatusDot>
         </div>
         <p className="dashboard-tile-meta">
           <span className="dashboard-tile-branch" title={branchTitle(p)}>

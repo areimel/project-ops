@@ -32,7 +32,7 @@ export function RegMarks() {
 
 /** A double-ruled stamped box. Not hidden: it carries text. */
 export function Stamp({ tone = "accent", children }: { tone?: StatusTone; children: ReactNode }) {
-  return <span className={`projects-dossier-stamp projects-dossier-stamp-${tone}`}><span className="projects-dossier-stamp-inner">{children}</span></span>;
+  return <span className={`projects-dossier-stamp tone-${tone}`}><span className="projects-dossier-stamp-inner">{children}</span></span>;
 }
 
 export function DotGrid() {

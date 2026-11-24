@@ -27,7 +27,7 @@
 /* Chosen category: a 2px accent bar and full-strength text; no fill, so the default ("All") stays quiet. */
 .projects-cat { color: var(--text-muted); }
 .projects-cat:hover { color: var(--text); }
-.projects-cat.is-selected { color: var(--text); font-weight: var(--fw-medium); box-shadow: inset 2px 0 0 var(--accent); }
+.projects-cat.is-selected { color: var(--text); font-weight: var(--fw-medium); box-shadow: inset var(--select-bar) 0 0 var(--accent); }
 .projects-cat.is-check { justify-content: flex-start; }
 .projects-cat.is-check .projects-cat-count { margin-left: auto; }
 .projects-check { flex: none; width: 10px; height: 10px; border: var(--line-w) solid var(--control-border); }
