@@ -45,6 +45,3 @@
 .dashboard-link-edit { flex: none; color: var(--text-muted); opacity: 0; }
 .dashboard-link:hover .dashboard-link-edit, .dashboard-link-edit:focus-visible { opacity: 1; }
 @media (hover: none) { .dashboard-link-edit { opacity: 1; } }
-
-/* ---- Link form ---- */
-.dashboard-dialog-remove { margin-right: auto; }

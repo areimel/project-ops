@@ -62,6 +62,8 @@
   padding: var(--sp-3) var(--sp-5); border-top: var(--line-w) solid var(--line); background: var(--bg);
 }
 
+.dialog-foot-start { margin-right: auto; }   /* a button that sits at the start of the footer, such as Remove */
+
 .confirm-body { margin: 0; color: var(--text-muted); line-height: var(--lh-body); }
 
 /* Toasts: bottom right, above the title block. A square status light leads the message. */
