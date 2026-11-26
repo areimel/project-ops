@@ -9,6 +9,7 @@ import { KeyValue, KeyValueList } from "../../components/common/KeyValue";
 import { StatusDot } from "../../components/common/StatusDot";
 import { capList, cardCategory, cardMuted, cardStatus, splitFolder, stackLabel, traitRows } from "./cardModel";
 import { GitRows, NoneText, OpenActions, ProjectLinks } from "./ProjectParts";
+import "./projectCard.css";
 
 /** Everything a card can ask for, addressed by project id so one stable object serves every card. */
 export interface CardActions {

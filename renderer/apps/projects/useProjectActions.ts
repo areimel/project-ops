@@ -4,14 +4,17 @@ import type { useProjects } from "../../hooks/useProjects";
 import { useLatest } from "../../hooks/useLatest";
 import { categoryValue, includeTag } from "./filterState";
 import type { CardActions } from "./ProjectCard";
-import type { useProjectFilters } from "./useProjectFilters";
+import type { ProjectFilters } from "./projectsModel";
 
 interface Inputs {
   api: ReturnType<typeof useProjects>;
-  view: ReturnType<typeof useProjectFilters>;
   attempt: ReturnType<typeof useAttempt>;
-  setEditing(id: string | null): void;
-  setProfile(id: string | null): void;
+  /** Open the edit dialog for a project. */
+  edit(id: string): void;
+  /** Show the project's page. */
+  show(id: string): void;
+  /** Apply a filter change: the live filters on the Projects screen, or the stored ones before going there. */
+  filter(update: (f: ProjectFilters) => ProjectFilters): void;
 }
 
 /** One stable CardActions object for every card and the dossier; it reads the latest inputs when called. */
@@ -27,11 +30,11 @@ export function useProjectActions(inputs: Inputs): CardActions {
         const p = find(id);
         if (p) void latest.current.attempt(() => latest.current.api.update(id, { pinned: !p.pinned }), p.pinned ? "Unpinned" : "Pinned");
       },
-      edit: (id) => latest.current.setEditing(id),
-      show: (id) => latest.current.setProfile(id),
+      edit: (id) => latest.current.edit(id),
+      show: (id) => latest.current.show(id),
       refresh: (id) => void latest.current.attempt(() => latest.current.api.refresh(id), "Refreshed"),
-      filterTag: (tag) => latest.current.view.setFilters((f) => includeTag(f, tag)),
-      filterCategory: (c) => latest.current.view.setFilters((f) => ({ ...f, category: categoryValue(c) })),
+      filterTag: (tag) => latest.current.filter((f) => includeTag(f, tag)),
+      filterCategory: (c) => latest.current.filter((f) => ({ ...f, category: categoryValue(c) })),
     };
   }, [latest]);
 }

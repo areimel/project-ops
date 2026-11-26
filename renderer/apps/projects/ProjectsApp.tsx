@@ -14,8 +14,8 @@ import { revealFilters } from "./filterState";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectDossier } from "./dossier/ProjectDossier";
 import { useProjectActions } from "./useProjectActions";
-import { ProjectDialog } from "./ProjectDialog";
-import { allCategories, allHosting, allServices, allTags, pinnedSplit } from "./projectsModel";
+import { useProjectEditor } from "./useProjectEditor";
+import { pinnedSplit } from "./projectsModel";
 import type { ProjectView } from "../../../shared/projects/view";
 import { ProjectsToolbar } from "./ProjectsToolbar";
 import { useProjectFilters } from "./useProjectFilters";
@@ -27,11 +27,10 @@ export default function ProjectsApp() {
   const { projects, status } = api;
   const roots = useRoots();
   const scanning = useScanState();
-  const { toast, route } = useShell();
+  const { route } = useShell();
   const attempt = useAttempt();
   const view = useProjectFilters(projects);
   const searchRef = useRef<HTMLInputElement>(null);
-  const [editing, setEditing] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [profile, setProfile] = useState<string | null>(null);
   const [pendingFocus, setPendingFocus] = useState<string | null>(null);
@@ -66,7 +65,8 @@ export default function ProjectsApp() {
   }, [selected, view.results, profile]);
 
   // ---- actions ----
-  const actions = useProjectActions({ api, view, attempt, setEditing, setProfile });
+  const editor = useProjectEditor({ api, attempt });
+  const actions = useProjectActions({ api, attempt, edit: editor.edit, show: setProfile, filter: view.setFilters });
 
   const addFolder = () => void attempt(api.addFolder, (r) => {
     if (r) setPendingFocus(r.id);
@@ -74,14 +74,6 @@ export default function ProjectsApp() {
   });
   const addRoot = () => void attempt(roots.add, (r) => (r ? `Added ${r.folder}` : null));
   const rescan = () => { if (!scanning) void attempt(api.scan, scanMessage); };
-  const remove = (id: string) => {
-    const p = projects.find((x) => x.id === id);
-    setEditing(null);
-    void attempt(() => api.remove(id)).then((ok) => {
-      if (ok) toast("info", `Removed ${p?.name ?? "project"}`, { label: "Undo", run: () => void attempt(() => api.restore(id), "Restored") });
-    });
-  };
-
   useCommandHandlers({
     "projects.search": () => { searchRef.current?.focus(); searchRef.current?.select(); },
     "projects.add-folder": addFolder,
@@ -90,16 +82,7 @@ export default function ProjectsApp() {
     ...(view.filtered ? { "projects.clear-filters": view.clear } : {}),
   });
 
-  const editingProject = editing ? projects.find((p) => p.id === editing) ?? null : null;
-  const categories = useMemo(() => allCategories(projects), [projects]);
-  const tags = useMemo(() => allTags(projects), [projects]);
-  const hosting = useMemo(() => allHosting(projects), [projects]);
-  const services = useMemo(() => allServices(projects), [projects]);
-  const dialog = editingProject && (
-    <ProjectDialog key={editingProject.id} project={editingProject} categories={categories} tags={tags} hosting={hosting} services={services}
-      onClose={() => setEditing(null)} onRemove={() => remove(editingProject.id)}
-      onSave={(patch) => attempt(() => api.update(editingProject.id, patch), "Saved")} />
-  );
+  const dialog = editor.dialog;
   const split = pinnedSplit(view.results);
   const grid = (list: readonly ProjectView[], label: string) => (
     <ul className="card-grid projects-grid" aria-label={label}>

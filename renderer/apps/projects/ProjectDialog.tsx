@@ -12,6 +12,7 @@ import { TextArea } from "../../components/common/TextArea";
 import { TextField } from "../../components/common/TextField";
 import { SiteFields } from "./SiteFields";
 import { draftFromView, draftInvalid, draftPatch, linkProblem, type ProjectDraft } from "./projectDraft";
+import "./projectDialog.css";
 
 const STATUS_OPTIONS: { value: ProjectStatus; label: string }[] = [
   { value: "active", label: "Active" }, { value: "paused", label: "Paused" }, { value: "archived", label: "Archived" },
