@@ -7,25 +7,6 @@
 .dashboard .section-head { min-height: var(--control-h); margin-bottom: var(--sp-3); }
 .dashboard-hint { max-width: 64ch; }
 
-/* ---- Project tiles ---- */
-.dashboard-tiles { --card-min: 220px; --card-gap: var(--sp-3); }
-.dashboard-tile-body { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-3) var(--sp-3) var(--sp-2); }
-.dashboard-tile-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
-.dashboard-tile-name {
-  min-width: 0; padding: 0; border: 0; background: none; color: inherit; text-align: left;
-  font-size: var(--fs-lg); font-weight: var(--fw-medium); line-height: 1.25;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.dashboard-tile-name:hover { text-decoration: underline; text-underline-offset: 3px; }
-.dashboard-tile-status { flex: none; }
-.dashboard-tile-meta { display: flex; justify-content: space-between; gap: var(--sp-2); margin: 0; color: var(--text-muted); font-size: var(--fs-sm); }
-.dashboard-tile-branch { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: var(--fs-xs); }
-.dashboard-tile-note { flex: none; white-space: nowrap; }
-.dashboard-tile-foot { gap: 0; padding: var(--sp-2); }
-.dashboard-tile-open { margin-right: auto; padding: 0 var(--sp-3); }
-.dashboard-tile-foot .icon-btn { color: var(--text-muted); }
-.dashboard-tile-foot .icon-btn:hover:not(:disabled) { color: var(--text); }
-
 /* ---- Resource links ---- */
 .dashboard-links { --card-min: 220px; --card-gap: var(--sp-5) var(--sp-4); }
 .dashboard-link-group-name { margin: 0 0 var(--sp-2); padding-bottom: var(--sp-2); border-bottom: var(--line-w) solid var(--line); color: var(--text-muted); }

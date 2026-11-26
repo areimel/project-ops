@@ -10,7 +10,7 @@ export const entry = {
   exports: ["IconButton"],
   purpose: "A square, ghost button that shows only an icon. The label is required: it becomes the tooltip and the accessible name. Use it where the icon is already understood, such as a card's footer or the title bar.",
   useFor: [
-    "Secondary actions in a card footer: open folder, open terminal, copy path, edit (projects and dashboard tiles).",
+    "Secondary actions in a card footer: open folder, open terminal, copy path, edit (the project card).",
     "Close and dismiss controls on dialogs and toasts.",
     "Pin toggles, with aria-pressed to show the state.",
   ],

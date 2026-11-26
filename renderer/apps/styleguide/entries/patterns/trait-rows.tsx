@@ -12,7 +12,7 @@ export const entry = {
   family: "patterns",
   source: "renderer/apps/projects/ProjectParts.tsx",
   exports: ["GitRows", "NoneText", "DirtyMark", "ProjectLinks", "OpenActions"],
-  purpose: "The small pieces the project card, the dashboard tile and the project page share: git rows, the muted None, the uncommitted-changes mark, link buttons and the open buttons. Reuse them so a project looks the same everywhere.",
+  purpose: "The small pieces the project card and the project page share: git rows, the muted None, the uncommitted-changes mark, link buttons and the open buttons. Reuse them so a project looks the same everywhere.",
   useFor: [
     "Branch and Last commit rows inside a KeyValueList (GitRows), on the card and in the dossier's Git cell.",
     "Open in editor, terminal and folder with the missing-folder rule built in (OpenActions).",
@@ -57,7 +57,7 @@ export const entry = {
       ),
     },
     {
-      label: "OpenActions, labels editor (card and tile)", wide: true,
+      label: "OpenActions, labels editor (card)", wide: true,
       render: () => <div className="styleguide-row"><OpenActions project={PROJECTS.pinned} onOpen={noop} /></div>,
     },
     {
@@ -76,7 +76,7 @@ export const entry = {
   ],
   notes: [
     "gitInfo(p) in cardModel.ts gives none (no branch: show one Git: None row), unread (a branch but no commit time, such as a repository with custom git config: GitRows shows Unknown) or read.",
-    "traitRows(p) lists the rows a card shows; the card, the tile (branch only) and dossier/DossierCells.tsx each pick their own from these parts.",
+    "traitRows(p) lists the rows a card shows; the card and dossier/DossierCells.tsx each pick their own from these parts.",
     "LINK_LABELS and linkKeys in cardModel.ts name and filter the links; ProjectLinks renders nothing for a project with none, and the caller supplies the wrapper that spaces them.",
     "OpenActions labels=\"editor\" gives a labelled Editor button plus terminal and folder icon buttons; \"all\" gives three labelled buttons. A missing project disables all of them.",
     "The styles live in projectParts.css, imported by the module, so any screen gets them.",

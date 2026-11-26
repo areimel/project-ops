@@ -14,7 +14,7 @@ export const entry = {
   purpose: "A flat, hairline-bordered square for one object that sits in a grid with gaps, such as a project. Compose it from a header strip, a body and a footer of actions.",
   useFor: [
     "A project on the Projects grid (as a list item) with its category, status light and open buttons.",
-    "A pinned or recent project tile on the dashboard.",
+    "A project on the Projects grid or the dashboard.",
     "Muting a card whose folder is missing and marking the one deep-linked card as selected.",
   ],
   notFor: [
@@ -68,7 +68,7 @@ export const entry = {
     { label: "As a section", width: 320, notInUse: true, render: () => <Card as="section" aria-label="Section card">{body}</Card> },
   ],
   notes: [
-    "Only as=\"li\" is used (Projects grid and dashboard tiles); article is the default and section and div are unused.",
+    "Only as=\"li\" is used (the project card, on the Projects grid and the dashboard); article is the default and section and div are unused.",
     "The card is not clickable itself: the name inside it is the button, so give the card an aria-label.",
   ],
 } satisfies CatalogueEntry;

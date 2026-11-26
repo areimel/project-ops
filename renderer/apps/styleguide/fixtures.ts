@@ -2,7 +2,6 @@
 import type { ProjectView } from "../../../shared/projects/view";
 import type { ResourceLinkView } from "../../../shared/resources/links";
 import type { CardActions } from "../projects/ProjectCard";
-import type { TileActions } from "../dashboard/ProjectTile";
 
 /** A fixed "now" (2026-11-24 09:00 UTC) so relative times read the same on every visit. */
 export const FIXTURE_NOW = Date.UTC(2026, 10, 24, 9, 0, 0);
@@ -57,4 +56,3 @@ const noop = () => {};
 export const NOOP_CARD_ACTIONS: CardActions = {
   open: noop, openLink: noop, copyPath: noop, togglePin: noop, edit: noop, show: noop, refresh: noop, filterTag: noop, filterCategory: noop,
 };
-export const NOOP_TILE_ACTIONS: TileActions = { open: noop, show: noop };

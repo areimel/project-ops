@@ -15,7 +15,7 @@ export const entry = {
     "The Site part of the edit dialog, as level 3, inside a form grid (className form-wide).",
   ],
   notFor: [
-    "The label strip of one card or tile: use CardHeader, which is a mono strip inside the card.",
+    "The label strip of one card: use CardHeader, which is a mono strip inside the card.",
     "A label on a single field: use the field's label.",
     "A row of buttons that is not a heading: use Toolbar or btn-row.",
   ],

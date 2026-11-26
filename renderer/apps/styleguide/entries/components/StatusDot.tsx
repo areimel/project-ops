@@ -11,7 +11,7 @@ export const entry = {
   useFor: [
     "The status of a project on its card header: Active in accent, Paused or Archived in muted.",
     "A project whose folder has gone missing: Folder missing in danger, which outranks the stored status.",
-    "A pinned tile on the dashboard, where the light alone shows and the name carries the label (hideLabel).",
+    "A compact row where the light alone shows and the name next to it carries the label (hideLabel).",
   ],
   notFor: [
     "A tag or a filter chip the owner can click: use Badge.",
