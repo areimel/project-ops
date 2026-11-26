@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.2.0 - 2026-11-22
+- Dashboard: pinned and recent projects now show the same full card as the Projects screen, with copy path, pin and edit; a tag or category on a dashboard card opens the Projects screen filtered by it
 - Project dossier page: open a project from its card name, a dashboard tile or a deep link to see its details laid out as one page, with its folder, git state, stack, links and a timeline
 - Site details on each project: client, hosting, launch date, services used and notes, edited in the project dialog; notes are plain text and are not encrypted, so keep secrets out of them
 - Search also finds projects by client, hosting or services

@@ -1,6 +1,6 @@
 # The styleguide: task guide
 
-The styleguide is a third screen, `renderer/apps/styleguide/`, that shows every token, every component in `renderer/components/common/` and the main patterns (card, tile, dossier cells, form dialog) in dark and light, with what each is for and what it is not for. It exists so a developer or an AI agent builds UI from the parts that already exist instead of writing new markup. The design is in `docs/superpowers/specs/2026-11-24-styleguide-design.md`.
+The styleguide is a third screen, `renderer/apps/styleguide/`, that shows every token, every component in `renderer/components/common/` and the main patterns (card, dossier cells, form dialog) in dark and light, with what each is for and what it is not for. It exists so a developer or an AI agent builds UI from the parts that already exist instead of writing new markup. The design is in `docs/superpowers/specs/2026-11-24-styleguide-design.md`.
 
 It is dev-only. `__STYLEGUIDE__` (set in `vite.config.ts`, false only for `--mode release`) removes it from release builds: `pnpm build:release` (which `pnpm dist`, `dist:win` and `dist:mac` run) builds with the flag off, and `scripts/check-release.mjs` fails the build if `dist-renderer` still holds styleguide code.
 
@@ -16,7 +16,7 @@ Before building or changing UI, read the matching entry in `renderer/apps/styleg
 | --- | --- |
 | `entries/foundations/` | colour, type, spacing, label look, icons (5 sheets) |
 | `entries/components/` | one sheet per file in `renderer/components/common/*.tsx`, named after the file |
-| `entries/patterns/` | compositions that are not a common component (10 sheets: project card, dashboard tile, dossier plate and cells, trait rows, filter chips, resource links, section heads, toolbars, dialog form) |
+| `entries/patterns/` | compositions that are not a common component (9 sheets: project card, dossier plate and cells, trait rows, filter chips, resource links, section heads, toolbars, dialog form) |
 | `types.ts` | the `CatalogueEntry` and `Specimen` contract |
 | `catalogue.ts` | `import.meta.glob` over `entries/**/*.tsx`; adding a file is all the registration there is |
 | `styleguideModel.ts` | pure: entry checks, family order, index rail, mode frames, scroll spy, contrast table (`tests/apps/styleguideModel.test.ts`) |
