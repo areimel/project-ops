@@ -3,11 +3,10 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { THEMES, WINDOW_BG, isThemeId, resolveMode, type ThemeId } from "../shared/theme";
 import { contrastRatio } from "../renderer/theme/color";
+import { ALL_TOKENS, BASE_TOKENS } from "../renderer/theme/tokenList";
 
-const TOKENS = [
-  "bg", "surface", "surface-raised", "text", "text-muted", "line", "accent", "accent-text", "accent-ink",
-  "danger", "danger-ink", "success",
-] as const;
+const TOKENS = BASE_TOKENS;
+
 const MODES = ["light", "dark"] as const;
 
 type Palette = Record<(typeof TOKENS)[number], string>;
@@ -50,6 +49,20 @@ describe.each(THEMES.map((t) => t.id))("%s", (theme) => {
       expect(ratio("text-muted", "surface")).toBeGreaterThanOrEqual(3);
       expect(ratio("text-muted", "bg")).toBeGreaterThanOrEqual(3);
     });
+  });
+});
+
+describe("token list", () => {
+  const declared = (file: string): string[] => {
+    const css = readFileSync(resolve(__dirname, `../renderer/theme/${file}`), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    return [...css.matchAll(/(?:^|[{;\s])--([a-z0-9-]+)\s*:/g)].map((m) => m[1]);
+  };
+  it("matches the custom properties declared in tokens.css and the theme files", () => {
+    const found = new Set([...declared("tokens.css"), ...declared("themes/kojima.css")]);
+    expect([...found].sort()).toEqual([...new Set(ALL_TOKENS)].sort());
+  });
+  it("lists no token twice", () => {
+    expect(new Set(ALL_TOKENS).size).toBe(ALL_TOKENS.length);
   });
 });
 

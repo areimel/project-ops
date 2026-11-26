@@ -10,8 +10,8 @@
 .settings-section { padding: var(--sp-5) 0; border-top: var(--line-w) solid var(--line); display: grid; gap: var(--sp-5); }
 .settings-section h2 { font-size: var(--fs-xl); }
 /* Section headings and list items carry the accent square. */
-.settings-section h2, .about-list li { display: flex; align-items: center; gap: var(--sp-3); }
-.settings-section h2::before, .about-list li::before {
+.settings-section h2, .settings-about-list li { display: flex; align-items: center; gap: var(--sp-3); }
+.settings-section h2::before, .settings-about-list li::before {
   content: ""; flex: none; width: var(--bullet); height: var(--bullet); background: var(--accent);
 }
 
@@ -32,26 +32,25 @@
 }
 
 /* Accent control */
-.accent-control { display: grid; gap: var(--sp-2); min-width: 0; }
-.accent-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); }
-.accent-swatch {
+.settings-accent-control { display: grid; gap: var(--sp-2); min-width: 0; }
+.settings-accent-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); }
+.settings-accent-swatch {
   width: var(--control-h); height: var(--control-h); padding: 2px; flex: none; cursor: pointer;
   background: var(--bg); border: var(--line-w) solid var(--control-border); border-radius: var(--r);
 }
-.accent-swatch::-webkit-color-swatch-wrapper { padding: 0; }
-.accent-swatch::-webkit-color-swatch { border: 0; border-radius: var(--r); }
-.accent-hex { width: 9rem; }
+.settings-accent-swatch::-webkit-color-swatch-wrapper { padding: 0; }
+.settings-accent-swatch::-webkit-color-swatch { border: 0; border-radius: var(--r); }
+.settings-accent-hex { width: 9rem; }
 .settings-note { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-sm); color: var(--text); }
 .settings-note.is-warning, .settings-note.is-error { color: var(--danger); }
-.settings-note .icon { flex: none; }
 .settings-muted { color: var(--text-muted); font-size: var(--fs-md); }
 
 /* About: trait rows, key in the mono label style, value in body text. */
-.about-facts, .about-facts dd, .about-list { margin: 0; padding: 0; }
-.about-facts { display: grid; grid-template-columns: max-content 1fr; font-size: var(--fs-md); border-bottom: var(--line-w) solid var(--line); }
-.about-facts dt, .about-facts dd { padding: var(--sp-2) 0; border-top: var(--line-w) solid var(--line); }
-.about-facts dt { padding-right: var(--sp-6); color: var(--text-muted); line-height: var(--lh-body); }
-.about-list { list-style: none; display: grid; gap: var(--sp-1); font-size: var(--fs-md); }
+.settings-about-facts, .settings-about-facts dd, .settings-about-list { margin: 0; padding: 0; }
+.settings-about-facts { display: grid; grid-template-columns: max-content 1fr; font-size: var(--fs-md); border-bottom: var(--line-w) solid var(--line); }
+.settings-about-facts dt, .settings-about-facts dd { padding: var(--sp-2) 0; border-top: var(--line-w) solid var(--line); }
+.settings-about-facts dt { padding-right: var(--sp-6); color: var(--text-muted); line-height: var(--lh-body); }
+.settings-about-list { list-style: none; display: grid; gap: var(--sp-1); font-size: var(--fs-md); }
 
 /* Projects: scan folder list, its actions, and the editor and terminal pickers */
 .settings-roots { display: grid; gap: var(--sp-3); min-width: 0; width: 100%; }

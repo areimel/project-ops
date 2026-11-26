@@ -75,3 +75,6 @@ Non-goals: status counts or charts, drag-to-reorder, http/localhost links, favic
 - Save this design as `docs/superpowers/specs/2026-11-19-dashboard-home-design.md`.
 - `CLAUDE.md` (overview, layout, IPC parts, stored data table, bundle shape, rules exception, commands, capture example note that home is the dashboard), `docs/guides/projects.md` where it lists record-field steps; `docs/guides/add-an-app.md` ("one app", "no navigation UI", expected ids), `add-a-stored-collection.md` ("the two that exist"), `add-an-ipc-channel.md` (parts list); the "both" comments in `electron/store/dataTransfer.ts` and `electron/features/projects.ts`; `CHANGELOG.md` bullets under the newest existing version heading (format checked by `tests/changelog.test.ts`).
 
+## As built (2026-11-26)
+
+The compact tile was removed: Pinned and Recent use `ProjectCard` from the projects app, so a project looks the same on both screens. That reverses the non-goal above: the card's pin, edit and copy buttons work on the dashboard (Edit opens the shared dialog from `useProjectEditor.tsx`), and a tag or category click stores that filter (`viewStore.ts`) and opens the Projects screen. The "Opened …" and "Commit …" notes went with the tile; Recent is still newest first.

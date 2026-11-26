@@ -24,7 +24,7 @@
   --font-text: "DM Sans", system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --font-display: "DM Sans", system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  --fs-xs: 12px; --fs-sm: 13px; --fs-md: 14px; --fs-lg: 16px; --fs-xl: 20px; --fs-2xl: 26px; --fs-3xl: 34px;
+  --fs-xs: 12px; --fs-sm: 13px; --fs-md: 14px; --fs-lg: 16px; --fs-xl: 20px; --fs-2xl: 26px; --fs-3xl: 34px; --fs-display: 48px;
   --fw-regular: 400; --fw-medium: 500; --fw-bold: 600; --fw-heavy: 700;
   --lh-tight: 1.15; --lh-body: 1.6;
   --track-heading: -0.035em;
@@ -34,8 +34,10 @@
   /* Space and shape */
   --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --sp-7: 48px;
   --r: 0; --r-pill: 0;
+  --hazard-w: 10px;
   --line-w: 1px; --focus-w: 2px; --focus-offset: 3px;
   --control-h: 34px;
+  --select-bar: 2px;   /* the accent bar on the left of a selected row */
   --bullet: 7px;   /* the solid accent square used as a bullet or status light */
 
   /* Layers */
@@ -45,7 +47,7 @@
   --dur-fast: 150ms; --dur: 150ms; --dur-glitch: 250ms; --ease: cubic-bezier(.2, .7, .2, 1);
 
   /* Shell sizes */
-  --titlebar-h: 44px; --footer-h: 44px; --content-max: 960px;
+  --titlebar-h: 44px; --footer-h: 44px;
 }
 
 :root[data-mode="light"], [data-theme][data-mode="light"] { color-scheme: light; --glitch-b: var(--bg); }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { nextMode, titleBlockModel } from "../renderer/shell/shellModel";
+import { nextMode, stateTone, titleBlockModel } from "../renderer/shell/shellModel";
 
 describe("nextMode", () => {
   it("cycles system, light, dark", () => {
@@ -25,5 +25,13 @@ describe("titleBlockModel", () => {
   it("labels settings and ignores a leftover count", () => {
     const m = titleBlockModel({ view: "settings" }, "Brand", "Settings", { count: "42 projects" }, "1");
     expect(m).toEqual({ name: "Brand", view: "Settings", state: { label: "Version 1", tone: "plain" } });
+  });
+});
+
+describe("stateTone", () => {
+  it("paints a saved state green, a failure red and everything else muted", () => {
+    expect(stateTone("saved")).toBe("success");
+    expect(stateTone("error")).toBe("danger");
+    for (const t of ["saving", "unsaved", "plain"] as const) expect(stateTone(t)).toBe("muted");
   });
 });

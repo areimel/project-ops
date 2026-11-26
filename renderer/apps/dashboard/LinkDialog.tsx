@@ -1,8 +1,7 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import { RESOURCE_LIMITS, type ResourceLinkPatch, type ResourceLinkView } from "../../../shared/resources/links";
-import { Button } from "../../components/common/Button";
 import { Combobox } from "../../components/common/Combobox";
-import { Dialog } from "../../components/common/Dialog";
+import { FormDialog } from "../../components/common/FormDialog";
 import { TextField } from "../../components/common/TextField";
 import { draftFrom, draftInvalid, draftPatch, emptyDraft, urlProblem, type LinkDraft } from "./dashboardModel";
 
@@ -14,45 +13,26 @@ interface Props {
   onSave(patch: ResourceLinkPatch): Promise<boolean>;
   onRemove(): void;
   onClose(): void;
+  /** Show the dialog in place instead of over the page (the styleguide). */
+  inline?: boolean;
 }
 
-export function LinkDialog({ link, groups, onSave, onRemove, onClose }: Props) {
+export function LinkDialog({ link, groups, onSave, onRemove, onClose, inline }: Props) {
   const [draft, setDraft] = useState<LinkDraft>(() => (link ? draftFrom(link) : emptyDraft()));
-  const [saving, setSaving] = useState(false);
-  const errorId = useId();
   const set = <K extends keyof LinkDraft>(key: K, value: LinkDraft[K]) => setDraft((d) => ({ ...d, [key]: value }));
   const invalid = draftInvalid(draft);
   const problem = urlProblem(draft.url);
 
-  const save = async () => {
-    if (invalid || saving) return;
-    const patch = draftPatch(draft, link ?? undefined);
-    if (!patch) { onClose(); return; }
-    setSaving(true);
-    const ok = await onSave(patch);
-    setSaving(false);
-    if (ok) onClose();
-  };
-
   return (
-    <Dialog title={link ? "Edit link" : "Add a link"} onClose={onClose}
-      footer={<>
-        {link && <Button variant="quiet" icon="trash" className="dashboard-dialog-remove" onClick={onRemove}>Remove</Button>}
-        <Button variant="quiet" onClick={onClose}>Cancel</Button>
-        <Button variant="primary" disabled={invalid || saving} onClick={save}>{link ? "Save changes" : "Add link"}</Button>
-      </>}>
-      <form className="dashboard-form" onSubmit={(e) => { e.preventDefault(); void save(); }}>
-        <TextField label="Name" data-autofocus value={draft.name} onChange={(v) => set("name", v)}
-          placeholder="Netlify" maxLength={RESOURCE_LIMITS.name} />
-        <Combobox label="Group" value={draft.group} onChange={(v) => set("group", v)}
-          suggestions={groups} placeholder="Optional, such as Hosting" maxLength={RESOURCE_LIMITS.group} />
-        <div className="dashboard-form-wide">
-          <TextField label="Address" value={draft.url} onChange={(v) => set("url", v)} invalid={problem !== null}
-            placeholder="https://" spellCheck={false} inputMode="url" aria-describedby={problem ? errorId : undefined} />
-          {problem && <p className="dashboard-form-error" id={errorId}>{problem}</p>}
-        </div>
-        <button type="submit" hidden />
-      </form>
-    </Dialog>
+    <FormDialog title={link ? "Edit link" : "Add a link"} saveLabel={link ? "Save changes" : "Add link"} invalid={invalid}
+      patch={() => draftPatch(draft, link ?? undefined)} onSave={onSave} onRemove={link ? onRemove : undefined}
+      onClose={onClose} inline={inline} formClassName="form-grid">
+      <TextField label="Name" data-autofocus value={draft.name} onChange={(v) => set("name", v)}
+        placeholder="Netlify" maxLength={RESOURCE_LIMITS.name} />
+      <Combobox label="Group" value={draft.group} onChange={(v) => set("group", v)}
+        suggestions={groups} placeholder="Optional, such as Hosting" maxLength={RESOURCE_LIMITS.group} />
+      <TextField className="form-wide" label="Address" value={draft.url} onChange={(v) => set("url", v)} error={problem ?? undefined}
+        placeholder="https://" spellCheck={false} inputMode="url" />
+    </FormDialog>
   );
 }

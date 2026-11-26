@@ -3,16 +3,18 @@ import { RESOURCE_LIMITS } from "../../../shared/resources/links";
 import type { ProjectView } from "../../../shared/projects/view";
 import { Button } from "../../components/common/Button";
 import { EmptyState } from "../../components/common/EmptyState";
+import { SectionHead } from "../../components/common/SectionHead";
 import { Spinner } from "../../components/common/Spinner";
 import { useAttempt } from "../../hooks/useAttempt";
-import { useLatest } from "../../hooks/useLatest";
 import { useProjects } from "../../hooks/useProjects";
 import { useResourceLinks } from "../../hooks/useResourceLinks";
 import { useCommandHandlers, useShell, useTitleInfo } from "../../shell/ShellContext";
-import { relativeTime } from "../projects/projectsModel";
+import { ProjectCard } from "../projects/ProjectCard";
+import { useProjectActions } from "../projects/useProjectActions";
+import { useProjectEditor } from "../projects/useProjectEditor";
+import { updateStoredFilters } from "../projects/viewStore";
 import { knownGroups, pinnedTiles, recentTiles } from "./dashboardModel";
 import { LinkDialog } from "./LinkDialog";
-import { ProjectTile, type TileActions } from "./ProjectTile";
 import { ResourceLinks } from "./ResourceLinks";
 import "./dashboard.css";
 
@@ -34,11 +36,13 @@ export default function DashboardApp() {
 
   useTitleInfo({ count: status === "ready" && pinned.length > 0 ? `${pinned.length} pinned` : undefined });
 
-  const latest = useLatest({ api, attempt, navigate });
-  const actions = useMemo<TileActions>(() => ({
-    open: (id, target) => void latest.current.attempt(() => latest.current.api.open(id, target)),
-    show: (id) => latest.current.navigate({ type: "open", appId: PROJECTS_APP, recordId: id }),
-  }), [latest]);
+  const editor = useProjectEditor({ api, attempt });
+  // The card is the Projects grid's own: its page and its tag and category filters live on the Projects screen.
+  const actions = useProjectActions({
+    api, attempt, edit: editor.edit,
+    show: (id) => navigate({ type: "open", appId: PROJECTS_APP, recordId: id }),
+    filter: (update) => { updateStoredFilters(update); navigate({ type: "open", appId: PROJECTS_APP }); },
+  });
   const allProjects = () => navigate({ type: "open", appId: PROJECTS_APP });
 
   const full = res.links.length >= RESOURCE_LIMITS.max;
@@ -51,9 +55,9 @@ export default function DashboardApp() {
     void attempt(() => res.remove(id), "Link removed");
   };
 
-  const tiles = (list: readonly ProjectView[], label: string, note: (p: ProjectView) => string) => (
-    <ul className="dashboard-tiles" aria-label={label}>
-      {list.map((p) => <ProjectTile key={p.id} project={p} note={note(p)} actions={actions} />)}
+  const cards = (list: readonly ProjectView[], label: string) => (
+    <ul className="card-grid projects-grid" aria-label={label}>
+      {list.map((p) => <ProjectCard key={p.id} project={p} selected={false} now={now} actions={actions} />)}
     </ul>
   );
 
@@ -73,26 +77,23 @@ export default function DashboardApp() {
             action={<Button variant="primary" onClick={allProjects}>Go to Projects</Button>} />
         ) : (<>
           <section className="dashboard-section" aria-label="Pinned">
-            <div className="dashboard-section-head">
-              <h2 className="kicker">Pinned</h2>
-              <Button variant="link" onClick={allProjects}>All projects</Button>
-            </div>
+            <SectionHead title="Pinned" end={<Button variant="link" onClick={allProjects}>All projects</Button>} />
             {pinned.length > 0
-              ? tiles(pinned, "Pinned projects", (p) => (p.lastCommitAt === null ? "" : `Commit ${relativeTime(p.lastCommitAt, now)}`))
-              : <p className="dashboard-hint">Nothing is pinned. Pin a project on the Projects screen to keep it here.</p>}
+              ? cards(pinned, "Pinned projects")
+              : <p className="hint dashboard-hint">Nothing is pinned. Pin a project on the Projects screen to keep it here.</p>}
           </section>
           <section className="dashboard-section" aria-label="Recent">
-            <div className="dashboard-section-head"><h2 className="kicker">Recent</h2></div>
+            <SectionHead title="Recent" />
             {recent.length > 0
-              ? tiles(recent, "Recently opened projects", (p) => `Opened ${relativeTime(p.lastOpenedAt, now)}`)
-              : <p className="dashboard-hint">Projects you open in an editor, a terminal or the file manager are listed here, newest first.</p>}
+              ? cards(recent, "Recently opened projects")
+              : <p className="hint dashboard-hint">Projects you open in an editor, a terminal or the file manager are listed here, newest first.</p>}
           </section>
         </>)}
 
         {res.status === "error" ? (
           <section className="dashboard-section" aria-label="Resources">
-            <div className="dashboard-section-head"><h2 className="kicker">Resources</h2></div>
-            <p className="dashboard-hint">Your links could not be loaded: {res.error} <Button variant="link" onClick={() => void res.reload()}>Try again</Button></p>
+            <SectionHead title="Resources" />
+            <p className="hint dashboard-hint">Your links could not be loaded: {res.error} <Button variant="link" onClick={() => void res.reload()}>Try again</Button></p>
           </section>
         ) : (
           <ResourceLinks links={res.links} full={full} onAdd={() => setDialog("new")} onEdit={setDialog}
@@ -100,6 +101,7 @@ export default function DashboardApp() {
         )}
       </div>
 
+      {editor.dialog}
       {(dialog === "new" || editing) && (
         <LinkDialog key={dialog} link={editing} groups={groups} onClose={() => setDialog(null)}
           onRemove={() => { if (editing) void removeLink(editing.id, editing.name); }}

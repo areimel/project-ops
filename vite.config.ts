@@ -6,12 +6,14 @@ import { brand } from "./shared/brand";
 
 const pkg = JSON.parse(readFileSync(resolve(import.meta.dirname, "package.json"), "utf8")) as { version: string; author: string };
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   root: resolve(import.meta.dirname, "renderer"),
   base: "./",
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
     __APP_AUTHOR__: JSON.stringify(pkg.author),
+    // false only for `--mode release` (pnpm build:release): the dev-only styleguide screen is left out of packaged builds.
+    __STYLEGUIDE__: JSON.stringify(mode !== "release"),
   },
   plugins: [
     react(),
@@ -28,4 +30,4 @@ export default defineConfig({
   },
   server: { port: Number(process.env.APP_DEV_PORT) || 5173, strictPort: true },
   test: { root: resolve(import.meta.dirname), include: ["tests/**/*.test.ts"] },
-});
+}));

@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.0 - 2026-11-22
+- Dashboard: pinned and recent projects now show the same full card as the Projects screen, with copy path, pin and edit; a tag or category on a dashboard card opens the Projects screen filtered by it
+- Project dossier page: open a project from its card name, a dashboard tile or a deep link to see its details laid out as one page, with its folder, git state, stack, links and a timeline
+- Site details on each project: client, hosting, launch date, services used and notes, edited in the project dialog; notes are plain text and are not encrypted, so keep secrets out of them
+- Search also finds projects by client, hosting or services
+- "All projects" on the dossier returns to the grid with that project's card selected; the command palette has "Back to all projects"
+- Deep link project-ops://open/projects/<id> now opens the project's dossier page instead of only scrolling to its card
+- Project cards: the footer buttons are now in the order editor, terminal, folder
+- Tags read in sentence case everywhere (the project page and the edit dialog), as typed
+- A selected row in lists shows a 2 px accent bar
+- The Editor button's accessible name now starts with "Editor"
+- Status colours, toasts, the title block and the project stamp share one set of tones
+- Form fields in the project and link dialogs can show an error message under the field
+- Development builds have a Styleguide screen (Ctrl/Cmd+3) that catalogues every colour, component and pattern in dark and light; release builds do not include it
+
 ## 0.1.0 - 2026-11-18
 - Project Ops: the starter template's eight demo apps are replaced by one screen that lists your coding projects as cards
 - Scan folders in Settings: add parent folders such as ~/code_projects and each project inside is found, with its name, stack, git branch, last commit and uncommitted-changes marker

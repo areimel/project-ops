@@ -19,26 +19,31 @@ interface Props<T extends string | number> {
   onSelect: (v: T) => void;
   /** Which side the menu opens on. Default "below". */
   placement?: "below" | "above";
+  /** Start open without taking focus (the styleguide). An outside click or Escape still closes it. */
+  defaultOpen?: boolean;
 }
 
 export function Dropdown<T extends string | number>(p: Props<T>) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(p.defaultOpen ?? false);
+  const userOpened = useRef(false);
   const [active, setActive] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const btn = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLUListElement>(null);
 
   const unavailable = p.disabled || p.options.length === 0;
-  const close = (refocus: boolean) => { setOpen(false); if (refocus) btn.current?.focus(); };
+  // A menu that was only pre-opened (never opened by the owner) closes without pulling focus to its button.
+  const close = (refocus: boolean) => { setOpen(false); if (refocus && userOpened.current) btn.current?.focus(); };
   const show = () => {
     if (unavailable) return;
     setActive(Math.max(0, p.options.findIndex((o) => o.value === p.selected)));
+    userOpened.current = true;
     setOpen(true);
   };
   useDismiss(ref, (reason) => close(reason === "escape"), { enabled: open });
 
   useEffect(() => {
-    if (open) (menu.current?.children[active] as HTMLElement | undefined)?.focus();
+    if (open && userOpened.current) (menu.current?.children[active] as HTMLElement | undefined)?.focus();
   }, [open, active]);
 
   const choose = (v: T) => { p.onSelect(v); close(true); };

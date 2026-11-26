@@ -2,7 +2,7 @@
 // manual record, and folding git and folder-exists results into a scan. projects.ts and projectsScanRun.ts do the IO.
 import type { RecordBase } from "../../shared/collections/base";
 import {
-  emptyScan, toRootView,
+  emptyScan, emptySite, toRootView,
   type ProjectFields, type ProjectRecord, type ProjectScan, type RootFields, type RootView,
 } from "../../shared/projects";
 import type { GitInfo } from "./gitInfoCore";
@@ -49,6 +49,7 @@ export function newManualProject(path: string, detected: DetectedScan | null, gi
   return {
     path, origin: "manual", rootId: null, missing: false, hidden: false,
     name: null, description: null, category: "", tags: [], status: "active", pinned: false,
+    site: emptySite(),
     links: { repo: null, site: null, docs: null },
     lastOpenedAt: null,
     scan: scanFacts(emptyScan(), detected, git, now),

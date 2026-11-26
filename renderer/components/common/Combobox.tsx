@@ -1,4 +1,5 @@
 import { useId, useState } from "react";
+import { FieldError, FieldLabel } from "./Field";
 import { SuggestionList, optionId } from "./SuggestionList";
 import { decideKey, filterSuggestions } from "./tagInputModel";
 
@@ -11,12 +12,17 @@ interface Props {
   placeholder?: string;
   maxLength?: number;
   className?: string;
+  /** What is wrong, in words: shown under the field, linked with `aria-describedby`, and marks it invalid. */
+  error?: string;
+  /** Start with the suggestion list open (needs at least one matching suggestion). */
+  defaultOpen?: boolean;
 }
 
 /** A single-value text input with a suggestion list; free text is allowed. `onChange` fires on every edit and pick. */
-export function Combobox({ label, hideLabel, value, onChange, suggestions, placeholder, maxLength, className = "" }: Props) {
+export function Combobox({ label, hideLabel, value, onChange, suggestions, placeholder, maxLength, className = "", error, defaultOpen = false }: Props) {
   const id = useId();
-  const [open, setOpen] = useState(false);
+  const errorId = `${id}-error`;
+  const [open, setOpen] = useState(defaultOpen);
   const [active, setActive] = useState(-1);
   const items = filterSuggestions(suggestions, [], value);
   const showing = open && items.length > 0;
@@ -35,12 +41,14 @@ export function Combobox({ label, hideLabel, value, onChange, suggestions, place
 
   return (
     <div className={`text-field combobox ${className}`.trim()}>
-      <label htmlFor={id} className={hideLabel ? "visually-hidden" : "text-field-label"}>{label}</label>
+      <FieldLabel htmlFor={id} hidden={hideLabel}>{label}</FieldLabel>
       <input id={id} role="combobox" aria-expanded={showing} aria-controls={`${id}-list`} aria-autocomplete="list"
         aria-activedescendant={showing && active >= 0 ? optionId(`${id}-list`, active) : undefined}
+        aria-invalid={error ? true : undefined} aria-describedby={error ? errorId : undefined}
         autoComplete="off" spellCheck={false} value={value} placeholder={placeholder} maxLength={maxLength}
         onChange={(e) => { onChange(e.target.value); setOpen(true); setActive(-1); }}
         onKeyDown={onKeyDown} onBlur={() => { setOpen(false); setActive(-1); }} />
+      {error && <FieldError id={errorId}>{error}</FieldError>}
       {showing && <SuggestionList id={`${id}-list`} label={`${label} suggestions`} items={items} active={active} onPick={pick} onHover={setActive} onClose={() => { setOpen(false); setActive(-1); }} />}
     </div>
   );

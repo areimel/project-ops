@@ -11,6 +11,7 @@ export const projects: AppDefinition = {
     { id: "projects.search", label: "Search projects", group: "Projects", keys: ["/"] },
     { id: "projects.add-folder", label: "Add a project folder", group: "Projects", accelerator: "CmdOrCtrl+O" },
     { id: "projects.rescan", label: "Rescan project folders", group: "Projects", accelerator: "F5" },
+    { id: "projects.back", label: "Back to all projects", group: "Projects" },
     { id: "projects.clear-filters", label: "Clear filters", group: "Projects" },
   ],
 };

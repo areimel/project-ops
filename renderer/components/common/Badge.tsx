@@ -1,6 +1,6 @@
 import { cx } from "../../utils/cx";
 
-export type BadgeVariant = "outline" | "solid" | "quiet";
+export type BadgeVariant = "outline" | "solid" | "quiet" | "tag";
 
 interface Props {
   children: string;
@@ -17,7 +17,7 @@ interface Props {
   className?: string;
 }
 
-/** A small mono label chip: plain, a toggle filter, a removable tag, or both of the last two. */
+/** A small mono label chip: plain, a toggle filter, a removable tag, or both of the last two. `variant="tag"` is for the owner's own words (tags, services): text face, sentence case. */
 export function Badge({ children, variant = "outline", onClick, pressed, excluded, onRemove, count, title, className = "" }: Props) {
   const cls = cx("badge", `badge-${variant}`, pressed && "is-pressed", excluded && "is-excluded", className);
   const inner = (

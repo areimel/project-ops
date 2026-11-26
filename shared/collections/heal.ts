@@ -24,6 +24,16 @@ export function line(x: unknown, max: number, fallback = ""): string {
 }
 
 /**
+ * Multi-line text: non-strings become "", `\r\n` and `\r` become `\n`, control characters other than `\n` and
+ * `\t` are stripped, then trimmed, cut to `max` and trimmed at the end again.
+ */
+export function text(x: unknown, max: number): string {
+  if (typeof x !== "string") return "";
+  // eslint-disable-next-line no-control-regex
+  return x.replace(/\r\n?/g, "\n").replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, "").trim().slice(0, max).trimEnd();
+}
+
+/**
  * A list of short strings: non-strings dropped, each item through `line()` (so cut to `maxLen`), empties
  * dropped, duplicates dropped case-insensitively keeping the first spelling, at most `maxItems` kept.
  */

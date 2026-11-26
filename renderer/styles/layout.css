@@ -8,7 +8,7 @@
   transition: background-color var(--dur-fast) var(--ease);
 }
 .list-row:hover { background: var(--hover); }
-.list-row.is-selected { background: var(--selected); box-shadow: inset 3px 0 0 var(--accent); }   /* a selection bar, not a shadow */
+.list-row.is-selected { background: var(--selected); box-shadow: inset var(--select-bar) 0 0 var(--accent); }   /* a selection bar, not a shadow */
 .list-row-leading { display: flex; align-items: center; color: var(--text-muted); }
 .list-row-title {
   display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 2px;
@@ -22,15 +22,26 @@
 .list-row-meta { flex: none; color: var(--text-muted); }
 .list-row-trailing { display: flex; align-items: center; flex: none; gap: var(--sp-1); }
 
+/* A section heading row: the kicker on the left, optional content on the right. */
+.section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+
 .toolbar {
   display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap;
   min-height: 48px; padding: var(--sp-2) var(--sp-3); border-bottom: var(--line-w) solid var(--line);
 }
+.toolbar.is-page { gap: var(--sp-2) var(--sp-3); padding: var(--sp-3) var(--sp-5); }
 .toolbar-end { display: flex; align-items: center; flex: 1 1 0; justify-content: flex-end; gap: var(--sp-2); min-width: 0; margin-left: auto; }
+
+/* A wrapping row of buttons. */
+.btn-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
 
 .split-pane { display: grid; height: 100%; min-height: 0; }
 .split-pane-start { min-width: 0; min-height: 0; overflow: auto; border-right: var(--line-w) solid var(--line); }
 .split-pane-end { min-width: 0; min-height: 0; overflow: auto; }
+
+/* The scrolling body of a screen under its toolbar. An app adds its own narrow-width padding. */
+.scroll-area { flex: 1; min-height: 0; overflow-y: auto; padding: var(--sp-5); }
+.scroll-area > .empty-state { margin-top: var(--sp-6); }
 
 .empty-state {
   display: grid; justify-items: center; gap: var(--sp-3); max-width: 400px;

@@ -1,7 +1,10 @@
 import { useCallback, useRef, useState } from "react";
 import { IconButton } from "./IconButton";
+import type { StatusTone } from "./StatusDot";
 
 export type ToastKind = "info" | "success" | "error";
+/** The tone each kind paints its left edge with. */
+const TOAST_TONE: Record<ToastKind, StatusTone> = { info: "accent", success: "success", error: "danger" };
 export interface ToastAction { label: string; run: () => void }  // e.g. Undo
 export interface ToastItem { id: number; kind: ToastKind; message: string; action?: ToastAction }
 
@@ -20,11 +23,12 @@ export function useToasts(): {
   return { items, push, dismiss };
 }
 
-export function ToastHost({ items, onDismiss }: { items: ToastItem[]; onDismiss(id: number): void }) {
+/** `inline` lays the stack out in normal flow instead of fixed to the window corner (the styleguide). */
+export function ToastHost({ items, onDismiss, inline = false }: { items: ToastItem[]; onDismiss(id: number): void; inline?: boolean }) {
   return (
-    <div className="toast-host" aria-live="polite">
+    <div className={`toast-host${inline ? " is-inline" : ""}`} aria-live="polite">
       {items.map((t) => (
-        <div key={t.id} className={`toast toast-${t.kind}`} role={t.kind === "error" ? "alert" : undefined}>
+        <div key={t.id} className={`toast tone-${TOAST_TONE[t.kind]}`} role={t.kind === "error" ? "alert" : undefined}>
           <span>{t.message}</span>
           {t.action && (
             <span className="toast-actions">

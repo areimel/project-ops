@@ -1,0 +1,53 @@
+/* The project card, on the Projects grid and the dashboard. Loaded by ProjectCard.tsx, so any screen gets it. Tokens only. */
+
+/* ---- Grid: separate cards with a gap, each with its own full border (.card-grid) ---- */
+.projects-grid { --card-min: 296px; }
+.projects-card { position: relative; content-visibility: auto; contain-intrinsic-size: auto 360px; }
+
+.projects-card .card-header { min-height: 37px; }
+.projects-card .card-header-end { white-space: nowrap; }
+.projects-card-cat {
+  flex: 0 1 auto; min-width: 0; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  margin: 0; padding: 0; border: 0; background: none; color: inherit;
+  font: inherit; letter-spacing: inherit; text-transform: inherit;
+  transition: color var(--dur-fast) var(--ease);
+}
+.projects-card-cat:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+
+.projects-card-body { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4) var(--sp-4) 0; }
+.projects-card-name {
+  display: flex; align-items: baseline; gap: var(--sp-2); color: inherit;
+  font-size: var(--fs-xl); line-height: 1.2; text-wrap: pretty;
+}
+.projects-card-name-text {
+  min-width: 0; overflow: hidden; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; letter-spacing: inherit;
+}
+.projects-card-name-text:hover { text-decoration: underline; text-underline-offset: 3px; }
+.projects-card-pin { flex: none; align-self: center; color: var(--accent-text); }
+.card.is-muted .projects-card-pin { color: inherit; }
+.projects-card-desc {
+  margin-top: calc(-1 * var(--sp-1)); color: var(--text-muted); font-size: var(--fs-md); line-height: 1.55;
+  overflow: hidden; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;
+}
+.projects-card-chips { align-items: center; }
+.projects-card-more { padding: 0 var(--sp-1); color: var(--text-muted); }
+
+/* Trait rows sit at the bottom of the body so rows line up across a grid row. */
+.projects-card-traits { margin-top: auto; }
+.projects-card-traits .kv-row { padding: 5px 0; }
+/* One rule above the block; the rows inside it separate by space alone. */
+.projects-card-traits .kv-row + .kv-row { border-top: 0; }
+.projects-card-traits .kv-row:first-child { padding-top: var(--sp-2); }
+/* Folder row: the front is cut with an ellipsis first, so the folder name at the end stays readable. */
+.projects-path { display: flex; justify-content: flex-end; min-width: 0; }
+.projects-path-head { flex: 0 1000 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.projects-path-tail { flex: 0 1 auto; min-width: 4ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.projects-card-foot { gap: 0; padding: var(--sp-2); }
+.projects-card-open { margin-right: var(--sp-2); padding: 0 var(--sp-3); }
+.projects-card-foot .icon-btn { color: var(--text-muted); }
+.projects-card-foot .icon-btn:hover:not(:disabled) { color: var(--text); }
+.projects-card-foot .icon-btn[aria-pressed="true"] { background: none; color: var(--accent-text); }
+.projects-card-foot-end { display: flex; margin-left: auto; }

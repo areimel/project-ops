@@ -1,0 +1,13 @@
+/* The project edit dialog. Loaded by ProjectDialog.tsx, so any screen that edits a project gets it. Tokens only. */
+
+/* ---- Edit form (.form-grid; these two only differ in columns and the narrow-window fold) ---- */
+.projects-form-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-3); }
+.projects-form-folder {
+  display: flex; align-items: baseline; gap: var(--sp-4); padding-top: var(--sp-3);
+  border-top: var(--line-w) solid var(--line); color: var(--text-muted);
+}
+.projects-form-folder-path { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); font-size: var(--fs-sm); }
+
+@media (max-width: 860px) {
+  .form-grid.projects-form, .projects-form-links, .form-grid.projects-form-site { grid-template-columns: minmax(0, 1fr); }
+}

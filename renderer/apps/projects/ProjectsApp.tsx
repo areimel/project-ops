@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../components/common/Button";
 import { EmptyState } from "../../components/common/EmptyState";
+import { SectionHead } from "../../components/common/SectionHead";
 import { Spinner } from "../../components/common/Spinner";
 import { useAttempt } from "../../hooks/useAttempt";
 import { useLatest } from "../../hooks/useLatest";
@@ -9,10 +10,12 @@ import { useCommandHandlers, useShell, useTitleInfo } from "../../shell/ShellCon
 import { projectCount, scanMessage } from "../../utils/projectText";
 import { ActiveFilters } from "./ActiveFilters";
 import { FilterRail } from "./FilterRail";
-import { categoryValue, includeTag, revealFilters } from "./filterState";
-import { ProjectCard, type CardActions } from "./ProjectCard";
-import { ProjectDialog } from "./ProjectDialog";
-import { allCategories, allTags, pinnedSplit } from "./projectsModel";
+import { revealFilters } from "./filterState";
+import { ProjectCard } from "./ProjectCard";
+import { ProjectDossier } from "./dossier/ProjectDossier";
+import { useProjectActions } from "./useProjectActions";
+import { useProjectEditor } from "./useProjectEditor";
+import { pinnedSplit } from "./projectsModel";
 import type { ProjectView } from "../../../shared/projects/view";
 import { ProjectsToolbar } from "./ProjectsToolbar";
 import { useProjectFilters } from "./useProjectFilters";
@@ -24,21 +27,22 @@ export default function ProjectsApp() {
   const { projects, status } = api;
   const roots = useRoots();
   const scanning = useScanState();
-  const { toast, route } = useShell();
+  const { route } = useShell();
   const attempt = useAttempt();
   const view = useProjectFilters(projects);
   const searchRef = useRef<HTMLInputElement>(null);
-  const [editing, setEditing] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const [profile, setProfile] = useState<string | null>(null);
   const [pendingFocus, setPendingFocus] = useState<string | null>(null);
   const scrolledTo = useRef<string | null>(null);
   const now = useMemo(() => Date.now(), [projects]);
 
   useTitleInfo({ count: status === "ready" ? projectCount(projects.length) : undefined });
 
-  // ---- focus a project: a deep link, or a folder just added ----
-  // The router makes a new route object for every navigation, so opening the same project again refocuses it.
-  useEffect(() => { if (route.view === "app" && route.recordId) setPendingFocus(route.recordId); }, [route]);
+  // ---- a deep link opens the project page; a folder just added is focused in the grid ----
+  // The router makes a new route object for every navigation, so opening the same project again reopens it.
+  useEffect(() => { if (route.view === "app") setProfile(route.recordId ?? null); }, [route]);
+  const back = () => { const id = profile; setProfile(null); if (id) setPendingFocus(id); };
   const latestFilters = useLatest(view.filters);
   useEffect(() => {
     if (!pendingFocus || status !== "ready") return;
@@ -49,31 +53,20 @@ export default function ProjectsApp() {
     setSelected(pendingFocus);
     setPendingFocus(null);
   }, [pendingFocus, projects, status]);
+  // The grid is unmounted while a dossier shows, so coming back always scrolls (and focuses) the card again.
   useEffect(() => {
+    if (profile) { scrolledTo.current = null; return; }
     if (!selected || scrolledTo.current === selected) return;
     const el = document.querySelector(`[data-project-id="${selected}"]`);
     if (!el) return;
     scrolledTo.current = selected;
     el.scrollIntoView({ block: "center" });
-  }, [selected, view.results]);
+    el.querySelector<HTMLElement>(".projects-card-name-text")?.focus({ preventScroll: true });
+  }, [selected, view.results, profile]);
 
   // ---- actions ----
-  const latest = useLatest({ projects, api, view, attempt });
-  const actions = useMemo<CardActions>(() => {
-    const find = (id: string) => latest.current.projects.find((p) => p.id === id);
-    return {
-      open: (id, target) => void latest.current.attempt(() => latest.current.api.open(id, target)),
-      openLink: (id, key) => void latest.current.attempt(() => latest.current.api.openLink(id, key)),
-      copyPath: (id) => void latest.current.attempt(() => latest.current.api.copyPath(id), "Path copied"),
-      togglePin: (id) => {
-        const p = find(id);
-        if (p) void latest.current.attempt(() => latest.current.api.update(id, { pinned: !p.pinned }), p.pinned ? "Unpinned" : "Pinned");
-      },
-      edit: (id) => setEditing(id),
-      filterTag: (tag) => latest.current.view.setFilters((f) => includeTag(f, tag)),
-      filterCategory: (c) => latest.current.view.setFilters((f) => ({ ...f, category: categoryValue(c) })),
-    };
-  }, [latest]);
+  const editor = useProjectEditor({ api, attempt });
+  const actions = useProjectActions({ api, attempt, edit: editor.edit, show: setProfile, filter: view.setFilters });
 
   const addFolder = () => void attempt(api.addFolder, (r) => {
     if (r) setPendingFocus(r.id);
@@ -81,27 +74,18 @@ export default function ProjectsApp() {
   });
   const addRoot = () => void attempt(roots.add, (r) => (r ? `Added ${r.folder}` : null));
   const rescan = () => { if (!scanning) void attempt(api.scan, scanMessage); };
-  const remove = (id: string) => {
-    const p = projects.find((x) => x.id === id);
-    setEditing(null);
-    void attempt(() => api.remove(id)).then((ok) => {
-      if (ok) toast("info", `Removed ${p?.name ?? "project"}`, { label: "Undo", run: () => void attempt(() => api.restore(id), "Restored") });
-    });
-  };
-
   useCommandHandlers({
     "projects.search": () => { searchRef.current?.focus(); searchRef.current?.select(); },
     "projects.add-folder": addFolder,
     "projects.rescan": rescan,
+    ...(profile ? { "projects.back": back } : {}),
     ...(view.filtered ? { "projects.clear-filters": view.clear } : {}),
   });
 
-  const editingProject = editing ? projects.find((p) => p.id === editing) ?? null : null;
-  const categories = useMemo(() => allCategories(projects), [projects]);
-  const tags = useMemo(() => allTags(projects), [projects]);
+  const dialog = editor.dialog;
   const split = pinnedSplit(view.results);
   const grid = (list: readonly ProjectView[], label: string) => (
-    <ul className="projects-grid" aria-label={label}>
+    <ul className="card-grid projects-grid" aria-label={label}>
       {list.map((p) => <ProjectCard key={p.id} project={p} selected={p.id === selected} now={now} actions={actions} />)}
     </ul>
   );
@@ -122,10 +106,19 @@ export default function ProjectsApp() {
       <div className="app-root projects projects-center">
         <EmptyState icon="folder" title="No projects yet"
           body="Add a folder that holds your projects and each one inside it is listed here. Or add a single project folder."
-          action={<div className="projects-empty-actions">
+          action={<div className="btn-row projects-empty-actions">
             <Button variant="primary" icon="plus" onClick={addRoot}>Add a scan folder</Button>
             <Button variant="quiet" onClick={addFolder}>Add one folder</Button>
           </div>} />
+      </div>
+    );
+  }
+
+  if (profile) {
+    return (
+      <div className="app-root projects projects-dossier-root">
+        <ProjectDossier project={projects.find((p) => p.id === profile) ?? null} now={now} actions={actions} onBack={back} />
+        {dialog}
       </div>
     );
   }
@@ -138,23 +131,19 @@ export default function ProjectsApp() {
           sort={view.sort} onSort={view.setSort} shown={view.results.length} total={projects.length}
           scanning={scanning} onAddFolder={addFolder} onRescan={rescan} />
         <ActiveFilters filters={view.filters} onChange={view.setFilters} onClear={view.clear} />
-        <div className="projects-scroll">
+        <div className="scroll-area projects-scroll">
           {view.results.length === 0 ? (
             <EmptyState icon="filter" title="No projects match" body="Nothing fits the search and filters you have set."
               action={<Button variant="quiet" icon="close" onClick={view.clear}>Clear filters</Button>} />
           ) : split > 0 ? (<>
-            <h2 className="kicker projects-group">Pinned</h2>
+            <SectionHead title="Pinned" className="projects-group" />
             {grid(view.results.slice(0, split), "Pinned projects")}
-            <h2 className="kicker projects-group">Other projects</h2>
+            <SectionHead title="Other projects" className="projects-group" />
             {grid(view.results.slice(split), "Other projects")}
           </>) : grid(view.results, "Projects")}
         </div>
       </div>
-      {editingProject && (
-        <ProjectDialog key={editingProject.id} project={editingProject} categories={categories} tags={tags}
-          onClose={() => setEditing(null)} onRemove={() => remove(editingProject.id)}
-          onSave={(patch) => attempt(() => api.update(editingProject.id, patch), "Saved")} />
-      )}
+      {dialog}
     </div>
   );
 }

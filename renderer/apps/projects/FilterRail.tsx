@@ -3,6 +3,7 @@ import type { ProjectStatus } from "../../../shared/projects/record";
 import { Badge } from "../../components/common/Badge";
 import { Button } from "../../components/common/Button";
 import { Icon } from "../../components/common/Icon";
+import { SectionHead } from "../../components/common/SectionHead";
 import { cx } from "../../utils/cx";
 import { stackLabel } from "./cardModel";
 import { cycleTag, visibleTags } from "./filterState";
@@ -27,7 +28,7 @@ function tagTitle(t: Facet): string {
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="projects-rail-group" aria-label={title}>
-      <h2 className="kicker projects-rail-title">{title}</h2>
+      <SectionHead title={title} className="projects-rail-title" />
       {children}
     </section>
   );
@@ -85,12 +86,12 @@ export function FilterRail({ facets, filters, filtered, onChange, onClear }: Pro
         </Group>
 
         {facets.tags.length === 0 && !facets.tagsExist ? (
-          <Group title="Tags"><p className="projects-rail-hint">No tags yet. Edit a project to add some.</p></Group>
+          <Group title="Tags"><p className="hint">No tags yet. Edit a project to add some.</p></Group>
         ) : facets.tags.length > 0 && (
           <Group title="Tags">
-            <div className="projects-chips">
+            <div className="chip-row">
               {tags.shown.map((t) => (
-                <Badge key={t.value} className="projects-tag" count={t.count} pressed={t.selected} excluded={t.excluded} title={tagTitle(t)}
+                <Badge key={t.value} variant="tag" count={t.count} pressed={t.selected} excluded={t.excluded} title={tagTitle(t)}
                   onClick={() => onChange((f) => cycleTag(f, t.value))}>{t.label}</Badge>
               ))}
             </div>
@@ -104,7 +105,7 @@ export function FilterRail({ facets, filters, filtered, onChange, onClear }: Pro
 
         {facets.stack.length > 0 && (
           <Group title="Stack">
-            <div className="projects-chips">
+            <div className="chip-row">
               {facets.stack.map((s) => (
                 <Badge key={s.value} count={s.count} pressed={s.selected}
                   onClick={() => onChange((f) => ({ ...f, stack: toggle(f.stack, s.value) }))}>{stackLabel(s.label)}</Badge>

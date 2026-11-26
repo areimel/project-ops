@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { emptyScan, type ProjectFields } from "../../shared/projects/record";
+import { emptyScan, emptySite, type ProjectFields } from "../../shared/projects/record";
 import type { ProjectRecord } from "../../shared/projects/view";
 import type { GitInfo } from "../../electron/features/gitInfoCore";
 import { mergeScan, type FoundProject } from "../../electron/features/projectScanCore";
@@ -18,7 +18,7 @@ function rec(over: Partial<ProjectFields> = {}): ProjectRecord {
     id: n.toString(16).padStart(16, "0"), createdAt: 1, updatedAt: 1,
     path: `/p/${n}`, origin: "scan", rootId: R1, missing: false, hidden: false,
     name: null, description: null, category: "", tags: [], status: "active", pinned: false,
-    links: { repo: null, site: null, docs: null }, lastOpenedAt: null, scan: emptyScan(), ...over,
+    site: emptySite(), links: { repo: null, site: null, docs: null }, lastOpenedAt: null, scan: emptyScan(), ...over,
   };
 }
 const found = (path: string, rootId = R1): FoundProject => ({ path, rootId, categoryHint: "", scan: { name: "x", description: null, stack: [] } });

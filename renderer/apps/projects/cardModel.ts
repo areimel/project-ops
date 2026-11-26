@@ -1,5 +1,6 @@
 // What a project card shows, decided once: status light, tag cap, stack labels, trait rows, folder split.
 // Pure: no React, no DOM.
+import { PROJECT_LINK_KEYS, type ProjectLinkKey } from "../../../shared/projects/record";
 import type { StatusTone } from "../../components/common/StatusDot";
 import type { ProjectView } from "../../../shared/projects/view";
 
@@ -61,3 +62,17 @@ export function splitFolder(folder: string): { head: string; tail: string } {
   const i = Math.max(folder.lastIndexOf("/"), folder.lastIndexOf("\\"));
   return i < 0 || i === folder.length - 1 ? { head: "", tail: folder } : { head: folder.slice(0, i + 1), tail: folder.slice(i + 1) };
 }
+
+/** Link buttons on the card and the dossier. (The edit dialog words its fields differently.) */
+export const LINK_LABELS: Record<ProjectLinkKey, string> = { repo: "Repo", site: "Site", docs: "Docs" };
+
+/** The link keys a project has, in the fixed order repo, site, docs. */
+export const linkKeys = (p: Pick<ProjectView, "links">): ProjectLinkKey[] => PROJECT_LINK_KEYS.filter((k) => p.links[k] !== null);
+
+/** The tooltip for the Branch row: the branch, with a note when the work tree has uncommitted changes. */
+export const branchTitle = (p: Pick<ProjectView, "branch" | "dirty">): string | undefined =>
+  p.dirty ? `${p.branch ?? "No branch"}: uncommitted changes` : p.branch ?? undefined;
+
+/** The tooltip for the Last commit row: the exact time when it was read, else why it was not. */
+export const lastCommitTitle = (p: Pick<ProjectView, "branch" | "lastCommitAt">): string =>
+  gitInfo(p) === "read" ? new Date(p.lastCommitAt!).toLocaleString() : GIT_UNREAD_NOTE;

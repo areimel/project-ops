@@ -13,28 +13,31 @@ interface Props {
   children: ReactNode;
   footer?: ReactNode;
   size?: "sm" | "md" | "lg";
+  /** Show the dialog in normal flow (the styleguide): no backdrop, no aria-modal, no focus move or trap, never dismisses itself. */
+  inline?: boolean;
 }
 
 /**
  * Modal dialog. On open, focus goes to `[data-autofocus]`, else the first control in the body or footer,
  * else the close button. Tab stays inside, Escape and the backdrop close it, focus goes back on close.
  */
-export function Dialog({ title, onClose, children, footer, size = "md" }: Props) {
+export function Dialog({ title, onClose, children, footer, size = "md", inline = false }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
-  useDismiss(ref, () => onClose(), { outside: false });
+  useDismiss(ref, () => onClose(), { outside: false, enabled: !inline });
 
   useEffect(() => {
+    if (inline) return;
     const returnTo = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const root = ref.current!;
     const inContent = [...root.querySelectorAll<HTMLElement>(".dialog-body, .dialog-foot")].flatMap(focusables);
     const target = root.querySelector<HTMLElement>("[data-autofocus]") ?? inContent[0] ?? focusables(root)[0] ?? root;
     target.focus();
     return () => { if (returnTo?.isConnected) returnTo.focus(); };
-  }, []);
+  }, [inline]);
 
   const trap = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key !== "Tab") return;
+    if (inline || e.key !== "Tab") return;
     const list = focusables(e.currentTarget);
     if (!list.length) { e.preventDefault(); return; }
     const [first, last] = [list[0], list[list.length - 1]];
@@ -43,8 +46,8 @@ export function Dialog({ title, onClose, children, footer, size = "md" }: Props)
   };
 
   return (
-    <div className="dialog-backdrop" onPointerDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div ref={ref} className={`dialog dialog-${size}`} role="dialog" aria-modal="true" aria-labelledby={titleId}
+    <div className={`dialog-backdrop${inline ? " is-inline" : ""}`} onPointerDown={(e) => { if (!inline && e.target === e.currentTarget) onClose(); }}>
+      <div ref={ref} className={`dialog dialog-${size}`} role="dialog" aria-modal={inline ? undefined : true} aria-labelledby={titleId}
         tabIndex={-1} onKeyDown={trap}>
         <div className="dialog-head">
           <h2 id={titleId} className="dialog-title">{title}</h2>
@@ -60,10 +63,10 @@ export function Dialog({ title, onClose, children, footer, size = "md" }: Props)
 /** A yes/no question. Cancel comes first in the footer and so takes the initial focus. */
 export function ConfirmDialog(p: {
   title: string; body?: string; confirmLabel: string; cancelLabel?: string; danger?: boolean;
-  onConfirm(): void; onCancel(): void;
+  onConfirm(): void; onCancel(): void; inline?: boolean;
 }) {
   return (
-    <Dialog title={p.title} size="sm" onClose={p.onCancel}
+    <Dialog title={p.title} size="sm" onClose={p.onCancel} inline={p.inline}
       footer={<>
         <Button variant="quiet" onClick={p.onCancel}>{p.cancelLabel ?? "Cancel"}</Button>
         <Button variant={p.danger ? "danger" : "primary"} onClick={p.onConfirm}>{p.confirmLabel}</Button>
